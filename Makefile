@@ -43,10 +43,7 @@ ${VAULT_FILE}: ${VAULT_PASS_FILE}
 
 # Linting
 YAML_FILES=$(shell find ansible/ -name '*.yml' -not -name '*vault*')
-
-# Ansible Lint skip list (https://ansible-lint.readthedocs.io/en/latest/default_rules.html)
-# [701] - "No 'galaxy_info' found (in role)"
-ANSIBLE_LINT_SKIP_LIST=701
+SKIP_FILE=./.lint-vars.sh
 
 # Targets
 deploy: ${ANSIBLE} ${VAULT_FILE}
@@ -58,8 +55,8 @@ check: ${ANSIBLE} ${VAULT_FILE}
 vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 	${ANSIBLE_VAULT} edit --vault-password-file ${VAULT_PASS_FILE} ${VAULT_FILE}
 
-lint: ${LINT_YAML} ${LINT_ANSIBLE}
+lint: ${LINT_YAML} ${LINT_ANSIBLE} ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	-@${LINT_YAML} ${YAML_FILES}
-	@printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "${ANSIBLE_LINT_SKIP_LIST}"
-	-@${LINT_ANSIBLE} -x ${ANSIBLE_LINT_SKIP_LIST} ${YAML_FILES}
+	@. ${SKIP_FILE}; printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "$$ANSIBLE_LINT_SKIP_LIST"
+	-@. ${SKIP_FILE}; ${LINT_ANSIBLE} -x $$ANSIBLE_LINT_SKIP_LIST ${YAML_FILES}

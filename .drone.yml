@@ -8,8 +8,9 @@ platform:
 
 steps:
   - name: lint
-    image: cytopia/ansible-lint
+    image: bdebyl/yamllint
     command:
       - export YML_FILES="$(find ansible/ -name '*.yml' -not -name '*vault*')"
-      - ansible-lint -x 701 "$YML_FILES"
+      - . .lint-vars.sh
+      - ansible-lint -x "$ANSIBLE_LINT_SKIP_LIST" "$YML_FILES"
       - yamllint "$YML_FILES"
