@@ -1,0 +1,10 @@
+---
+deps: [
+  docker,
+  fail2ban
+]
+
+fail2ban_jails: [
+  sshd.local,
+  nginx.local
+]

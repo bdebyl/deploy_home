@@ -1,0 +1,17 @@
+---
+- name: Create Drone CI container
+  community.general.docker_container:
+    name: drone
+    image: drone/drone
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    env:
+      DRONE_GITHUB_CLIENT_ID: {{ drone_gh_client_id }}
+      DRONE_GITHUB_CLIENT_SECRET: {{ drone_gh_client_sec }}
+      DRONE_RPC_SECRET: {{ drone_rpc_secret }}
+      DRONE_SERVER_HOST: {{ ci_server_name }}
+      DRONE_SERVER_PROTO: {{ drone_server_proto }}
+      DRONE_GIT_ALWAYS_AUTH: 'true'
+      DRONE_USER_FILTER: {{ drone_user_filter }}
+

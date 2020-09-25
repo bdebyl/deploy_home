@@ -1,0 +1,31 @@
+---
+- name: ensure sshd disallows passwords
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.re }}"
+    line: "{{ item.li }}"
+  with_items:
+    - {re: '^[# ]*PasswordAuthentication ', li: 'PasswordAuthentication no'}
+    - {re: '^[# ]*PermitEmptyPasswords ', li: 'PermitEmptyPasswords no'}
+    - {re: '^[# ]*PermitRootLogin ', li: 'PermitRootLogin no'}
+  notify: restart_sshd
+  tags: security
+
+- name: setup fail2ban jails
+  become: true
+  copy:
+    src: files/fail2ban/jails/{{ item }}
+    dest: /etc/fail2ban/jail.d/{{ item }}
+  with_items: "{{ fail2ban_jails }}"
+  notify: restart_fail2ban
+  tags: security
+
+- name: adjust fail2ban sshd filter
+  become: true
+  lineinfile:
+    path: /etc/fail2ban/filter.d/sshd.conf
+    regexp: '^[#]*filter ='
+    line: 'filter = sshd[mode=extra]'
+  notify: restart_fail2ban
+  tags: security

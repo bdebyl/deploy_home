@@ -1,0 +1,10 @@
+---
+- cron: renew certbot ssl certificate weekly
+  cron:
+    name: ci_bdebyl_net_renewal
+    special_time: weekly
+    job: |
+      certbot --renew certonly --webroot --webroot-path=/srv/http \
+      -m {{ ci_server_email }} --agree-tos \
+      -d {{ ci_server_name }}
+  tags: never

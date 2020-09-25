@@ -1,0 +1,9 @@
+---
+ci_server_email: bastian@bdebyl.net
+ci_server_name: ci.bdebyl.net
+
+deps: [
+  certbot,
+  certbot-nginx,
+  nginx
+]

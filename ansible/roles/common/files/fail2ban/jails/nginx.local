@@ -1,0 +1,20 @@
+[nginx-limit-req]
+enabled = true
+port = http,https
+findtime = 600
+bantime = 1w
+maxretry = 8
+
+[nginx-http-auth]
+enabled = true
+port = http,https
+logpath = %(nginx_error_log)s
+bantime = 2w
+maxretry = 5
+
+[nginx-botsearch]
+enabled = true
+port = http,https
+logpath = %(nginx_error_log)s
+bantime = 1w
+maxretry = 5

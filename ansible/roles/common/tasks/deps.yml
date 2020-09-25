@@ -1,0 +1,7 @@
+---
+- name: install common dependencies
+  become: true
+  pacman:
+    name: "{{ deps }}"
+    state: present
+  tags: deps

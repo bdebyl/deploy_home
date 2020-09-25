@@ -1,0 +1,56 @@
+---
+- name: setup nginx base configuration
+  become: true
+  copy:
+    src: files/nginx/nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify: restart_nginx
+  tags: http
+
+- name: setup nginx directories
+  become: true
+  file:
+    path: "/etc/nginx/{{ item }}"
+    state: directory
+  with_items:
+    - sites-enabled
+    - sites-available
+  tags: http
+
+- name: chown http user home
+  become: true
+  file:
+    path: /srv/http
+    owner: http
+    group: http
+    recurse: true
+  tags: http
+
+- name: touch nginx logs, enable jail
+  become: true
+  file:
+    path: "/var/log/nginx/error.log"
+    state: file
+  notify: restart_fail2ban
+  tags: http, security
+
+- name: template nginx http sites-available
+  become: true
+  template:
+    src: "templates/nginx/sites/{{ item }}.j2"
+    dest: "/etc/nginx/sites-available/{{ item }}"
+  with_items:
+    - "{{ ci_server_name }}.http.conf"
+  notify: restart_nginx
+  tags: http
+
+- name: enable desired nginx http sites
+  become: true
+  file:
+    src: "/etc/nginx/sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-enabled/{{ item }}"
+    state: link
+  with_items:
+    - "{{ ci_server_name }}.http.conf"
+  notify: restart_nginx
+  tags: http
