@@ -1,3 +1,9 @@
+#               __       ____ __
+#   __ _  ___ _/ /_____ / _(_) /__
+#  /  ' \/ _ `/  '_/ -_) _/ / / -_)
+# /_/_/_/\_,_/_/\_\\__/_//_/_/\__/
+#
+# Author: bdebyl (Bastian de Byl)
 all: lint
 
 # Default to all ansible tags to run (passed via 'make deploy TAGS=sometag')
@@ -35,9 +41,10 @@ ${VAULT_PASS_FILE}: ${ANSIBLE}
 ${VAULT_FILE}: ${VAULT_PASS_FILE}
 	${ANSIBLE_VAULT} create --vault-password-file ${VAULT_PASS_FILE} $@
 
+# Linting
 YAML_FILES=$(shell find ansible/ -name '*.yml' -not -name '*vault*')
 
-# Ansible Lint skip list:
+# Ansible Lint skip list (https://ansible-lint.readthedocs.io/en/latest/default_rules.html)
 # [701] - "No 'galaxy_info' found (in role)"
 ANSIBLE_LINT_SKIP_LIST=701
 
