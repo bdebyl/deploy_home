@@ -8,6 +8,9 @@ server {
   server_name {{ ci_server_name }};
 
   add_header              Strict-Transport-Security max-age=6307200;
+  add_header              Allow "GET, POST, HEAD" always;
+
+  limit_except GET POST { deny all; }
 
   ssl_certificate         /etc/letsencrypt/live/{{ ci_server_name }}/fullchain.pem;
   ssl_certificate_key     /etc/letsencrypt/live/{{ ci_server_name }}/privkey.pem;
