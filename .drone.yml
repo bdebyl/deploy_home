@@ -8,4 +8,8 @@ platform:
 
 steps:
   - name: lint
-    image: bdebyl/python-make
+    image: cytopia/ansible-lint
+    command:
+      - export YML_FILES="$(find ansible/ -name '*.yml' -not -name '*vault*')"
+      - ansible-lint -x 701 "$YML_FILES"
+      - yamllint "$YML_FILES"
