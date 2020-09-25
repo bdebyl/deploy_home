@@ -4,6 +4,7 @@
   copy:
     src: files/nginx/nginx.conf
     dest: /etc/nginx/nginx.conf
+    mode: 0644
   notify: restart_nginx
   tags: http
 
@@ -12,6 +13,7 @@
   file:
     path: "/etc/nginx/{{ item }}"
     state: directory
+    mode: 0644
   with_items:
     - sites-enabled
     - sites-available
@@ -31,6 +33,7 @@
   file:
     path: "/var/log/nginx/error.log"
     state: file
+    mode: 0644
   notify: restart_fail2ban
   tags: http, security
 
@@ -39,6 +42,7 @@
   template:
     src: "templates/nginx/sites/{{ item }}.j2"
     dest: "/etc/nginx/sites-available/{{ item }}"
+    mode: 0644
   with_items:
     - "{{ ci_server_name }}.http.conf"
   notify: restart_nginx

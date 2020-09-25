@@ -35,6 +35,12 @@ ${VAULT_PASS_FILE}: ${ANSIBLE}
 ${VAULT_FILE}: ${VAULT_PASS_FILE}
 	${ANSIBLE_VAULT} create --vault-password-file ${VAULT_PASS_FILE} $@
 
+YAML_FILES=$(shell find ansible/ -name '*.yml' -not -name '*vault*')
+
+# Ansible Lint skip list:
+# [701] - "No 'galaxy_info' found (in role)"
+ANSIBLE_LINT_SKIP_LIST=701
+
 # Targets
 deploy: ${ANSIBLE} ${VAULT_FILE}
 	${ANSIBLE} --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
@@ -46,5 +52,7 @@ vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 	${ANSIBLE_VAULT} edit --vault-password-file ${VAULT_PASS_FILE} ${VAULT_FILE}
 
 lint: ${LINT_YAML} ${LINT_ANSIBLE}
-	${LINT_YAML} ansible/
-	${LINT_ANSIBLE} ansible/
+	@printf "Running yamllint...\n"
+	-@${LINT_YAML} ${YAML_FILES}
+	@printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "${ANSIBLE_LINT_SKIP_LIST}"
+	-@${LINT_ANSIBLE} -x ${ANSIBLE_LINT_SKIP_LIST} ${YAML_FILES}
