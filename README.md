@@ -6,6 +6,8 @@ Just as Dorothy managed the simple task of clicking her heels together, the
 desire for an equally simple one-button push deployment was in my heart. Thus,
 this repository was made.
 
+[![Build Status](https://ci.bdebyl.net/api/badges/bdebyl/deploy_home/status.svg)](https://ci.bdebyl.net/bdebyl/deploy_home)
+
 ## Ansible
 Ansible, along with double-encrypted secrets, deploys the necessary
 configurations to make the home fit for certain needs and desires. Namely,
