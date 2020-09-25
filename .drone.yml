@@ -10,7 +10,7 @@ steps:
   - name: lint
     image: bdebyl/yamllint
     command:
-      - export YML_FILES="$(find ansible/ -name '*.yml' -not -name '*vault*')"
-      - . .lint-vars.sh
+      - export YML_FILES="$(find $PWD/ansible/ -name '*.yml' -not -name '*vault*')"
+      - source "$PWD/.lint-vars.sh"
       - ansible-lint -x "$ANSIBLE_LINT_SKIP_LIST" "$YML_FILES"
       - yamllint "$YML_FILES"
