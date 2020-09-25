@@ -1,1 +1,2 @@
 .pass.sh filter=git-crypt diff=git-crypt
+ansible/vars/vault.yml filter=git-crypt diff=git-crypt

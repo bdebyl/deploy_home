@@ -1,0 +1,43 @@
+---
+- name: create drone-ci server container
+  diff: false
+  docker_container:
+    name: drone
+    image: drone/drone:latest
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    env:
+      DRONE_GITHUB_CLIENT_ID: "{{ drone_gh_client_id }}"
+      DRONE_GITHUB_CLIENT_SECRET: "{{ drone_gh_client_sec }}"
+      DRONE_GIT_ALWAYS_AUTH: 'true'
+      DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
+      DRONE_SERVER_HOST: "{{ ci_server_name }}"
+      DRONE_SERVER_PROTO: "{{ drone_server_proto }}"
+      DRONE_USER_FILTER: "{{ drone_user_filter }}"
+    volumes:
+      - /var/lib/drone:/data
+    ports:
+      - "8080:80"
+  tags: drone
+
+- name: create drone-ci worker container
+  diff: false
+  docker_container:
+    name: drone-runner
+    image: drone/drone-runner-docker:latest
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    env:
+      DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
+      DRONE_RPC_HOST: "{{ ci_server_name }}"
+      DRONE_RPC_PROTO: "{{ drone_server_proto }}"
+      DRONE_RUNNER_CAPACITY: "{{ drone_runner_capacity }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
+  tags: drone

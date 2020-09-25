@@ -1,10 +1,9 @@
 ---
-- cron: renew certbot ssl certificate weekly
+- name: renew certbot ssl certificates weekly
+  become: true
   cron:
-    name: ci_bdebyl_net_renewal
+    name: certbot_renew
     special_time: weekly
     job: |
-      certbot --renew certonly --webroot --webroot-path=/srv/http \
-      -m {{ ci_server_email }} --agree-tos \
-      -d {{ ci_server_name }}
-  tags: never
+      certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx"
+  tags: cron

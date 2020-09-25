@@ -2,3 +2,4 @@
 - import_tasks: deps.yml
 - import_tasks: http.yml
 - import_tasks: ssl.yml
+- import_tasks: cron.yml

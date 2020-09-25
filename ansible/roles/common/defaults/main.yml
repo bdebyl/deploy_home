@@ -1,7 +1,8 @@
 ---
 deps: [
   docker,
-  fail2ban
+  fail2ban,
+  python-docker
 ]
 
 fail2ban_jails: [

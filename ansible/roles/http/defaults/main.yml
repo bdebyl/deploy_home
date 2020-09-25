@@ -4,6 +4,5 @@ ci_server_name: ci.bdebyl.net
 
 deps: [
   certbot,
-  certbot-nginx,
   nginx
 ]
