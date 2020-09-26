@@ -11,8 +11,3 @@ steps:
     image: bdebyl/yamllint
     command:
       - make lint-ci
-
-trigger:
-  event:
-    - pull_request
-    - push
