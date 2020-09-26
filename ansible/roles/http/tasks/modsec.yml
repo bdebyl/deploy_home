@@ -1,0 +1,51 @@
+---
+- name: create nginx/conf directory
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "{{ nginx_conf_dir }}"
+    - "{{ modsec_rules_dir }}"
+  tags: modsec
+
+- name: create modsec_includes.conf
+  become: true
+  copy:
+    src: files/nginx/modsec_includes.conf
+    dest: "{{ nginx_dir }}/modsec_includes.conf"
+    mode: 0644
+  notify: restart_nginx
+  tags: modsec
+
+- name: fetch core rule set files for mod-security
+  become: true
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - {"url": "{{ modsec_conf_url }}",
+       "dest": "{{ nginx_dir }}/modsecurity.conf"}
+    - {"url": "{{ modsec_unicode_url }}",
+       "dest": "{{ nginx_dir }}/unicode.mapping"}
+    - {"url": "{{ crs_setup_url }}",
+       "dest": "{{ nginx_conf_dir }}/crs-setup.conf"}
+    - {"url": "{{ crs_before_url }}",
+       "dest": "{{ modsec_crs_before_rule_conf }}"}
+    - {"url": "{{ crs_after_url }}",
+       "dest": "{{ modsec_crs_after_rule_conf }}"}
+  notify: restart_nginx
+  tags: modsec
+
+- name: activate mod-security
+  become: true
+  lineinfile:
+    path: /etc/nginx/modsecurity.conf
+    regexp: '^SecRuleEngine'
+    line: 'SecRuleEngine On'
+  notify: restart_nginx
+  tags: modsec

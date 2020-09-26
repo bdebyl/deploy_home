@@ -1,8 +1,31 @@
 ---
-ci_server_email: bastian@bdebyl.net
-ci_server_name: ci.bdebyl.net
-
 deps: [
   certbot,
-  nginx
+  nginx,
+  nginx-mod-modsecurity
 ]
+
+nginx_dir: /etc/nginx
+nginx_conf_dir: "{{ nginx_dir }}/conf"
+modsec_rules_dir: "{{ nginx_conf_dir }}/rules"
+modsec_crs_before_rule_conf:
+  "{{ modsec_rules_dir }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
+modsec_crs_after_rule_conf:
+  "{{ modsec_rules_dir }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
+
+ci_server_name: ci.bdebyl.net
+
+modsec_conf_url:
+  https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommended
+
+modsec_unicode_url:
+  https://github.com/SpiderLabs/ModSecurity/raw/v3/master/unicode.mapping
+
+crs_setup_url:
+  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/crs-setup.conf.example
+
+crs_before_url:
+  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example
+
+crs_after_url:
+  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example
