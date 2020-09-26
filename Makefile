@@ -39,7 +39,10 @@ ${VAULT_PASS_FILE}: ${ANSIBLE}
 	. ${PASS_SRC}; pass $$PASS_LOC > $@
 
 ${VAULT_FILE}: ${VAULT_PASS_FILE}
-	${ANSIBLE_VAULT} create --vault-password-file ${VAULT_PASS_FILE} $@
+	if [ ! -e "${VAULT_FILE}" ]; then \
+		${ANSIBLE_VAULT} create --vault-password-file ${VAULT_PASS_FILE} $@; \
+	fi
+	touch $@
 
 # Linting
 YAML_FILES=$(shell find ansible/ -name '*.yml' -not -name '*vault*')
