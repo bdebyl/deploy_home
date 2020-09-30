@@ -1,3 +1,4 @@
+---
 kind: pipeline
 type: docker
 name: default
@@ -11,3 +12,13 @@ steps:
     image: bdebyl/yamllint
     command:
       - make lint-ci
+
+trigger:
+  event:
+    exclude:
+    - pull_request
+---
+kind: signature
+hmac: 4280c0f368f066e7c24573ae80777b3a7f8f6483a643f7843388a50529379c71
+
+...
