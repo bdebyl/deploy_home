@@ -4,5 +4,6 @@
   - vars/vault.yml
   roles:
   - role: common
+  - role: ssl
   - role: http
   - role: drone

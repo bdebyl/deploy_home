@@ -1,0 +1,22 @@
+---
+- name: template nginx https sites-available
+  become: true
+  template:
+    src: "templates/nginx/sites/{{ item }}.j2"
+    dest: "/etc/nginx/sites-available/{{ item }}"
+    mode: 0644
+  with_items:
+    - "{{ ci_server_name }}.https.conf"
+  tags: https
+
+- name: enable desired nginx https sites
+  become: true
+  file:
+    src: "/etc/nginx/sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-enabled/{{ item }}"
+    state: link
+  with_items:
+    - "{{ ci_server_name }}.https.conf"
+  notify: restart_nginx
+  when: stat_result.stat.exists
+  tags: https
