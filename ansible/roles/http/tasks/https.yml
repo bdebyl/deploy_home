@@ -1,5 +1,4 @@
 ---
-
 - name: template nginx https sites-available
   become: true
   template:
