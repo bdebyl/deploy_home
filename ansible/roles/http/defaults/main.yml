@@ -5,27 +5,131 @@ deps: [
   nginx-mod-modsecurity
 ]
 
-nginx_dir: /etc/nginx
-nginx_conf_dir: "{{ nginx_dir }}/conf"
-modsec_rules_dir: "{{ nginx_conf_dir }}/rules"
-modsec_crs_before_rule_conf:
-  "{{ modsec_rules_dir }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
-modsec_crs_after_rule_conf:
-  "{{ modsec_rules_dir }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
-
 ci_server_name: ci.bdebyl.net
+install_path: /usr/share
 
-modsec_conf_url:
-  https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommended
+nginx_path: /etc/nginx
+nginx_conf_path: "{{ nginx_path }}/conf"
+modsec_rules_path: "{{ nginx_conf_path }}/rules"
+modsec_crs_before_rule_conf:
+  "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
+modsec_crs_after_rule_conf:
+  "{{ modsec_rules_path }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
+modsec_path: "{{ install_path }}/modsecurity"
+crs_path: "{{ install_path }}/coreruleset"
+crs_rules_path: "{{ crs_path }}/rules"
 
-modsec_unicode_url:
-  https://github.com/SpiderLabs/ModSecurity/raw/v3/master/unicode.mapping
+modsec_whitelist_local_re: >-
+  ^SecRule.*REMOTE_ADDR.*192\.168\.1\.1/24.*$
 
-crs_setup_url:
-  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/crs-setup.conf.example
+modsec_whitelist_local: >-
+  SecRule REMOTE_ADDR "@ipMatch 192.168.1.1/24"
+  "id:1,phase:1,nolog,allow,ctl:ruleEngine=Off"
 
-crs_before_url:
-  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example
+modsec_git_urls:
+  - src: "https://github.com/coreruleset/coreruleset.git"
+    dest: "{{ crs_path }}"
+    ver: "v3.3.0"
+  - src: "https://github.com/SpiderLabs/ModSecurity.git"
+    dest: "{{ modsec_path }}"
+    ver: "v3.0.4"
 
-crs_after_url:
-  https://github.com/coreruleset/coreruleset/raw/v3.4/dev/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example
+modsec_conf_links:
+  - src: "{{ modsec_path }}/modsecurity.conf-recommended"
+    dest: "{{ nginx_path }}/modsecurity.conf"
+  - src: "{{ modsec_path }}/unicode.mapping"
+    dest: "{{ nginx_path }}/unicode.mapping"
+  - src: "{{ crs_path }}/crs-setup.conf.example"
+    dest: "{{ nginx_conf_path }}/crs-setup.conf"
+  - src:
+      "{{ crs_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example"
+    dest: "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
+  - src:
+      "{{ crs_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example"
+    dest: "{{ modsec_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf"
+
+crs_rule_links:
+  - name: REQUEST-901-INITIALIZATION
+    enabled: true
+  - name: REQUEST-903.9001-DRUPAL-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-903.9003-NEXTCLOUD-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-903.9004-DOKUWIKI-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-903.9005-CPANEL-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-903.9006-XENFORO-EXCLUSION-RULES
+    enabled: true
+  - name: REQUEST-905-COMMON-EXCEPTIONS
+    enabled: true
+  - name: REQUEST-910-IP-REPUTATION
+    enabled: true
+  - name: REQUEST-911-METHOD-ENFORCEMENT
+    enabled: true
+  - name: REQUEST-912-DOS-PROTECTION
+    enabled: true
+  - name: REQUEST-913-SCANNER-DETECTION
+    enabled: true
+  - name: REQUEST-920-PROTOCOL-ENFORCEMENT
+    enabled: true
+  - name: REQUEST-921-PROTOCOL-ATTACK
+    enabled: true
+  - name: REQUEST-930-APPLICATION-ATTACK-LFI
+    enabled: true
+  - name: REQUEST-931-APPLICATION-ATTACK-RFI
+    enabled: true
+  - name: REQUEST-932-APPLICATION-ATTACK-RCE
+    enabled: true
+  - name: REQUEST-933-APPLICATION-ATTACK-PHP
+    enabled: true
+  - name: REQUEST-934-APPLICATION-ATTACK-NODEJS
+    enabled: true
+  - name: REQUEST-941-APPLICATION-ATTACK-XSS
+    enabled: true
+  - name: REQUEST-942-APPLICATION-ATTACK-SQLI
+    enabled: true
+  - name: REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION
+    enabled: true
+  - name: REQUEST-944-APPLICATION-ATTACK-JAVA
+    enabled: true
+  - name: REQUEST-949-BLOCKING-EVALUATION
+    enabled: true
+  - name: RESPONSE-950-DATA-LEAKAGES
+    enabled: true
+  - name: RESPONSE-951-DATA-LEAKAGES-SQL
+    enabled: true
+  - name: RESPONSE-952-DATA-LEAKAGES-JAVA
+    enabled: true
+  - name: RESPONSE-953-DATA-LEAKAGES-PHP
+    enabled: true
+  - name: RESPONSE-954-DATA-LEAKAGES-IIS
+    enabled: true
+  - name: RESPONSE-959-BLOCKING-EVALUATION
+    enabled: true
+  - name: RESPONSE-980-CORRELATION
+    enabled: true
+
+crs_data_links:
+  - crawlers-user-agents
+  - iis-errors
+  - java-classes
+  - java-code-leakages
+  - java-errors
+  - lfi-os-files
+  - php-config-directives
+  - php-errors
+  - php-function-names-933150
+  - php-function-names-933151
+  - php-variables
+  - restricted-files
+  - restricted-upload
+  - scanners-headers
+  - scanners-urls
+  - scanners-user-agents
+  - scripting-user-agents
+  - sql-errors
+  - unix-shell
+  - windows-powershell-commands

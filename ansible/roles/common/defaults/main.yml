@@ -1,6 +1,7 @@
 ---
 deps: [
   docker,
+  git,
   fail2ban,
   python-docker
 ]
