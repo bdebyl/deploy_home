@@ -36,7 +36,7 @@ server {
     proxy_set_header Host              $http_host;
 
     proxy_pass         http://drone;
-    proxy_repathect     off;
+    proxy_redirect     off;
     proxy_http_version 1.1;
     proxy_buffering    off;
 
