@@ -29,14 +29,14 @@ server {
 
   location / {
     modsecurity on;
-    modsecurity_rules_file {{ nginx_dir }}/modsec_includes.conf;
+    modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
 
     proxy_set_header X-Forwarded-For   $remote_addr;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header Host              $http_host;
 
     proxy_pass         http://drone;
-    proxy_redirect     off;
+    proxy_repathect     off;
     proxy_http_version 1.1;
     proxy_buffering    off;
 
