@@ -5,6 +5,9 @@ deps: [
   nginx-mod-modsecurity
 ]
 
+ci_server_name: ci.bdebyl.net
+install_path: /usr/share
+
 nginx_path: /etc/nginx
 nginx_conf_path: "{{ nginx_path }}/conf"
 modsec_rules_path: "{{ nginx_conf_path }}/rules"
@@ -12,13 +15,16 @@ modsec_crs_before_rule_conf:
   "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
 modsec_crs_after_rule_conf:
   "{{ modsec_rules_path }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
-
-ci_server_name: ci.bdebyl.net
-
-install_path: /usr/share
 modsec_path: "{{ install_path }}/modsecurity"
 crs_path: "{{ install_path }}/coreruleset"
 crs_rules_path: "{{ crs_path }}/rules"
+
+modsec_whitelist_local_re: >-
+  ^SecRule.*REMOTE_ADDR.*192\.168\.1\.1/24.*$
+
+modsec_whitelist_local: >-
+  SecRule REMOTE_ADDR "@ipMatch 192.168.1.1/24"
+  "id:1,phase:1,nolog,allow,ctl:ruleEngine=Off"
 
 modsec_git_urls:
   - src: "https://github.com/coreruleset/coreruleset.git"
@@ -35,9 +41,11 @@ modsec_conf_links:
     dest: "{{ nginx_path }}/unicode.mapping"
   - src: "{{ crs_path }}/crs-setup.conf.example"
     dest: "{{ nginx_conf_path }}/crs-setup.conf"
-  - src: "{{ crs_rules_path  }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example"
+  - src:
+      "{{ crs_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example"
     dest: "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
-  - src: "{{ crs_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example"
+  - src:
+      "{{ crs_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example"
     dest: "{{ modsec_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf"
 
 crs_rule_links:

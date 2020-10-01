@@ -68,25 +68,15 @@
   notify: restart_nginx
   tags: modsec, modsec_rules
 
-# name: fetch core rule set files for mod-security
-# become: true
-# get_url:
-#   url: "{{ item.url }}"
-#   dest: "{{ item.dest }}"
-#   mode: 0644
-# with_items:
-#   - {"url": "{{ modsec_conf_url }}",
-#      "dest": "{{ nginx_path }}/modsecurity.conf"}
-#   - {"url": "{{ modsec_unicode_url }}",
-#      "dest": "{{ nginx_path }}/unicode.mapping"}
-#   - {"url": "{{ crs_setup_url }}",
-#      "dest": "{{ nginx_conf_path }}/crs-setup.conf"}
-#   - {"url": "{{ crs_before_url }}",
-#      "dest": "{{ modsec_crs_before_rule_conf }}"}
-#   - {"url": "{{ crs_after_url }}",
-#      "dest": "{{ modsec_crs_after_rule_conf }}"}
-# notify: restart_nginx
-# tags: modsec
+- name: whitelist local ip addresses
+  become: true
+  lineinfile:
+    path: "{{ nginx_path }}/modsecurity.conf"
+    regexp: "{{ modsec_whitelist_local_re }}"
+    line: "{{ modsec_whitelist_local }}"
+    mode: 0644
+  notify: restart_nginx
+  tags: modsec, modsec_rules, modsec_whitelist
 
 - name: activate mod-security
   become: true
