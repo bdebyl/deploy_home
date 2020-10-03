@@ -5,7 +5,7 @@
     path: /etc/ssh/sshd_config
     regexp: "{{ item.re }}"
     line: "{{ item.li }}"
-  with_items:
+  loop:
     - {re: '^[# ]*PasswordAuthentication ', li: 'PasswordAuthentication no'}
     - {re: '^[# ]*PermitEmptyPasswords ', li: 'PermitEmptyPasswords no'}
     - {re: '^[# ]*PermitRootLogin ', li: 'PermitRootLogin no'}
@@ -18,7 +18,7 @@
     src: files/fail2ban/jails/{{ item }}
     dest: /etc/fail2ban/jail.d/{{ item }}
     mode: 0644
-  with_items: "{{ fail2ban_jails }}"
+  loop: "{{ fail2ban_jails }}"
   notify: restart_fail2ban
   tags: security
 

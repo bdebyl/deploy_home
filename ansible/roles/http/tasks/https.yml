@@ -5,7 +5,7 @@
     src: "templates/nginx/sites/{{ item }}.j2"
     dest: "/etc/nginx/sites-available/{{ item }}"
     mode: 0644
-  with_items:
+  loop:
     - "{{ ci_server_name }}.https.conf"
   notify: restart_nginx
   tags: https
@@ -16,7 +16,7 @@
     src: "/etc/nginx/sites-available/{{ item }}"
     dest: "/etc/nginx/sites-enabled/{{ item }}"
     state: link
-  with_items:
+  loop:
     - "{{ ci_server_name }}.https.conf"
   notify: restart_nginx
   tags: https

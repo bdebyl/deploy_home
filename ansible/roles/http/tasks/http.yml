@@ -14,7 +14,7 @@
     path: "/etc/nginx/{{ item }}"
     state: directory
     mode: 0644
-  with_items:
+  loop:
     - sites-enabled
     - sites-available
   tags: http
@@ -43,7 +43,7 @@
     src: "templates/nginx/sites/{{ item }}.j2"
     dest: "/etc/nginx/sites-available/{{ item }}"
     mode: 0644
-  with_items:
+  loop:
     - "{{ ci_server_name }}.http.conf"
   notify: restart_nginx
   tags: http
@@ -54,7 +54,7 @@
     src: "/etc/nginx/sites-available/{{ item }}"
     dest: "/etc/nginx/sites-enabled/{{ item }}"
     state: link
-  with_items:
+  loop:
     - "{{ ci_server_name }}.http.conf"
   notify: restart_nginx
   tags: http
