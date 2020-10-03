@@ -71,7 +71,7 @@
 - name: whitelist local ip addresses
   become: true
   lineinfile:
-    path: "{{ nginx_path }}/modsecurity.conf"
+    path: "{{ modsec_crs_before_rule_conf }}"
     regexp: "{{ modsec_whitelist_local_re }}"
     line: "{{ modsec_whitelist_local }}"
     mode: 0644
