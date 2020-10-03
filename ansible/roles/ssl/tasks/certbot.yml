@@ -16,10 +16,3 @@
   args:
     creates: "/etc/letsencrypt/live/{{ ci_server_name }}"
   tags: ssl
-
-- name: check if certbot certificate was created
-  become: true
-  stat:
-    path: "/etc/letsencrypt/live/{{ ci_server_name }}"
-  register: stat_result
-  tags: ssl
