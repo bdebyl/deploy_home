@@ -7,7 +7,7 @@
     owner: root
     group: root
     mode: 0644
-  with_items:
+  loop:
     - "{{ nginx_conf_path }}"
     - "{{ modsec_rules_path }}"
   tags: modsec
@@ -28,7 +28,7 @@
     dest: "{{ item.dest }}"
     update: false
     version: "{{ item.ver }}"
-  with_items: "{{ modsec_git_urls }}"
+  loop: "{{ modsec_git_urls }}"
   notify: restart_nginx
   tags: modsec
 
@@ -40,7 +40,7 @@
     state: link
     force: true
     mode: 0644
-  with_items: "{{ modsec_conf_links }}"
+  loop: "{{ modsec_conf_links }}"
   notify: restart_nginx
   tags: modsec
 
@@ -52,7 +52,7 @@
     state: "{{ item.enabled | ternary('link', 'absent') }}"
     force: true
     mode: 0644
-  with_items: "{{ crs_rule_links }}"
+  loop: "{{ crs_rule_links }}"
   notify: restart_nginx
   tags: modsec, modsec_rules
 
@@ -64,7 +64,7 @@
     state: link
     force: true
     mode: 0644
-  with_items: "{{ crs_data_links }}"
+  loop: "{{ crs_data_links }}"
   notify: restart_nginx
   tags: modsec, modsec_rules
 
