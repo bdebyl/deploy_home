@@ -7,6 +7,7 @@
     mode: 0644
   with_items:
     - "{{ ci_server_name }}.https.conf"
+  notify: restart_nginx
   tags: https
 
 - name: enable desired nginx https sites
@@ -18,5 +19,4 @@
   with_items:
     - "{{ ci_server_name }}.https.conf"
   notify: restart_nginx
-  when: stat_result.stat.exists
   tags: https
