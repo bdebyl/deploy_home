@@ -56,6 +56,9 @@ deploy: ${ANSIBLE} ${VAULT_FILE}
 list-tags: ${ANSIBLE} ${VAULT_FILE}
 	${ANSIBLE} --list-tags -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
 
+list-tasks: ${ANSIBLE} ${VAULT_FILE}
+	${ANSIBLE} --list-tasks -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+
 check: ${ANSIBLE} ${VAULT_FILE}
 	${ANSIBLE} --check --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
 
