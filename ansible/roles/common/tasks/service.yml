@@ -1,0 +1,9 @@
+---
+- name: ensure desired services are started and enabled
+  become: true
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ services }}"
+  tags: security, service

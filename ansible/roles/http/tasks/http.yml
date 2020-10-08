@@ -28,15 +28,6 @@
     recurse: true
   tags: http
 
-- name: touch nginx logs, enable jail
-  become: true
-  file:
-    path: "/var/log/nginx/error.log"
-    state: file
-    mode: 0644
-  notify: restart_fail2ban
-  tags: http, security
-
 - name: template nginx http sites-available
   become: true
   template:

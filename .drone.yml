@@ -3,10 +3,6 @@ kind: pipeline
 type: docker
 name: default
 
-platform:
-  os: linux
-  arch: arm
-
 steps:
   - name: lint
     image: bdebyl/yamllint
@@ -19,6 +15,6 @@ trigger:
     - pull_request
 ---
 kind: signature
-hmac: 4280c0f368f066e7c24573ae80777b3a7f8f6483a643f7843388a50529379c71
+hmac: 7e505a3615347898a4858753d4bcc19295548c84278e48eb68cfff38dfe1eed6
 
 ...
