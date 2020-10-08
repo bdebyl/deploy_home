@@ -2,7 +2,7 @@
 - name: generate openssl dhparam for nginx
   become: true
   command: |
-    openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 2048
+    openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
   args:
     creates: /etc/ssl/certs/dhparam.pem
   tags: ssl

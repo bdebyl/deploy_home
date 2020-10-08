@@ -1,0 +1,12 @@
+---
+- name: touch nginx logs, enable jail
+  become: true
+  file:
+    path: "/var/log/nginx/{{ item }}.log"
+    state: touch
+    mode: 0644
+  loop:
+    - access
+    - error
+  notify: restart_fail2ban
+  tags: http, security

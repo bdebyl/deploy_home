@@ -6,9 +6,6 @@
 # Author: bdebyl (Bastian de Byl)
 all: lint
 
-# Default to all ansible tags to run (passed via 'make deploy TAGS=sometag')
-TAGS?=all
-
 PASS_SRC=./.pass.sh
 # Setup Definitions
 VENV=.venv
@@ -26,6 +23,10 @@ VAULT_FILE=ansible/vars/vault.yml
 # Variables
 ANSIBLE_INVENTORY=ansible/inventories/home/hosts.yml
 SSH_KEY=${HOME}/.ssh/id_rsa_home_ansible
+
+# Default to all ansible tags to run (passed via 'make deploy TAGS=sometag')
+TAGS?=all
+TARGET?=all
 
 ${VENV}:
 	virtualenv -p python3 ${VENV}
@@ -50,10 +51,13 @@ SKIP_FILE=./.lint-vars.sh
 
 # Targets
 deploy: ${ANSIBLE} ${VAULT_FILE}
-	${ANSIBLE} --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+	${ANSIBLE} --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+
+list-tags: ${ANSIBLE} ${VAULT_FILE}
+	${ANSIBLE} --list-tags -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
 
 check: ${ANSIBLE} ${VAULT_FILE}
-	${ANSIBLE} --check --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+	${ANSIBLE} --check --diff --private-key ${SSH_KEY} -t ${TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
 
 vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 	${ANSIBLE_VAULT} edit --vault-password-file ${VAULT_PASS_FILE} ${VAULT_FILE}
