@@ -1,0 +1,18 @@
+---
+- name: create awsddns server container
+  diff: false
+  docker_container:
+    name: awsddns
+    image: bdebyl/awsddns
+    pull: true
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    env:
+      AWS_ZONE_ID: "{{ aws_zone_id }}"
+      AWS_ZONE_HOSTNAME: "{{ aws_zone_hostname }}"
+      AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+      AWS_DEFAULT_REGION: "{{ aws_default_region }}"
+  tags: ddns
