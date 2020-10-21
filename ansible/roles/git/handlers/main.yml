@@ -1,0 +1,8 @@
+---
+- name: start-gitdaemon
+  become: true
+  systemd:
+    name: git-daemon.service
+    state: started
+    enabled: true
+    daemon_reload: true
