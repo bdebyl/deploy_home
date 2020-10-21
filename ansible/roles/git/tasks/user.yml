@@ -1,0 +1,36 @@
+---
+- name: create git user
+  become: true
+  user:
+    name: "{{ git_user }}"
+    comment: Git user for SSH remotes
+    shell: /usr/bin/git-shell
+    createhome: true
+    home: "{{ git_home }}"
+  tags: git
+
+- name: create git's .ssh directory
+  become: true
+  become_user: git
+  file:
+    path: "{{ git_home }}/.ssh"
+    state: directory
+    mode: 0700
+  tags: git
+
+- name: check git authorized_keys exists
+  become: true
+  stat:
+    path: "{{ git_home }}/.ssh/authorized_keys"
+  register: git_authfile
+  tags: git
+
+- name: touch git authorized_keys
+  become: true
+  become_user: git
+  file:
+    path: "{{ git_home }}/.ssh/authorized_keys"
+    state: touch
+    mode: 0600
+  when: not git_authfile.stat.exists
+  tags: git

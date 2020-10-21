@@ -1,0 +1,3 @@
+---
+git_user: git
+git_home: "/srv/{{ git_user }}"
