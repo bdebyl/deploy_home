@@ -5,6 +5,5 @@
     name: certbot_renew
     special_time: weekly
     job: >-
-      certbot renew --pre-hook "systemctl stop nginx"
-      --post-hook "systemctl start nginx"
+      certbot renew
   tags: cron
