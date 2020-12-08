@@ -4,6 +4,7 @@
   - vars/vault.yml
   roles:
   - role: common
+  - role: git
   - role: ddns
   - role: ssl
   - role: http

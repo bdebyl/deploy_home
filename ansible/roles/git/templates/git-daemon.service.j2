@@ -1,0 +1,18 @@
+[Unit]
+Description=Start Git Daemon
+
+[Service]
+ExecStart=/usr/bin/git daemon --reuseaddr --base-path={{ git_home }} {{ git_home }}
+
+Restart=always
+RestartSec=500ms
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=git-daemon
+
+User={{ git_user }}
+Group={{ git_user }}
+
+[Install]
+WantedBy=multi-user.target
