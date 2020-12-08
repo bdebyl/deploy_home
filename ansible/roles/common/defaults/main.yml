@@ -15,6 +15,7 @@ fail2ban_jails: [
 ]
 
 services:
+  - cronie
   - docker
   - fail2ban
   - iptables
