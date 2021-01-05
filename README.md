@@ -9,7 +9,7 @@ this repository was made.
 [![Build Status](https://ci.bdebyl.net/api/badges/bdebyl/deploy_home/status.svg)](https://ci.bdebyl.net/bdebyl/deploy_home)
 
 ## Ansible
-Ansible, along with double-encrypted secrets, deploys the necessary
+Ansible, along with double encrypted secrets, deploys the necessary
 configurations to make the home fit for certain needs and desires. Namely,
 having access to my home from anywhere, securely, and a self-hosted CI server
 that easily ties into existing workflows.
