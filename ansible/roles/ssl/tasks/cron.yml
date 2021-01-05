@@ -5,5 +5,5 @@
     name: certbot_renew
     special_time: weekly
     job: >-
-      certbot renew
+      certbot renew --post-hook 'systemctl restart nginx'
   tags: cron
