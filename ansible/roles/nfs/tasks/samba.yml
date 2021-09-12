@@ -1,0 +1,20 @@
+---
+- name: copy samba smb.conf
+  become: true
+  copy:
+    src: files/smb.conf
+    dest: /etc/samba/smb.conf
+
+- name: start and enable samba service
+  become: true
+  service:
+    name: smb.service
+    state: started
+    enabled: true
+
+- name: start and enabme samba name service
+  become: true
+  service:
+    name: nmb.service
+    state: started
+    enabled: true

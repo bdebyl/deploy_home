@@ -1,0 +1,11 @@
+---
+- name: restart_nfs
+  become: true
+  service:
+    name: nfs-server.service
+    state: restarted
+    enabled: true
+
+- name: reload_exports
+  become: true
+  shell: exportfs -arv
