@@ -9,3 +9,5 @@
   - role: ssl
   - role: http
   - role: drone
+  - role: nfs
+    tags: nfs

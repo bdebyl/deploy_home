@@ -1,0 +1,32 @@
+---
+- name: create nfs folder/ensure ownership
+  become: true
+  file:
+    path: "{{ nfs_root }}"
+    state: directory
+    owner: "{{ nfs_user }}"
+    group: "{{ nfs_group }}"
+    mode: 0777
+    recurse: true
+
+- name: enable and start nfs server
+  become: true
+  service:
+    name: nfs-server.service
+    state: started
+    enabled: true
+
+- name: enable and start nfs idmap service
+  become: true
+  service:
+    name: nfs-idmapd.service
+    state: started
+    enabled: true
+
+- name: create exports
+  become: true
+  copy:
+    src: files/exports
+    dest: /etc/exports
+    mode: 0644
+  notify: reload_exports

@@ -1,0 +1,10 @@
+---
+deps: [
+  nfs-utils,
+  samba
+]
+
+nfs_root: /srv/nfs
+
+nfs_user: nfs
+nfs_group: nfsshare

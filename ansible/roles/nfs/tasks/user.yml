@@ -1,0 +1,17 @@
+---
+- name: create nfs group
+  become: true
+  group:
+    name: "{{ nfs_group }}"
+    gid: 2021
+    state: present
+
+- name: create nfs user
+  become: true
+  user:
+    name: "{{ nfs_user }}"
+    group: "{{ nfs_group }}"
+    uid: 2021
+    create_home: false
+    home: "{{ nfs_root }}"
+    shell: /bin/sh
