@@ -28,4 +28,5 @@
   copy:
     src: files/exports
     dest: /etc/exports
+    mode: 0644
   notify: reload_exports

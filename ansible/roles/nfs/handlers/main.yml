@@ -8,4 +8,4 @@
 
 - name: reload_exports
   become: true
-  shell: exportfs -arv
+  command: exportfs -arv
