@@ -11,3 +11,5 @@
   - role: drone
   - role: nfs
     tags: nfs
+  - role: motion
+    tags: motion
