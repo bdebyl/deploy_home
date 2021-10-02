@@ -5,7 +5,6 @@ geo $whitelisted {
 
 server {
   listen 80 default_server;
-  listen 443 ssl default_server;
   server_name {{ home_server_name }};
   if ($whitelisted = 1) {
     return 302 http://pi.hole;
