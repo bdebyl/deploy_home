@@ -1,0 +1,17 @@
+geo $whitelisted {
+  default 0;
+  192.168.1.1/24 1;
+}
+
+server {
+  listen 80;
+  listen 443 ssl;
+  server_name {{ home_server_name }};
+  if ($whitelisted = 1) {
+    return 302 http://pi.hole;
+  }
+
+  if ($whitelisted = 0) {
+    return 302 $scheme://bdebyl.net$request_uri;
+  }
+}
