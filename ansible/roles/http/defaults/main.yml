@@ -6,6 +6,7 @@ deps: [
 ]
 
 ci_server_name: ci.bdebyl.net
+home_server_name: home.bdebyl.net
 install_path: /usr/share
 
 nginx_path: /etc/nginx
