@@ -37,6 +37,7 @@
   loop:
     - "{{ ci_server_name }}.http.conf"
     - "{{ home_server_name }}.conf"
+    - "{{ parts_server_name }}.conf"
   notify: restart_nginx
   tags: http
 
@@ -48,5 +49,6 @@
     state: link
   loop:
     - "{{ ci_server_name }}.http.conf"
+    - "{{ parts_server_name }}.conf"
   notify: restart_nginx
   tags: http

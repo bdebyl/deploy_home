@@ -20,3 +20,4 @@ services:
   - fail2ban
   - iptables
   - nginx
+  - systemd-timesyncd

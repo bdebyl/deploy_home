@@ -1,0 +1,77 @@
+---
+- name: create required partkeepr volumes
+  docker_volume:
+    name: "{{ item }}"
+  with_items:
+   - parkeepr-web-vol
+   - partkeepr-conf-vol
+   - partkeepr-data-vol
+   - partkeepr-db-vol
+
+- name: create partkeepr-db container
+  diff: false
+  docker_container: 
+    name: partkeepr-db
+    image: mariadb:10.0
+    recreate: false
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    env:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: partkeepr
+      MYSQL_USER: partkeepr
+      MYSQL_PASSWORD: partkeepr
+    volumes:
+      - partkeepr-db-vol:/var/lib/mysql
+
+
+      # 'PARTKEEPR_AUTHENTICATION_PROVIDER': 'PartKeepr.Auth.WSSEAuthenticationProvider'
+      # 'PARTKEEPR_CACHE_DOCTRINE': 'array'
+      # 'PARTKEEPR_CACHE_DUNGLAS': False
+      # 'PARTKEEPR_DATABASE_DRIVER': 'pdo_mysql'
+      # 'PARTKEEPR_DATABASE_HOST': 'database'
+      # 'PARTKEEPR_DATABASE_NAME': 'partkeepr'
+      # 'PARTKEEPR_DATABASE_PORT': 3306
+      # 'PARTKEEPR_DATABASE_USER': 'partkeepr'
+      # 'PARTKEEPR_DATABASE_PASS': 'partkeepr'
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_ACCOUNTCANONICALFORM': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_ACCOUNTDOMAINNAME': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_ACCOUNTDOMAINNAMESHORT': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_ACCOUNTFILTERFORMAT': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_BASEDN': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_BINDREQUIRESDN': False
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_HOST': '127.0.0.1'
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_OPTREFERRALS': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_PASSWORD': NULL
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_PORT': 389
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_USESSL': False
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_USESTARTTLS': False
+      # 'PARTKEEPR_FR3D_LDAP_DRIVER_USERNAME': NULL
+      # 'PARTKEEPR_FR3D_LDAP_USER_ATTRIBUTE_EMAIL': 'email'
+      # 'PARTKEEPR_FR3D_LDAP_USER_ATTRIBUTE_USERNAME': 'samaccountname'
+      # 'PARTKEEPR_FR3D_LDAP_USER_BASEDN': 'dc=example,dc=com'
+      # 'PARTKEEPR_FR3D_LDAP_USER_ENABLED': False
+      # 'PARTKEEPR_FR3D_LDAP_USER_FILTER': NULL
+      # 'PARTKEEPR_LOCALE': 'en'
+      # 'PARTKEEPR_MAILER_AUTH_MODE': NULL
+      # 'PARTKEEPR_MAILER_ENCRYPTION': NULL
+      # 'PARTKEEPR_MAILER_HOST': NULL
+      # 'PARTKEEPR_MAILER_PASSWORD': NULL
+      # 'PARTKEEPR_MAILER_PORT': 25
+      # 'PARTKEEPR_MAILER_TRANSPORT': NULL
+      # 'PARTKEEPR_MAILER_USER': NULL
+      # 'PARTKEEPR_AUTH_MAX_USERS': 'unlimited'
+      # 'PARTKEEPR_CATEGORY_PATH_SEPARATOR': ' ➤ '
+      # 'PARTKEEPR_CRONJOB_CHECK': True
+      # 'PARTKEEPR_FILESYSTEM_DATA_DIRECTORY': '%kernel.root_dir%/../data/'
+      # 'PARTKEEPR_FILESYSTEM_QUOTA': False
+      # 'PARTKEEPR_MAINTENANCE': false
+      # 'PARTKEEPR_MAINTENANCE_MESSAGE': NULL
+      # 'PARTKEEPR_MAINTENANCE_TITLE': NULL
+      # 'PARTKEEPR_OCTOPART_APIKEY': NULL
+      # 'PARTKEEPR_PARTS_INTERNALPARTNUMBERUNIQUE': False
+      # 'PARTKEEPR_PARTS_LIMIT': False
+      # 'PARTKEEPR_USERS_LIMIT': False
+      # 'PARTKEEPR_SECRET': 'OJBKOJIKNONAJENLBJJNLFIDPDGKDIED'
+    # volumes:

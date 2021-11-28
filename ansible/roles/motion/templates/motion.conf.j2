@@ -37,7 +37,7 @@ target_dir {{ motion_target_dir }}
 ; vid_control_params value
 
 # The full URL of the network camera stream.
-netcam_url rtsp://{{ motion_user }}:{{ motion_pass }}@{{ motion_hostname }}:{{ motion_port }}/mpeg4/media.amp
+netcam_url rtsp://{{ motion_hostname }}:{{ motion_port }}/h264?username={{ motion_user }}&password={{ motion_pass }}
 
 # Name of mmal camera (e.g. vc.ril.camera for pi camera).
 ; mmalcam_name value
@@ -87,10 +87,10 @@ minimum_motion_frames 1
 event_gap 60
 
 # The number of pre-captured (buffered) pictures from before motion.
-pre_capture 3
+pre_capture 80
 
 # Number of frames to capture after motion is no longer detected.
-post_capture 0
+post_capture 300
 
 ############################################################
 # Script execution configuration parameters
@@ -123,16 +123,16 @@ picture_filename %Y%m%d%H%M%S-%q
 movie_output on
 
 # Maximum length of movie in seconds.
-movie_max_time 60
+movie_max_time 30
 
 # The encoding quality of the movie. (0=use bitrate. 1=worst quality, 100=best)
 movie_quality 45
 
 # Container/Codec to used for the movie. See motion_guide.html
-movie_codec mkv
+movie_codec mp4
 
 # File name(without extension) for movies relative to target directory
-movie_filename %t-%v-%Y%m%d%H%M%S
+movie_filename %Y%m%d-%H_%M_%S
 
 ############################################################
 # Webcontrol configuration parameters

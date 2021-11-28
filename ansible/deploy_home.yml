@@ -13,3 +13,5 @@
     tags: nfs
   - role: motion
     tags: motion
+  - role: partkeepr
+    tags: partkeepr
