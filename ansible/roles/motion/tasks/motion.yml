@@ -1,0 +1,51 @@
+---
+- name: give motion user nfs permissions
+  become: true
+  user:
+    name: motion
+    groups: "{{ nfs_group }}"
+    append: true
+  notify:
+    - restart_motion
+
+- name: create motion directory
+  become: true
+  file:
+    path: "{{ motion_target_dir }}"
+    state: directory
+    owner: "{{ nfs_user }}"
+    group: "{{ nfs_group }}"
+    mode: 0777
+
+- name: template motion config
+  become: true
+  template:
+    src: templates/motion.conf.j2
+    dest: /etc/motion/motion.conf
+    mode: 0644
+    backup: true
+  notify:
+    - restart_motion
+
+- name: create motion systemd override directory
+  become: true
+  file:
+    path: /etc/systemd/system/motion.service.d/
+    state: directory
+    mode: 0644
+
+- name: template motion systemd override
+  become: true
+  template:
+    src: templates/motion.service.override.j2
+    dest: /etc/systemd/system/motion.service.d/override.conf
+    mode: 0644
+  notify:
+    - restart_motion
+
+- name: enable (now) motion.service
+  become: true
+  service:
+    name: motion.service
+    state: stopped
+    enabled: false

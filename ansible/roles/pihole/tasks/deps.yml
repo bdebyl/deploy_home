@@ -1,0 +1,11 @@
+---
+- name: install pi-hole-server
+  command: yay -S --noconfirm pi-hole-server
+  args:
+    creates: /bin/pihole
+
+- name: install pi-hole-server dependencies
+  become: true
+  pacman:
+    name: "{{ deps }}"
+    state: present
