@@ -26,7 +26,8 @@
   git:
     repo: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    update: false
+    update: true
+    force: true
     version: "{{ item.ver }}"
   loop: "{{ modsec_git_urls }}"
   notify: restart_nginx

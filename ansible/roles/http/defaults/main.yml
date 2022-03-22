@@ -30,10 +30,10 @@ modsec_whitelist_local: >-
 modsec_git_urls:
   - src: "https://github.com/coreruleset/coreruleset.git"
     dest: "{{ crs_path }}"
-    ver: "v3.3.0"
+    ver: "v3.3.2"
   - src: "https://github.com/SpiderLabs/ModSecurity.git"
     dest: "{{ modsec_path }}"
-    ver: "v3.0.4"
+    ver: "v3.0.6"
 
 modsec_conf_links:
   - src: "{{ modsec_path }}/modsecurity.conf-recommended"
