@@ -36,9 +36,17 @@
     mode: 0644
   loop:
     - "{{ ci_server_name }}.http.conf"
+    - "{{ pi_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
   notify: restart_nginx
+  tags: http
+
+- name: remove pihole from sites-enabled if there
+  become: true
+  file:
+    path: "/etc/nginx/sites-enabled/pi.hole.conf"
+    state: absent
   tags: http
 
 - name: enable desired nginx http sites
@@ -49,6 +57,7 @@
     state: link
   loop:
     - "{{ ci_server_name }}.http.conf"
+    - "{{ pi_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
   notify: restart_nginx
   tags: http

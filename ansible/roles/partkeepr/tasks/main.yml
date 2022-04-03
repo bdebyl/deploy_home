@@ -3,10 +3,10 @@
   docker_volume:
     name: "{{ item }}"
   with_items:
-  - partkeepr-web-vol
-  - partkeepr-conf-vol
-  - partkeepr-data-vol
-  - partkeepr-db-vol
+    - partkeepr-web-vol
+    - partkeepr-conf-vol
+    - partkeepr-data-vol
+    - partkeepr-db-vol
 
 - name: create partkeepr network
   docker_network:
