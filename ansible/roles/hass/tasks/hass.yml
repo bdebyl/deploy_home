@@ -4,7 +4,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    mode: 640
+    mode: 0640
   with_items:
     - /usr/share/hass
     - /usr/share/hass/media
@@ -16,7 +16,7 @@
   copy:
     src: "files/{{ item }}"
     dest: "/var/lib/private/hass/{{ item }}"
-    mode: 644
+    mode: 0644
   with_items:
     - configuration.yaml
     - automations.yaml
