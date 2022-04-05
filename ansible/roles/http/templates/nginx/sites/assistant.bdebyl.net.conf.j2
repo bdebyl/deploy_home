@@ -1,0 +1,17 @@
+server {
+  listen 80;
+  server_name {{ assistant_server_name }};
+
+  location / {
+    allow 192.168.1.0/24;
+    allow 127.0.0.1;
+    deny all;
+
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Upgrade         $http_upgrade;
+    proxy_set_header Connection      $connection_upgrade;
+
+    proxy_buffering off;
+    proxy_pass http://localhost:8123;
+  }
+}

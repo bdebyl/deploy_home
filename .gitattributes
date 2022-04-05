@@ -1,3 +1,5 @@
 .pass.sh filter=git-crypt diff=git-crypt
 ansible/vars/vault.yml filter=git-crypt diff=git-crypt
+ansible/roles/hass/files/automations.yaml filter=git-crypt diff=git-crypt
+ansible/roles/hass/files/configuration.yaml filter=git-crypt diff=git-crypt
 *.yml linguist-detectable

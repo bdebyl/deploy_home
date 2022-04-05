@@ -10,6 +10,7 @@
   - role: pihole
   - role: http
   - role: drone
+  - role: hass
   - role: nfs
     tags: nfs
   - role: motion

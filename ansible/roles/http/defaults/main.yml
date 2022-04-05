@@ -7,6 +7,7 @@ deps: [
 
 ci_server_name: ci.bdebyl.net
 pi_server_name: pi.bdebyl.net
+assistant_server_name: assistant.bdebyl.net
 home_server_name: home.bdebyl.net
 parts_server_name: parts.bdebyl.net
 install_path: /usr/share

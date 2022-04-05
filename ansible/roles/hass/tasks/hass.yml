@@ -1,0 +1,38 @@
+---
+- name: create home-assistant host directory volumes
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /usr/share/hass
+    - /usr/share/hass/media
+    - /var/lib/private/hass
+  tags: hass
+
+- name: copy configuration and automations
+  become: true
+  copy:
+    src: "files/{{ item }}"
+    dest: "/var/lib/private/hass/{{ item }}"
+    mode: 644
+  with_items:
+    - configuration.yaml
+    - automations.yaml
+  tags: hass
+
+- name: create home-assistant server container
+  diff: false
+  docker_container:
+    name: hass
+    image: ghcr.io/home-assistant/home-assistant:stable
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    volumes:
+      - /var/lib/hass:/config
+      - /usr/share/hass:/share
+    ports:
+      - "8123:8123"
+  tags: hass
