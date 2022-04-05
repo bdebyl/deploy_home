@@ -1,3 +1,6 @@
+upstream hass {
+  server 127.0.0.1:8123;
+}
 server {
   listen 80;
   server_name {{ assistant_server_name }};
@@ -12,6 +15,6 @@ server {
     proxy_set_header Connection      $connection_upgrade;
 
     proxy_buffering off;
-    proxy_pass http://localhost:8123;
+    proxy_pass http://hass;
   }
 }
