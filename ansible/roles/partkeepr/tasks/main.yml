@@ -1,6 +1,6 @@
 ---
 - name: create required partkeepr volumes
-  docker_volume:
+  community.general.docker_volume:
     name: "{{ item }}"
   with_items:
     - partkeepr-web-vol
@@ -9,12 +9,12 @@
     - partkeepr-db-vol
 
 - name: create partkeepr network
-  docker_network:
+  community.general.docker_network:
     name: "partkeepr"
 
 - name: create partkeepr-db container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: partkeepr-db
     image: mariadb:10.0
     recreate: false
@@ -24,7 +24,7 @@
     networks:
       - name: "partkeepr"
     env:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: partkeepr
       MYSQL_USER: partkeepr
       MYSQL_PASSWORD: partkeepr
@@ -33,7 +33,7 @@
 
 - name: create partkeepr container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: partkeepr
     image: mhubig/partkeepr:latest
     recreate: false
@@ -49,7 +49,7 @@
 
 - name: create partkeepr-cron container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: partkeepr-cron
     image: mhubig/partkeepr:latest
     entrypoint: []
@@ -65,7 +65,7 @@
 
 - name: create partkeepr container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: partkeepr
     image: mhubig/partkeepr:latest
     recreate: false

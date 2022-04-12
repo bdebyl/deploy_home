@@ -1,7 +1,7 @@
 ---
 - name: install shinobi dependencies
   become: true
-  pacman:
+  community.general.pacman:
     name: "{{ deps }}"
     state: present
   tags:

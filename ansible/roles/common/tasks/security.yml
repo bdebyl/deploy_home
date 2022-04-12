@@ -1,20 +1,20 @@
 ---
 - name: ensure sshd disallows passwords
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.re }}"
     line: "{{ item.li }}"
   loop:
-    - {re: '^[# ]*PasswordAuthentication ', li: 'PasswordAuthentication no'}
-    - {re: '^[# ]*PermitEmptyPasswords ', li: 'PermitEmptyPasswords no'}
-    - {re: '^[# ]*PermitRootLogin ', li: 'PermitRootLogin no'}
+    - { re: "^[# ]*PasswordAuthentication ", li: "PasswordAuthentication no" }
+    - { re: "^[# ]*PermitEmptyPasswords ", li: "PermitEmptyPasswords no" }
+    - { re: "^[# ]*PermitRootLogin ", li: "PermitRootLogin no" }
   notify: restart_sshd
   tags: security
 
 - name: setup fail2ban jails
   become: true
-  copy:
+  ansible.builtin.copy:
     src: files/fail2ban/jails/{{ item }}
     dest: /etc/fail2ban/jail.d/{{ item }}
     mode: 0644
@@ -24,9 +24,9 @@
 
 - name: adjust fail2ban sshd filter
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/fail2ban/filter.d/sshd.conf
-    regexp: '^[#]*filter ='
-    line: 'filter = sshd[mode=extra]'
+    regexp: "^[#]*filter ="
+    line: "filter = sshd[mode=extra]"
   notify: restart_fail2ban
   tags: security

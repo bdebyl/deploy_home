@@ -1,7 +1,7 @@
 ---
 - name: touch nginx logs, enable jail
   become: true
-  file:
+  ansible.builtin.file:
     path: "/var/log/nginx/{{ item }}.log"
     state: touch
     mode: 0644

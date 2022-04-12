@@ -1,14 +1,14 @@
 ---
 - name: create shinobi user
   become: true
-  user:
+  ansible.builtin.user:
     name: "{{ motion_user }}"
     shell: /bin/nologin
   tags: motion
 
 - name: mount shinob videos folder
   become: true
-  file:
+  ansible.builtin.file:
     path: /mnt/shinobi
     state: directory
     owner: "{{ motion_user }}"
@@ -18,7 +18,7 @@
 
 - name: mount smb via cifs
   become: true
-  mount:
+  ansible.posix.mount:
     path: /mnt/shinobi
     src: "//{{ motion_hostname }}/share/GardenCamera"
     fstype: cifs
@@ -29,13 +29,13 @@
 
 - name: create shinobi data volume
   become: true
-  docker_volume:
+  community.general.docker_volume:
     name: shinobi_data
   tags: motion
 
 - name: create shinobi server container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: shinobi
     image: migoller/shinobidocker:latest
     recreate: true

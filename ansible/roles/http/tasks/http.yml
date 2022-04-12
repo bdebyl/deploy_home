@@ -1,7 +1,7 @@
 ---
 - name: setup nginx base configuration
   become: true
-  copy:
+  ansible.builtin.copy:
     src: files/nginx/nginx.conf
     dest: /etc/nginx/nginx.conf
     mode: 0644
@@ -10,7 +10,7 @@
 
 - name: setup nginx directories
   become: true
-  file:
+  ansible.builtin.file:
     path: "/etc/nginx/{{ item }}"
     state: directory
     mode: 0755
@@ -19,13 +19,14 @@
     - sites-available
   tags: http
 
-- name: ensure http/s directories exist
+- name: ensure http and letsencrypt directories exist
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: http
     group: http
+    mode: 0644
   loop:
     - /srv/http
     - /srv/http/letsencrypt
@@ -33,16 +34,17 @@
 
 - name: chown http user home
   become: true
-  file:
+  ansible.builtin.file:
     path: /srv/http
     owner: http
     group: http
+    mode: 0644
     recurse: true
   tags: http
 
 - name: template nginx http sites-available
   become: true
-  template:
+  ansible.builtin.template:
     src: "templates/nginx/sites/{{ item }}.j2"
     dest: "/etc/nginx/sites-available/{{ item }}"
     mode: 0644
@@ -58,14 +60,14 @@
 
 - name: remove pihole from sites-enabled if there
   become: true
-  file:
+  ansible.builtin.file:
     path: "/etc/nginx/sites-enabled/pi.hole.conf"
     state: absent
   tags: http
 
 - name: enable desired nginx http sites
   become: true
-  file:
+  ansible.builtin.file:
     src: "/etc/nginx/sites-available/{{ item }}"
     dest: "/etc/nginx/sites-enabled/{{ item }}"
     state: link
@@ -81,5 +83,6 @@
 
 - name: validate nginx configurations
   become: true
-  shell: nginx -t
+  ansible.builtin.command: nginx -t
+  changed_when: false
   tags: http

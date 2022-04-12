@@ -1,7 +1,7 @@
 ---
 - name: create drone-ci server container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: drone
     image: drone/drone:latest
     recreate: true
@@ -11,7 +11,7 @@
     env:
       DRONE_GITHUB_CLIENT_ID: "{{ drone_gh_client_id }}"
       DRONE_GITHUB_CLIENT_SECRET: "{{ drone_gh_client_sec }}"
-      DRONE_GIT_ALWAYS_AUTH: 'true'
+      DRONE_GIT_ALWAYS_AUTH: "true"
       DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
       DRONE_SERVER_HOST: "{{ ci_server_name }}"
       DRONE_SERVER_PROTO: "{{ drone_server_proto }}"
@@ -24,7 +24,7 @@
 
 - name: create drone-ci worker container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: drone-runner
     image: drone/drone-runner-docker:latest
     recreate: true

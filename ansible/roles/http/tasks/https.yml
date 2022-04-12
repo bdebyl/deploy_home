@@ -1,7 +1,7 @@
 ---
 - name: template nginx https sites-available
   become: true
-  template:
+  ansible.builtin.template:
     src: "templates/nginx/sites/{{ item }}.j2"
     dest: "/etc/nginx/sites-available/{{ item }}"
     mode: 0644
@@ -13,7 +13,7 @@
 
 - name: enable desired nginx https sites
   become: true
-  file:
+  ansible.builtin.file:
     src: "/etc/nginx/sites-available/{{ item }}"
     dest: "/etc/nginx/sites-enabled/{{ item }}"
     state: link

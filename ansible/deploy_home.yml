@@ -1,19 +1,17 @@
 ---
 - hosts: all
   vars_files:
-  - vars/vault.yml
+    - vars/vault.yml
   roles:
-  - role: common
-  - role: git
-  - role: ddns
-  - role: ssl
-  - role: pihole
-  - role: http
-  - role: drone
-  - role: hass
-  - role: nfs
-    tags: nfs
-  - role: motion
-    tags: motion
-  - role: partkeepr
-    tags: partkeepr
+    - role: common
+    - role: git
+    - role: ddns
+    - role: ssl
+    - role: pihole
+    - role: http
+    - role: drone
+    - role: hass
+    - role: motion
+      tags: motion
+    - role: partkeepr
+      tags: partkeepr

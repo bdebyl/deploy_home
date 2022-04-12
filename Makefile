@@ -75,4 +75,4 @@ lint-ci: ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	@yamllint ${YAML_FILES}
 	@. ${SKIP_FILE}; printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "$$ANSIBLE_LINT_SKIP_LIST"
-	@. ${SKIP_FILE}; ansible-lint -x $$ANSIBLE_LINT_SKIP_LIST ${YAML_FILES}
+	@. ${SKIP_FILE}; ansible-lint -x $$ANSIBLE_LINT_SKIP_LIST ansible/

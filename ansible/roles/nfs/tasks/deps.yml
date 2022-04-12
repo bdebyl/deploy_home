@@ -1,7 +1,0 @@
----
-- name: install nfs dependencies
-  become: true
-  pacman:
-    name: "{{ deps }}"
-    state: present
-  tags: deps

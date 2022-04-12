@@ -1,7 +1,7 @@
 ---
 - name: renew certbot ssl certificates weekly
   become: true
-  cron:
+  ansible.builtin.cron:
     name: certbot_renew
     special_time: weekly
     job: >-

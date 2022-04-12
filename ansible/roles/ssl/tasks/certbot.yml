@@ -1,14 +1,14 @@
 ---
 - name: stat dhparam
   become: true
-  stat:
+  ansible.builtin.stat:
     path: /etc/ssl/certs/dhparam.pem
   register: dhparam
   tags: ssl
 
 - name: generate openssl dhparam for nginx
   become: true
-  command: |
+  ansible.builtin.command: |
     openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
   when: not dhparam.stat.exists
   args:
@@ -17,7 +17,7 @@
 
 - name: create ssl certificate for ci server
   become: true
-  command: |
+  ansible.builtin.command: |
     certbot certonly --webroot --webroot-path=/srv/http/letsencrypt \
     -m {{ ssl_email }} --agree-tos \
     -d {{ item }}

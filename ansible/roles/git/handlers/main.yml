@@ -1,7 +1,7 @@
 ---
 - name: start-gitdaemon
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: git-daemon.service
     state: started
     enabled: true

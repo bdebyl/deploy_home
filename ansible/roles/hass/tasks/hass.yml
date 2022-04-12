@@ -1,7 +1,7 @@
 ---
 - name: create home-assistant host directory volumes
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: 0640
@@ -13,7 +13,7 @@
 
 - name: copy configuration and automations
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "files/{{ item }}"
     dest: "/var/lib/private/hass/{{ item }}"
     mode: 0644
@@ -24,7 +24,7 @@
 
 - name: create home-assistant server container
   diff: false
-  docker_container:
+  community.general.docker_container:
     name: hass
     image: ghcr.io/home-assistant/home-assistant:stable
     recreate: true

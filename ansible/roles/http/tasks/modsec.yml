@@ -1,7 +1,7 @@
 ---
 - name: create nginx/conf directory
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
@@ -14,7 +14,7 @@
 
 - name: create modsec_includes.conf
   become: true
-  copy:
+  ansible.builtin.copy:
     src: files/nginx/modsec_includes.conf
     dest: "{{ nginx_path }}/modsec_includes.conf"
     mode: 0644
@@ -23,7 +23,7 @@
 
 - name: clone coreruleset and modsecurity
   become: true
-  git:
+  ansible.builtin.git:
     repo: "{{ item.src }}"
     dest: "{{ item.dest }}"
     update: true
@@ -35,7 +35,7 @@
 
 - name: setup modsec and coreruleset configs
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     force: true
@@ -47,7 +47,7 @@
 
 - name: setup coreruleset rules
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ crs_rules_path }}/{{ item.name }}.conf"
     dest: "{{ modsec_rules_path }}/{{ item.name }}.conf"
     force: true
@@ -60,7 +60,7 @@
 
 - name: setup coreruleset data
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ crs_rules_path }}/{{ item }}.data"
     dest: "{{ modsec_rules_path }}/{{ item }}.data"
     force: true
@@ -72,7 +72,7 @@
 
 - name: whitelist local ip addresses
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ modsec_crs_before_rule_conf }}"
     regexp: "{{ modsec_whitelist_local_re }}"
     line: "{{ modsec_whitelist_local }}"
@@ -82,9 +82,9 @@
 
 - name: activate mod-security
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/nginx/modsecurity.conf
-    regexp: '^SecRuleEngine'
-    line: 'SecRuleEngine On'
+    regexp: "^SecRuleEngine"
+    line: "SecRuleEngine On"
   notify: restart_nginx
   tags: modsec

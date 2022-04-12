@@ -1,7 +1,7 @@
 ---
 - name: replace pi.hole hostname
   become: true
-  replace:
+  ansible.builtin.replace:
     path: "{{ item }}"
     regexp: "pi\\.hole"
     replace: "pi.bdebyl.net"
