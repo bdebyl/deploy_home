@@ -7,6 +7,7 @@
     mode: 0644
   loop:
     - "{{ ci_server_name }}.https.conf"
+    - "{{ parts_server_name }}.https.conf"
   notify: restart_nginx
   tags: https
 
@@ -18,5 +19,6 @@
     state: link
   loop:
     - "{{ ci_server_name }}.https.conf"
+    - "{{ parts_server_name }}.https.conf"
   notify: restart_nginx
   tags: https

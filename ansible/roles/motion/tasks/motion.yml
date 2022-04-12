@@ -1,51 +1,50 @@
 ---
-- name: give motion user nfs permissions
+- name: create shinobi user
   become: true
   user:
-    name: motion
-    groups: "{{ nfs_group }}"
-    append: true
-  notify:
-    - restart_motion
+    name: "{{ motion_user }}"
+    shell: /bin/nologin
+  tags: motion
 
-- name: create motion directory
+- name: mount shinob videos folder
   become: true
   file:
-    path: "{{ motion_target_dir }}"
+    path: /mnt/shinobi
     state: directory
-    owner: "{{ nfs_user }}"
-    group: "{{ nfs_group }}"
-    mode: 0777
+    owner: "{{ motion_user }}"
+    group: "{{ motion_user }}"
+    mode: 0755
+  tags: motion
 
-- name: template motion config
+- name: mount smb via cifs
   become: true
-  template:
-    src: templates/motion.conf.j2
-    dest: /etc/motion/motion.conf
-    mode: 0644
-    backup: true
-  notify:
-    - restart_motion
+  mount:
+    path: /mnt/shinobi
+    src: "//{{ motion_hostname }}/share/GardenCamera"
+    fstype: cifs
+    # yamllint disable-line rule:line-length
+    opts: "username={{ motion_user }},password={{ motion_pass }},workgroup=workgroup,iocharset=utf8,uid={{ motion_user }},gid={{ motion_user }}"
+    state: mounted
+  tags: motion
 
-- name: create motion systemd override directory
+- name: create shinobi data volume
   become: true
-  file:
-    path: /etc/systemd/system/motion.service.d/
-    state: directory
-    mode: 0644
+  docker_volume:
+    name: shinobi_data
+  tags: motion
 
-- name: template motion systemd override
-  become: true
-  template:
-    src: templates/motion.service.override.j2
-    dest: /etc/systemd/system/motion.service.d/override.conf
-    mode: 0644
-  notify:
-    - restart_motion
-
-- name: enable (now) motion.service
-  become: true
-  service:
-    name: motion.service
-    state: stopped
-    enabled: false
+- name: create shinobi server container
+  diff: false
+  docker_container:
+    name: shinobi
+    image: migoller/shinobidocker:latest
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    volumes:
+      - "shinobi_data:/var/lib/mysql"
+      - "/mnt/shinobi:/opt/shinobi/videos"
+    ports:
+      - "8085:8080"
+  tags: motion

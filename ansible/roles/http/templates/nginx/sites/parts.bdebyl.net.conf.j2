@@ -3,20 +3,20 @@ geo $whitelisted {
   192.168.1.0/24 1;
 }
 
-upstream partkeepr {
-  server localhost:8081;
-}
-
 server {
+  modsecurity on;
+  modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
+
   listen 80;
+  listen [::]:80;
   server_name {{ parts_server_name }};
 
-  if ($whitelisted = 0) {
-    return 302 $scheme://bdebyl.net$request_uri;
-  }
+	location /.well-known {
+		root /srv/http/letsencrypt;
+		try_files $uri $uri/ =404;
+	}
 
   location / {
-    proxy_pass http://partkeepr;
-    proxy_connect_timeout 1s;
+	  return 302 https://$host$request_uri;
   }
 }

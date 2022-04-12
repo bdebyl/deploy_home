@@ -35,36 +35,37 @@
 
 - name: setup modsec and coreruleset configs
   become: true
-  file:
+  copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    state: link
     force: true
     mode: 0644
+    remote_src: true
   loop: "{{ modsec_conf_links }}"
   notify: restart_nginx
   tags: modsec
 
 - name: setup coreruleset rules
   become: true
-  file:
+  copy:
     src: "{{ crs_rules_path }}/{{ item.name }}.conf"
     dest: "{{ modsec_rules_path }}/{{ item.name }}.conf"
-    state: "{{ item.enabled | ternary('link', 'absent') }}"
     force: true
     mode: 0644
+    remote_src: true
+  when: item.enabled
   loop: "{{ crs_rule_links }}"
   notify: restart_nginx
   tags: modsec, modsec_rules
 
 - name: setup coreruleset data
   become: true
-  file:
+  copy:
     src: "{{ crs_rules_path }}/{{ item }}.data"
     dest: "{{ modsec_rules_path }}/{{ item }}.data"
-    state: link
     force: true
     mode: 0644
+    remote_src: true
   loop: "{{ crs_data_links }}"
   notify: restart_nginx
   tags: modsec, modsec_rules

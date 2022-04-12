@@ -9,4 +9,6 @@
     - access
     - error
   notify: restart_fail2ban
-  tags: http, security
+  tags:
+    - http
+    - security

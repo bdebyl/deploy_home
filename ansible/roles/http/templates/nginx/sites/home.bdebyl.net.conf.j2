@@ -4,6 +4,9 @@ geo $whitelisted {
 }
 
 server {
+  modsecurity on;
+  modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
+
   listen 80 default_server;
   server_name {{ home_server_name }};
   if ($whitelisted = 1) {

@@ -1,7 +1,9 @@
 ---
-- name: install motion
+- name: install shinobi dependencies
   become: true
   pacman:
     name: "{{ deps }}"
     state: present
-  tags: deps
+  tags:
+    - deps
+    - motion

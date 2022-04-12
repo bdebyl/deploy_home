@@ -10,6 +10,7 @@ pi_server_name: pi.bdebyl.net
 assistant_server_name: assistant.bdebyl.net
 home_server_name: home.bdebyl.net
 parts_server_name: parts.bdebyl.net
+video_server_name: video.bdebyl.net
 install_path: /usr/share
 
 nginx_path: /etc/nginx

@@ -1,6 +1,2 @@
 ---
-deps: [
-  motion
-]
-
-motion_target_dir: "{{ nfs_root }}/motion"
+deps: ["cifs-utils"]

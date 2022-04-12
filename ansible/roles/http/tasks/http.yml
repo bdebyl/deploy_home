@@ -19,6 +19,18 @@
     - sites-available
   tags: http
 
+- name: ensure http/s directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: http
+    group: http
+  loop:
+    - /srv/http
+    - /srv/http/letsencrypt
+  tags: http
+
 - name: chown http user home
   become: true
   file:
@@ -39,6 +51,7 @@
     - "{{ pi_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
+    - "{{ video_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
   notify: restart_nginx
   tags: http
@@ -62,5 +75,11 @@
     - "{{ parts_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
+    - "{{ video_server_name }}.conf"
   notify: restart_nginx
+  tags: http
+
+- name: validate nginx configurations
+  become: true
+  shell: nginx -t
   tags: http
