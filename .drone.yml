@@ -6,6 +6,7 @@ name: default
 steps:
   - name: lint
     image: bdebyl/yamllint
+    pull: always
     command:
       - make lint-ci
 
@@ -15,6 +16,6 @@ trigger:
     - pull_request
 ---
 kind: signature
-hmac: 7e505a3615347898a4858753d4bcc19295548c84278e48eb68cfff38dfe1eed6
+hmac: 12a8371679582716620cf0d32554684aabb0e86bdda3c849eca3e9dc55738b84
 
 ...
