@@ -1,0 +1,4 @@
+exclude_paths:
+  - ansible/vars/vault.yml
+  - ansible/roles/hass/files/automations.yaml
+  - ansible/roles/hass/files/configuration.yaml
