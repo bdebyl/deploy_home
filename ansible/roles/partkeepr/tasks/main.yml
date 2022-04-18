@@ -7,10 +7,12 @@
     - partkeepr-conf-vol
     - partkeepr-data-vol
     - partkeepr-db-vol
+  tags: partkeepr
 
 - name: create partkeepr network
   community.general.docker_network:
     name: "partkeepr"
+  tags: partkeepr
 
 - name: create partkeepr-db container
   diff: false
@@ -19,8 +21,13 @@
     image: mariadb:10.0
     recreate: false
     restart: true
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
     networks:
       - name: "partkeepr"
     env:
@@ -30,6 +37,7 @@
       MYSQL_PASSWORD: partkeepr
     volumes:
       - partkeepr-db-vol:/var/lib/mysql
+  tags: partkeepr
 
 - name: create partkeepr container
   diff: false
@@ -38,40 +46,13 @@
     image: mhubig/partkeepr:latest
     recreate: false
     restart: true
-    restart_policy: on-failure
+    restart_policy: unless-stopped
     restart_retries: 3
-    networks:
-      - name: "partkeepr"
-    volumes:
-      - partkeepr-db-conf-vol:/var/www/html/app/config
-      - partkeepr-db-data-vol:/var/www/html/data
-      - partkeepr-db-web-vol:/var/www/html/web
-
-- name: create partkeepr-cron container
-  diff: false
-  community.general.docker_container:
-    name: partkeepr-cron
-    image: mhubig/partkeepr:latest
-    entrypoint: []
-    command: bash -c "crontab /etc/cron.d/partkeepr && cron -f"
-    recreate: false
-    restart: true
-    restart_policy: on-failure
-    restart_retries: 3
-    volumes:
-      - partkeepr-db-conf-vol:/var/www/html/app/config:ro
-      - partkeepr-db-data-vol:/var/www/html/data
-      - partkeepr-db-web-vol:/var/www/html/web
-
-- name: create partkeepr container
-  diff: false
-  community.general.docker_container:
-    name: partkeepr
-    image: mhubig/partkeepr:latest
-    recreate: false
-    restart: true
-    restart_policy: on-failure
-    restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
     networks:
       - name: "partkeepr"
     ports:
@@ -80,3 +61,27 @@
       - partkeepr-db-conf-vol:/var/www/html/app/config
       - partkeepr-db-data-vol:/var/www/html/data
       - partkeepr-db-web-vol:/var/www/html/web
+  tags: partkeepr
+
+- name: create partkeepr-cron container
+  diff: false
+  community.general.docker_container:
+    name: partkeepr-cron
+    image: mhubig/partkeepr:latest
+    command_handling: correct
+    entrypoint: []
+    command: bash -c "crontab /etc/cron.d/partkeepr && cron -f"
+    recreate: false
+    restart: true
+    restart_policy: unless-stopped
+    restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
+    volumes:
+      - partkeepr-db-conf-vol:/var/www/html/app/config:ro
+      - partkeepr-db-data-vol:/var/www/html/data
+      - partkeepr-db-web-vol:/var/www/html/web
+  tags: partkeepr

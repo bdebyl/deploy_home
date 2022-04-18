@@ -12,7 +12,7 @@ server {
 	listen [::]:80;
 
 	root /srv/http/pihole;
-	server_name pi.bdebyl.net;
+	server_name {{ pi_server_name }};
 	autoindex off;
 
 	proxy_intercept_errors on;
@@ -21,6 +21,7 @@ server {
 	index pihole/index.php index.php index.html index.htm;
 
 	allow 192.168.1.0/24;
+	allow 127.0.0.1;
 	deny all;
 
 	location / {

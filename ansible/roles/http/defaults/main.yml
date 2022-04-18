@@ -1,9 +1,5 @@
 ---
-deps: [
-  certbot,
-  nginx,
-  nginx-mod-modsecurity
-]
+deps: [certbot, nginx, nginx-mod-modsecurity]
 
 ci_server_name: ci.bdebyl.net
 pi_server_name: pi.bdebyl.net
@@ -11,15 +7,15 @@ assistant_server_name: assistant.bdebyl.net
 home_server_name: home.bdebyl.net
 parts_server_name: parts.bdebyl.net
 video_server_name: video.bdebyl.net
+logs_server_name: logs.bdebyl.net
 install_path: /usr/share
 
 nginx_path: /etc/nginx
 nginx_conf_path: "{{ nginx_path }}/conf"
+modsec_log_path: /var/log/nginx/modsec_audit.log
 modsec_rules_path: "{{ nginx_conf_path }}/rules"
-modsec_crs_before_rule_conf:
-  "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
-modsec_crs_after_rule_conf:
-  "{{ modsec_rules_path }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
+modsec_crs_before_rule_conf: "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
+modsec_crs_after_rule_conf: "{{ modsec_rules_path }}/REQUEST-999-EXCLUSION-RULES-AFTER-CRS.conf"
 modsec_path: "{{ install_path }}/modsecurity"
 crs_path: "{{ install_path }}/coreruleset"
 crs_rules_path: "{{ crs_path }}/rules"
@@ -39,6 +35,12 @@ modsec_git_urls:
     dest: "{{ modsec_path }}"
     ver: "v3.0.6"
 
+modsec_conf_replaces:
+  - regex: "^SecRuleEngine"
+    line: "SecRuleEngine On"
+  - regex: "^SecAuditLog"
+    line: "SecAuditLog {{ modsec_log_path }}"
+
 modsec_conf_links:
   - src: "{{ modsec_path }}/modsecurity.conf-recommended"
     dest: "{{ nginx_path }}/modsecurity.conf"
@@ -46,11 +48,9 @@ modsec_conf_links:
     dest: "{{ nginx_path }}/unicode.mapping"
   - src: "{{ crs_path }}/crs-setup.conf.example"
     dest: "{{ nginx_conf_path }}/crs-setup.conf"
-  - src:
-      "{{ crs_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example"
+  - src: "{{ crs_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example"
     dest: "{{ modsec_rules_path }}/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf"
-  - src:
-      "{{ crs_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example"
+  - src: "{{ crs_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example"
     dest: "{{ modsec_rules_path }}/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf"
 
 crs_rule_links:
