@@ -1,18 +1,7 @@
 ---
-deps: [
-  cronie,
-  docker,
-  fail2ban,
-  git,
-  python-docker,
-  tmux,
-  weechat
-]
+deps: [cronie, docker, fail2ban, git, logrotate, python-docker, tmux, weechat]
 
-fail2ban_jails: [
-  sshd.local,
-  nginx.local
-]
+fail2ban_jails: [sshd.local, nginx.local]
 
 services:
   - cronie

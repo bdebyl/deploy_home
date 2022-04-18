@@ -8,6 +8,11 @@
     restart: true
     restart_policy: on-failure
     restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
     env:
       DRONE_GITHUB_CLIENT_ID: "{{ drone_gh_client_id }}"
       DRONE_GITHUB_CLIENT_SECRET: "{{ drone_gh_client_sec }}"
@@ -31,6 +36,11 @@
     restart: true
     restart_policy: on-failure
     restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}} .Name {{'}}'}}"
     env:
       DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
       DRONE_RPC_HOST: "{{ ci_server_name }}"

@@ -1,0 +1,10 @@
+---
+- name: template nginx log rotation
+  become: true
+  ansible.builtin.template:
+    src: logrotate/nginx.j2
+    dest: /etc/logrotate.d/nginx
+    mode: 0644
+  tags:
+    - http
+    - logrotate

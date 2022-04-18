@@ -12,6 +12,5 @@
     - role: drone
     - role: hass
     - role: motion
-      tags: motion
     - role: partkeepr
-      tags: partkeepr
+    - role: graylog

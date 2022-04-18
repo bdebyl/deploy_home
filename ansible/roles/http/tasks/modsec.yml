@@ -84,7 +84,8 @@
   become: true
   ansible.builtin.lineinfile:
     path: /etc/nginx/modsecurity.conf
-    regexp: "^SecRuleEngine"
-    line: "SecRuleEngine On"
+    regexp: "{{ item.regex }}"
+    line: "{{ item.line }}"
+  loop: "{{ modsec_conf_replaces }} "
   notify: restart_nginx
   tags: modsec

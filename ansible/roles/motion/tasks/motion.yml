@@ -38,10 +38,15 @@
   community.general.docker_container:
     name: shinobi
     image: migoller/shinobidocker:latest
-    recreate: true
+    recreate: false
     restart: true
     restart_policy: on-failure
     restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}} .Name {{'}}'}}"
     volumes:
       - "shinobi_data:/var/lib/mysql"
       - "/mnt/shinobi:/opt/shinobi/videos"

@@ -27,10 +27,15 @@
   community.general.docker_container:
     name: hass
     image: ghcr.io/home-assistant/home-assistant:stable
-    recreate: true
+    recreate: false
     restart: true
     restart_policy: on-failure
     restart_retries: 3
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
     volumes:
       - /var/lib/hass:/config
       - /usr/share/hass:/share

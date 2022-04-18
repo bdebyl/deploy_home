@@ -4,3 +4,4 @@
 - import_tasks: modsec.yml
 - import_tasks: http.yml
 - import_tasks: https.yml
+- import_tasks: logrotate.yml

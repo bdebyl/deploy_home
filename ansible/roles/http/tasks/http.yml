@@ -1,9 +1,11 @@
 ---
 - name: setup nginx base configuration
   become: true
-  ansible.builtin.copy:
-    src: files/nginx/nginx.conf
+  ansible.builtin.template:
+    src: templates/nginx/nginx.conf.j2
     dest: /etc/nginx/nginx.conf
+    owner: root
+    group: http
     mode: 0644
   notify: restart_nginx
   tags: http
@@ -26,7 +28,7 @@
     state: directory
     owner: http
     group: http
-    mode: 0644
+    mode: 0755
   loop:
     - /srv/http
     - /srv/http/letsencrypt
@@ -38,7 +40,7 @@
     path: /srv/http
     owner: http
     group: http
-    mode: 0644
+    mode: 0755
     recurse: true
   tags: http
 
@@ -55,6 +57,7 @@
     - "{{ assistant_server_name }}.conf"
     - "{{ video_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
+    - "{{ logs_server_name }}.conf"
   notify: restart_nginx
   tags: http
 
@@ -78,6 +81,7 @@
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
     - "{{ video_server_name }}.conf"
+    - "{{ logs_server_name }}.conf"
   notify: restart_nginx
   tags: http
 

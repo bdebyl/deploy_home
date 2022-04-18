@@ -2,6 +2,11 @@ upstream drone {
   server 127.0.0.1:8080;
 }
 
+geo $local_access {
+  default 0;
+  192.168.1.1 1;
+}
+
 server {
   modsecurity on;
   modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
@@ -24,7 +29,12 @@ server {
   ssl_stapling              on;
   ssl_stapling_verify       on;
 
+  resolver 127.0.0.1 127.0.0.53 9.9.9.9 valid=60s;
+
   location / {
+    if ($local_access = 1) {
+      access_log off;
+    }
     add_header Allow                     "GET, POST, HEAD"                                                                                                                                                                        always;
     add_header Content-Security-Policy   "default-src 'self'; img-src 'self' https://*.githubusercontent.com; frame-ancestors 'self'; base-uri 'none',base-uri 'self'; form-action 'self'" always;
     add_header Referrer-Policy           "same-origin"                                                                                                                                                                            always;
