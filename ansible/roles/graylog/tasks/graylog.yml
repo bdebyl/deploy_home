@@ -73,7 +73,6 @@
       # Graylog web interface and REST API
       - "{{ graylog_port }}:9000"
       # Syslog TCP
-      #- 1514:1514
       # Syslog UDP
       - "0.0.0.0:{{ syslog_udp_default }}:{{ syslog_udp_default }}/udp"
       # Syslog2 UDP
@@ -81,7 +80,7 @@
       # Syslog2 UDP
       - "0.0.0.0:{{ syslog_udp_error }}:{{ syslog_udp_error }}/udp"
       # GELF TCP
-      #- 12201:12201
+      # - 12201:12201
       # GELF UDP
-      #- 12201:12201/udp
+      # - 12201:12201/udp
   tags: graylog
