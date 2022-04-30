@@ -1,7 +1,7 @@
 ---
 - name: install http dependencies
   become: true
-  pacman:
+  ansible.builtin.package:
     name: "{{ deps }}"
     state: present
   tags: deps

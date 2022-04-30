@@ -1,0 +1,4 @@
+---
+- name: restorecon drone
+  become: true
+  ansible.builtin.command: sh -c 'restorecon -Firv /var/lib/drone'

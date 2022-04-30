@@ -7,13 +7,13 @@ bantime = 1w
 maxretry = 8
 ignoreip  = 127.0.0.1/32 192.168.1.0/24
 
-[nginx-http-auth]
-enabled = true
-port = http,https
-logpath = %(nginx_error_log)s
-bantime = 2w
-maxretry = 5
-ignoreip  = 127.0.0.1/32 192.168.1.0/24
+#[nginx-http-auth]
+#enabled = true
+#port = http,https
+#logpath = %(nginx_error_log)s
+#bantime = 2w
+#maxretry = 5
+#ignoreip  = 127.0.0.1/32 192.168.1.0/24
 
 [nginx-botsearch]
 enabled = true

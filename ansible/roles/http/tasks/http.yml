@@ -5,7 +5,7 @@
     src: templates/nginx/nginx.conf.j2
     dest: /etc/nginx/nginx.conf
     owner: root
-    group: http
+    group: nginx
     mode: 0644
   notify: restart_nginx
   tags: http
@@ -26,8 +26,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: http
-    group: http
+    owner: nginx
+    group: nginx
     mode: 0755
   loop:
     - /srv/http
@@ -38,8 +38,8 @@
   become: true
   ansible.builtin.file:
     path: /srv/http
-    owner: http
-    group: http
+    owner: nginx
+    group: nginx
     mode: 0755
     recurse: true
   tags: http
@@ -83,10 +83,4 @@
     - "{{ video_server_name }}.conf"
     - "{{ logs_server_name }}.conf"
   notify: restart_nginx
-  tags: http
-
-- name: validate nginx configurations
-  become: true
-  ansible.builtin.command: nginx -t
-  changed_when: false
   tags: http

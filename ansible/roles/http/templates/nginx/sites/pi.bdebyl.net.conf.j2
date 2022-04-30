@@ -9,7 +9,6 @@ server {
   modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
 
 	listen 80;
-	listen [::]:80;
 
 	root /srv/http/pihole;
 	server_name {{ pi_server_name }};

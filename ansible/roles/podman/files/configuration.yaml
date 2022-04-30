@@ -1,0 +1,19 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+api:
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 172.0.0.0/8
+
+homeassistant:
+  time_zone: America/New_York
+  media_dirs:
+    media: /share
+
+automation: !include automations.yaml

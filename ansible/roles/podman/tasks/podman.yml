@@ -1,0 +1,58 @@
+---
+- name: create podman user
+  become: true
+  ansible.builtin.user:
+    name: "{{ podman_user }}"
+    comment: Rootless podman user
+    shell: /sbin/nologin
+    home: "{{ podman_home }}"
+  tags: podman
+
+- name: check if podman user lingering enabled
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/systemd/linger/{{ podman_user }}"
+  register: user_lingering
+  tags: podman
+
+- name: enable podman user lingering
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.command: |
+    loginctl enable-linger {{ podman_user }}
+  when:
+    - not user_lingering.stat.exists
+  tags: podman
+
+- name: selinux context for podman directories
+  become: true
+  community.general.sefcontext:
+    target: "{{ item.target }}(/.*)?"
+    setype: "{{ item.setype }}"
+    state: present
+  notify: restorecon podman
+  with_items:
+    - { target: "{{ podman_home }}", setype: "user_home_dir_t" }
+    - { target: "{{ podman_path }}", setype: "container_file_t" }
+  tags:
+    - podman
+    - selinux
+
+- name: create podman system directories
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.file:
+    path: "{{ podman_home }}/{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  with_items:
+    - ".config/systemd/user"
+    - "{{ podman_containers }}"
+    - "{{ podman_volumes }}"
+  tags: podman
+
+- meta: flush_handlers
+  tags: podman

@@ -1,0 +1,9 @@
+---
+- name: selinux context for drone directory
+  become: true
+  community.general.sefcontext:
+    target: "/var/lib/drone(/.*)?"
+    setype: svirt_sandbox_file_t
+    state: present
+  notify: restorecon drone
+  tags: selinux

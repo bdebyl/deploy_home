@@ -2,3 +2,18 @@
 - import_tasks: deps.yml
 - import_tasks: security.yml
 - import_tasks: service.yml
+
+- name: create the docker group
+  become: true
+  ansible.builtin.group:
+    name: docker
+    state: present
+  tags: common
+
+- name: add default user to docker group
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true
+  tags: common

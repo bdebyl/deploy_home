@@ -5,12 +5,9 @@
   roles:
     - role: common
     - role: git
-    - role: ddns
+    - role: podman
     - role: ssl
-    - role: pihole
-    - role: http
+    #- role: pihole
     - role: drone
-    - role: hass
-    - role: motion
-    - role: partkeepr
     - role: graylog
+    - role: http

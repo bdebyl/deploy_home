@@ -10,7 +10,7 @@ server {
   listen 80 default_server;
   server_name {{ home_server_name }};
   if ($whitelisted = 1) {
-    return 302 http://pi.bdebyl.net;
+    return 302 http://192.168.1.12;
   }
 
   if ($whitelisted = 0) {

@@ -1,0 +1,8 @@
+---
+- name: restorecon podman
+  become: true
+  ansible.builtin.command: |
+    restorecon -Frv {{ podman_home }}
+  tags:
+    - podman
+    - selinux

@@ -8,7 +8,6 @@ server {
   modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
 
   listen 80;
-  listen [::]:80;
   server_name {{ parts_server_name }};
 
 	location /.well-known {

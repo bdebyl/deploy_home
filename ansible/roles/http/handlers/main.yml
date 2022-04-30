@@ -1,6 +1,17 @@
 ---
 - name: restart_nginx
   become: true
+  ansible.builtin.command: docker restart nginx
+
+- name: restart firewalld
+  become: true
   ansible.builtin.service:
-    name: nginx
+    name: firewalld
     state: restarted
+
+- name: restorecon nginx
+  become: true
+  ansible.builtin.command: restorecon -irv /etc/{{ item }}
+  with_items:
+    - nginx
+    - letsencrypt

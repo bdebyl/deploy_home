@@ -6,6 +6,6 @@
 
 - name: install pi-hole-server dependencies
   become: true
-  community.general.pacman:
+  ansible.builtin.package:
     name: "{{ deps }}"
     state: present

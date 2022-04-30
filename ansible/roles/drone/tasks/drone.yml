@@ -4,7 +4,7 @@
   community.general.docker_container:
     name: drone
     image: drone/drone:latest
-    recreate: true
+    recreate: false
     restart: true
     restart_policy: on-failure
     restart_retries: 3
@@ -32,7 +32,7 @@
   community.general.docker_container:
     name: drone-runner
     image: drone/drone-runner-docker:latest
-    recreate: true
+    recreate: false
     restart: true
     restart_policy: on-failure
     restart_retries: 3

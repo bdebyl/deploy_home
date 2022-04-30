@@ -1,2 +1,3 @@
 ---
 - import_tasks: drone.yml
+- import_tasks: selinux.yml

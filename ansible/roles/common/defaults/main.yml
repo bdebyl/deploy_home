@@ -1,12 +1,21 @@
 ---
-deps: [cronie, docker, fail2ban, git, logrotate, python-docker, tmux, weechat]
+deps:
+  [
+    cockpit-podman,
+    cronie,
+    docker,
+    fail2ban,
+    fail2ban-selinux,
+    git,
+    logrotate,
+    podman,
+    python-docker,
+  ]
 
 fail2ban_jails: [sshd.local, nginx.local]
 
 services:
-  - cronie
+  - crond
   - docker
   - fail2ban
-  - iptables
-  - nginx
   - systemd-timesyncd

@@ -44,9 +44,10 @@
       transport.host: "localhost"
       network.host: "0.0.0.0"
       cluster.name: "graylog"
-      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx512m"
+      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx2048m"
     ulimits:
       - "memlock:-1:-1"
+      - "nofile:64000:64000"
     memory: 1G
   tags: graylog
 
@@ -58,14 +59,18 @@
     restart: true
     restart_policy: on-failure
     restart_retries: 3
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 1
+      net.ipv6.conf.default.disable_ipv6: 1
     networks:
       - name: "graylog"
     volumes:
       - graylog-conf:/usr/share/graylog/data/config
+      - /var/lib/docker/shared/graylog:/usr/share/graylog/bin:z
     env:
       GRAYLOG_PASSWORD_SECRET: "{{ graylog_secret }}"
       GRAYLOG_ROOT_PASSWORD_SHA2: "{{ graylog_root_pass_sha2 }}"
-      GRAYLOG_HTTP_EXTERNAL_URI: http://192.168.1.12:9000/
+      GRAYLOG_HTTP_EXTERNAL_URI: http://192.168.1.10:9000/
       GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
       GRAYLOG_MONGODB_URI: mongodb://graylog-mongo/graylog
       GRAYLOG_ELASTICSEARCH_HOSTS: http://graylog-elastic:9200

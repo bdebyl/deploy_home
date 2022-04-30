@@ -1,0 +1,33 @@
+---
+- name: selinux context for nginx directories
+  become: true
+  community.general.sefcontext:
+    target: "/etc/{{ item }}"
+    setype: container_file_t
+    state: present
+  with_items:
+    - "nginx(/.*)?"
+    - "letsencrypt(/.*)?"
+  notify: restorecon nginx
+  tags: selinux
+
+- name: create nginx modsecurity container
+  community.general.docker_container:
+    name: nginx
+    image: owasp/modsecurity:nginx
+    entrypoint: ["nginx", "-g", "daemon off;"]
+    command_handling: correct
+    recreate: true
+    restart: true
+    restart_policy: on-failure
+    restart_retries: 3
+    network_mode: host
+    log_driver: syslog
+    log_options:
+      syslog-address: "udp://localhost:{{ syslog_udp_default }}"
+      syslog-facility: daemon
+      tag: "docker/{{'{{'}}.Name{{'}}'}}"
+    volumes:
+      - /etc/nginx:/etc/nginx:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+  tags: nginx

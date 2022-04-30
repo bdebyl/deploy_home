@@ -1,0 +1,57 @@
+---
+- name: create home-assistant host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  with_items:
+    - "{{ hass_path }}/media"
+    - "{{ hass_path }}/config"
+  tags: hass
+
+- name: copy configuration and automations
+  become: true
+  ansible.builtin.copy:
+    src: "files/{{ item }}"
+    dest: "{{ hass_path }}/config/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  notify: restorecon podman
+  with_items:
+    - configuration.yaml
+    - automations.yaml
+  tags: hass
+
+- meta: flush_handlers
+  tags: hass
+
+- name: create home-assistant server container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: hass
+    image: ghcr.io/home-assistant/home-assistant:stable
+    recreate: false
+    restart: true
+    restart_policy: on-failure
+    log_driver: journald
+    cap_add:
+      - CAP_NET_RAW
+      - CAP_NET_BIND_SERVICE
+    volumes:
+      - "{{ hass_path }}/config:/config"
+      - "{{ hass_path }}/media:/share"
+    ports:
+      - "8123:8123"
+  tags: hass
+
+- name: create systemd startup job for hass
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: hass
+  tags: hass

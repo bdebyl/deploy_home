@@ -1,0 +1,95 @@
+---
+- name: create required partkeepr volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  with_items:
+    - "{{ partkeepr_path }}/mysql"
+  tags: partkeepr
+
+- meta: flush_handlers
+  tags: partkeepr
+
+- name: create partkeepr network
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_network:
+    name: partkeepr
+  tags: partkeepr
+
+- name: create partkeepr-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partkeepr-db
+    image: docker.io/mariadb:10.0
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - partkeepr
+    env:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: partkeepr
+      MYSQL_USER: partkeepr
+      MYSQL_PASSWORD: "{{ partkeepr_mysql_password }}"
+    volumes:
+      - "{{ partkeepr_path }}/mysql:/var/lib/mysql"
+  tags: partkeepr
+
+- name: create systemd startup job for partkeepr-db
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: partkeepr-db
+  tags: partkeepr
+
+- name: create partkeepr container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partkeepr
+    image: docker.io/mhubig/partkeepr:latest
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - partkeepr
+    ports:
+      - "8081:80"
+  tags: partkeepr
+
+- name: create systemd startup job for partkeepr
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: partkeepr
+  tags: partkeepr
+
+- name: create partkeepr-cron container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partkeepr-cron
+    image: docker.io/mhubig/partkeepr:latest
+    entrypoint: ""
+    command: >
+      bash -c "crontab /etc/cron.d/partkeepr && cron -f"
+    recreate: false
+    restart: true
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - partkeepr
+  tags: partkeepr
+
+- name: create systemd startup job for partkeepr-cron
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: partkeepr-cron
+  tags: partkeepr

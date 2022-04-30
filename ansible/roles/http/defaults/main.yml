@@ -1,6 +1,4 @@
 ---
-deps: [certbot, nginx, nginx-mod-modsecurity]
-
 ci_server_name: ci.bdebyl.net
 pi_server_name: pi.bdebyl.net
 assistant_server_name: assistant.bdebyl.net

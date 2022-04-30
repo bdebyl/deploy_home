@@ -1,6 +1,0 @@
----
-- name: restart_motion
-  become: true
-  ansible.builtin.service:
-    name: motion
-    state: restarted

@@ -1,0 +1,41 @@
+- id: '1649042254031'
+  alias: Office Lights Morning
+  description: ''
+  trigger:
+  - platform: time
+    at: '10:30:00'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 04a5b4bea0caafe63bca3fb31c49091b
+    entity_id: light.bastian_s_office_lights
+    domain: light
+    brightness_pct: 100
+  mode: single
+- id: '1649042299713'
+  alias: Office Lights Evening
+  description: ''
+  trigger:
+  - platform: time
+    at: '17:00:00'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 04a5b4bea0caafe63bca3fb31c49091b
+    entity_id: light.bastian_s_office_lights
+    domain: light
+    brightness_pct: 1
+  mode: single
+- id: '1649042328061'
+  alias: Office Lights Off
+  description: ''
+  trigger:
+  - platform: time
+    at: '20:00:00'
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 04a5b4bea0caafe63bca3fb31c49091b
+    entity_id: light.bastian_s_office_lights
+    domain: light
+  mode: single

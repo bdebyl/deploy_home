@@ -1,0 +1,3 @@
+---
+partkeepr_path: "{{ podman_volumes }}/partkeepr"
+hass_path: "{{ podman_volumes }}/hass"

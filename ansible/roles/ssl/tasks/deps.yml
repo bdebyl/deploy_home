@@ -1,5 +1,5 @@
 ---
-- name: install common dependencies
+- name: install ssl dependencies
   become: true
   ansible.builtin.package:
     name: "{{ deps }}"
