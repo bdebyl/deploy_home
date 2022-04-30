@@ -8,6 +8,6 @@
     - role: podman
     - role: ssl
     #- role: pihole
-    - role: drone
+    #- role: drone
     - role: graylog
     - role: http

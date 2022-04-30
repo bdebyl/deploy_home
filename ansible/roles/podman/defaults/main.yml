@@ -1,3 +1,7 @@
 ---
-partkeepr_path: "{{ podman_volumes }}/partkeepr"
+drone_path: "{{ podman_volumes }}/drone"
 hass_path: "{{ podman_volumes }}/hass"
+partkeepr_path: "{{ podman_volumes }}/partkeepr"
+
+drone_server_proto: "https"
+drone_runner_capacity: "4"

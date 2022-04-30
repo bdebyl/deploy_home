@@ -1,5 +1,6 @@
 ---
 - import_tasks: podman.yml
 - import_tasks: container-awsddns.yml
-- import_tasks: container-partkeepr.yml
+- import_tasks: container-drone.yml
 - import_tasks: container-hass.yml
+- import_tasks: container-partkeepr.yml
