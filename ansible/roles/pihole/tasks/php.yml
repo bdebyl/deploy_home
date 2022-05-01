@@ -5,7 +5,7 @@
     path: "{{ item }}"
     regexp: "pi\\.hole"
     replace: "pi.bdebyl.net"
-  with_items:
+  loop:
     - /srv/http/pihole/admin/scripts/pi-hole/php/auth.php
     - /srv/http/pihole/pihole/index.php
   tags:

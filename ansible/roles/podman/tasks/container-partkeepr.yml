@@ -8,18 +8,11 @@
     group: "{{ podman_user }}"
     mode: 0755
   notify: restorecon podman
-  with_items:
+  loop:
     - "{{ partkeepr_path }}/mysql"
   tags: partkeepr
 
 - meta: flush_handlers
-  tags: partkeepr
-
-- name: create partkeepr network
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_network:
-    name: partkeepr
   tags: partkeepr
 
 - name: create partkeepr-db container
@@ -33,7 +26,7 @@
     restart_policy: on-failure
     log_driver: journald
     network:
-      - partkeepr
+      - shared
     env:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: partkeepr
@@ -54,13 +47,13 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: partkeepr
-    image: docker.io/mhubig/partkeepr:latest
+    image: docker.io/bdebyl/partkeepr:0.1.10
     recreate: false
     restart: false
     restart_policy: on-failure
     log_driver: journald
     network:
-      - partkeepr
+      - shared
     ports:
       - "8081:80"
   tags: partkeepr
@@ -69,27 +62,4 @@
   include_tasks: systemd-generate.yml
   vars:
     container_name: partkeepr
-  tags: partkeepr
-
-- name: create partkeepr-cron container
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_container:
-    name: partkeepr-cron
-    image: docker.io/mhubig/partkeepr:latest
-    entrypoint: ""
-    command: >
-      bash -c "crontab /etc/cron.d/partkeepr && cron -f"
-    recreate: false
-    restart: true
-    restart_policy: on-failure
-    log_driver: journald
-    network:
-      - partkeepr
-  tags: partkeepr
-
-- name: create systemd startup job for partkeepr-cron
-  include_tasks: systemd-generate.yml
-  vars:
-    container_name: partkeepr-cron
   tags: partkeepr

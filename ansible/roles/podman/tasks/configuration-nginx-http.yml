@@ -1,0 +1,95 @@
+---
+- name: create required nginx volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ nginx_path }}/etc"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  tags: http
+
+- name: setup nginx base configuration
+  become: true
+  ansible.builtin.template:
+    src: templates/nginx/nginx.conf.j2
+    dest: "{{ nginx_path }}/etc/nginx.conf"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  notify:
+    - restorecon podman
+    - restart nginx
+  tags: http
+
+- name: create required nginx files
+  become: true
+  ansible.builtin.copy:
+    src: "files/nginx/{{ item }}"
+    dest: "{{ nginx_path }}/etc/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  loop:
+    - mime.types
+  notify:
+    - restorecon podman
+    - restart nginx
+  tags: http
+
+- name: setup nginx directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ nginx_path }}/etc/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    state: directory
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - sites-enabled
+    - sites-available
+  tags: http
+
+- name: template nginx http sites-available
+  become: true
+  ansible.builtin.template:
+    src: "templates/nginx/sites/{{ item }}.j2"
+    dest: "{{ nginx_path }}/etc/sites-available/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  loop:
+    - "{{ ci_server_name }}.http.conf"
+    #- "{{ pi_server_name }}.conf"
+    - "{{ home_server_name }}.conf"
+    - "{{ assistant_server_name }}.conf"
+    - "{{ video_server_name }}.conf"
+    - "{{ parts_server_name }}.conf"
+    - "{{ logs_server_name }}.conf"
+  notify:
+    - restorecon podman
+    - restart nginx
+  tags: http
+
+- name: enable desired nginx http sites
+  become: true
+  ansible.builtin.file:
+    src: "../sites-available/{{ item }}"
+    dest: "{{ nginx_path }}/etc/sites-enabled/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    state: link
+  loop:
+    - "{{ ci_server_name }}.http.conf"
+    #- "{{ pi_server_name }}.conf"
+    - "{{ parts_server_name }}.conf"
+    - "{{ home_server_name }}.conf"
+    - "{{ assistant_server_name }}.conf"
+    - "{{ video_server_name }}.conf"
+    - "{{ logs_server_name }}.conf"
+  notify:
+    - restorecon podman
+    - restart nginx
+  tags: http

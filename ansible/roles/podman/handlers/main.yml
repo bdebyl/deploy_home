@@ -2,7 +2,27 @@
 - name: restorecon podman
   become: true
   ansible.builtin.command: |
-    restorecon -Frv {{ podman_home }}
+    restorecon -Frv {{ podman_home }}/.local/share/volumes
   tags:
     - podman
     - selinux
+
+- name: restart nginx
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.command: |
+    podman restart nginx
+  tags:
+    - nginx
+    - http
+    - https
+    - modsec
+    - modsec_rules
+
+- name: restart firewalld
+  become: true
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
+  tags:
+    - firewall

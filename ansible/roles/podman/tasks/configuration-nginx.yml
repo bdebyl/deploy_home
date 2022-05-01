@@ -1,0 +1,22 @@
+---
+- name: create letsencrypt shared root srv directory
+  become: true
+  ansible.builtin.file:
+    path: /srv/http/letsencrypt
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+    state: directory
+  tags:
+    - ssl
+    - https
+
+- import_tasks: configuration-nginx-http.yml
+- import_tasks: configuration-nginx-https.yml
+- import_tasks: configuration-nginx-modsec.yml
+
+- meta: flush_handlers
+  tags:
+    - http
+    - modsec
+    - modsec_rules

@@ -1,7 +1,0 @@
----
-- import_tasks: deps.yml
-- import_tasks: firewall.yml
-- import_tasks: modsec.yml
-- import_tasks: http.yml
-- import_tasks: https.yml
-- import_tasks: nginx.yml

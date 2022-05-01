@@ -6,8 +6,3 @@
     - role: common
     - role: git
     - role: podman
-    - role: ssl
-    #- role: pihole
-    #- role: drone
-    - role: graylog
-    - role: http

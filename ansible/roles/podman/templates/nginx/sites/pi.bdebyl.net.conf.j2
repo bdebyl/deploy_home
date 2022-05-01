@@ -6,7 +6,7 @@
 
 server {
   modsecurity on;
-  modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
+  modsecurity_rules_file /etc/nginx/modsec_includes.conf;
 
 	listen 80;
 
@@ -55,4 +55,3 @@ server {
 		deny all;
 	}
 }
-

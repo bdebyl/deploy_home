@@ -3,19 +3,20 @@ deps:
   [
     cockpit-podman,
     cronie,
-    docker,
     fail2ban,
     fail2ban-selinux,
     git,
     logrotate,
     podman,
+    podman-docker,
     python-docker,
   ]
 
-fail2ban_jails: [sshd.local, nginx.local]
+fail2ban_jails: [sshd.local]
 
 services:
   - crond
-  - docker
+  - podman.socket
+  - podman
   - fail2ban
   - systemd-timesyncd

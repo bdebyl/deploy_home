@@ -8,6 +8,28 @@
     home: "{{ podman_home }}"
   tags: podman
 
+- name: set ulimits for podman user
+  become: true
+  community.general.pam_limits:
+    domain: podman
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - name: memlock
+      type: soft
+      value: "unlimited"
+    - name: memlock
+      type: hard
+      value: "unlimited"
+    - name: nofile
+      type: soft
+      value: 39693561
+    - name: memlock
+      type: hard
+      value: 39693561
+  tags: podman
+
 - name: check if podman user lingering enabled
   become: true
   ansible.builtin.stat:
@@ -31,7 +53,7 @@
     setype: "{{ item.setype }}"
     state: present
   notify: restorecon podman
-  with_items:
+  loop:
     - { target: "{{ podman_home }}", setype: "user_home_dir_t" }
     - { target: "{{ podman_path }}", setype: "container_file_t" }
   tags:
@@ -42,17 +64,41 @@
   become: true
   become_user: "{{ podman_user }}"
   ansible.builtin.file:
-    path: "{{ podman_home }}/{{ item }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
     mode: 0755
   notify: restorecon podman
-  with_items:
-    - ".config/systemd/user"
+  loop:
+    - "{{ podman_home }}/.config/systemd/user"
     - "{{ podman_containers }}"
     - "{{ podman_volumes }}"
   tags: podman
 
 - meta: flush_handlers
   tags: podman
+
+- name: create podman shared network
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_network:
+    name: shared
+  tags: podman
+
+- name: allow unprivileged ports to lower number
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "80"
+    sysctl_set: true
+    state: present
+    reload: true
+  tags: podman
+
+- name: fetch subuid of {{ podman_user }}
+  become: true
+  ansible.builtin.shell: |
+    cat /etc/subuid | awk -F':' '/{{ podman_user }}/{ print $2 }' | head -n 1
+  register: podman_subuid
+  tags: always

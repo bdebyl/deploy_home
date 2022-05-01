@@ -4,21 +4,26 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: root
-    group: root
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
     mode: 0644
   loop:
     - "{{ nginx_conf_path }}"
     - "{{ modsec_rules_path }}"
+  notify: restorecon podman
   tags: modsec
 
 - name: create modsec_includes.conf
   become: true
   ansible.builtin.copy:
     src: files/nginx/modsec_includes.conf
-    dest: "{{ nginx_path }}/modsec_includes.conf"
+    dest: "{{ nginx_path }}/etc/modsec_includes.conf"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
     mode: 0644
-  notify: restart_nginx
+  notify:
+    - restorecon podman
+    - restart nginx
   tags: modsec
 
 - name: clone coreruleset and modsecurity
@@ -26,11 +31,10 @@
   ansible.builtin.git:
     repo: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    update: true
+    update: "{{ update_modsec | default(false) }}"
     force: true
     version: "{{ item.ver }}"
   loop: "{{ modsec_git_urls }}"
-  notify: restart_nginx
   tags: modsec
 
 - name: setup modsec and coreruleset configs
@@ -38,11 +42,13 @@
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    force: true
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    force: "{{ update_modsec | default(false) }}"
     mode: 0644
     remote_src: true
   loop: "{{ modsec_conf_links }}"
-  notify: restart_nginx
+  notify: restorecon podman
   tags: modsec
 
 - name: setup coreruleset rules
@@ -50,25 +56,33 @@
   ansible.builtin.copy:
     src: "{{ crs_rules_path }}/{{ item.name }}.conf"
     dest: "{{ modsec_rules_path }}/{{ item.name }}.conf"
-    force: true
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    force: "{{ update_modsec | default(false) }}"
     mode: 0644
     remote_src: true
   when: item.enabled
   loop: "{{ crs_rule_links }}"
-  notify: restart_nginx
-  tags: modsec, modsec_rules
+  notify: restorecon podman
+  tags:
+    - modsec
+    - modsec_rules
 
 - name: setup coreruleset data
   become: true
   ansible.builtin.copy:
     src: "{{ crs_rules_path }}/{{ item }}.data"
     dest: "{{ modsec_rules_path }}/{{ item }}.data"
-    force: true
+    force: "{{ update_modsec | default(false) }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
     mode: 0644
     remote_src: true
   loop: "{{ crs_data_links }}"
-  notify: restart_nginx
-  tags: modsec, modsec_rules
+  notify: restorecon podman
+  tags:
+    - modsec
+    - modsec_rules
 
 - name: whitelist local ip addresses
   become: true
@@ -76,9 +90,11 @@
     path: "{{ modsec_crs_before_rule_conf }}"
     regexp: "{{ modsec_whitelist_local_re }}"
     line: "{{ modsec_whitelist_local }}"
-    mode: 0644
-  notify: restart_nginx
-  tags: modsec, modsec_rules, modsec_whitelist
+  notify: restart nginx
+  tags:
+    - modsec
+    - modsec_rules
+    - modsec_whitelist
 
 - name: activate mod-security
   become: true

@@ -1,30 +1,4 @@
 ---
-- name: create nginx ssl directory
-  become: true
-  ansible.builtin.file:
-    path: /etc/nginx/ssl
-    owner: root
-    group: root
-    mode: 0644
-    state: directory
-  tags: ssl
-
-- name: stat dhparam
-  become: true
-  ansible.builtin.stat:
-    path: /etc/nginx/ssl/dhparam.pem
-  register: dhparam
-  tags: ssl
-
-- name: generate openssl dhparam for nginx
-  become: true
-  ansible.builtin.command: |
-    openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
-  when: not dhparam.stat.exists
-  args:
-    creates: /etc/nginx/ssl/dhparam.pem
-  tags: ssl
-
 - name: create ssl certificate for ci server
   become: true
   ansible.builtin.command: |
@@ -36,4 +10,13 @@
   loop:
     - "{{ ci_server_name }}"
     - "{{ parts_server_name }}"
+  tags: ssl
+
+- name: set group ownership for /etc/letsencrypt/
+  become: true
+  ansible.builtin.file:
+    path: /etc/letsencrypt
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    recurse: true
   tags: ssl

@@ -8,7 +8,7 @@
     group: "{{ podman_user }}"
     mode: 0755
   notify: restorecon podman
-  with_items:
+  loop:
     - "{{ hass_path }}/media"
     - "{{ hass_path }}/config"
   tags: hass
@@ -22,7 +22,7 @@
     group: "{{ podman_user }}"
     mode: 0644
   notify: restorecon podman
-  with_items:
+  loop:
     - configuration.yaml
     - automations.yaml
   tags: hass

@@ -4,7 +4,7 @@ worker_processes 1;
 load_module /usr/lib/nginx/modules/ngx_http_modsecurity_module.so;
 
 error_log /var/log/nginx/error.log notice;
-error_log syslog:server=localhost:{{ syslog_udp_error }},tag=nginx,severity=info notice;
+error_log syslog:server=127.0.0.1:{{ syslog_udp_error }},tag=nginx,severity=info notice;
 
 events {
   worker_connections 1024;
@@ -46,7 +46,7 @@ http {
       '"nginx_access": true }';
 
   access_log /var/log/nginx/access.log main;
-  access_log syslog:server=localhost:{{ syslog_udp_default }},tag=nginx,severity=info graylog_json;
+  access_log syslog:server=127.0.0.1:{{ syslog_udp_default }},tag=nginx,severity=info graylog_json;
 
   sendfile        on;
   server_tokens   off;

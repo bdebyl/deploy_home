@@ -1,0 +1,25 @@
+---
+- name: create nginx container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: nginx
+    image: docker.io/owasp/modsecurity:nginx
+    entrypoint: ""
+    command: ["nginx", "-g", "daemon off;"]
+    recreate: false
+    restart: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - host
+    cap_add:
+      - CAP_NET_BIND_SERVICE
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "{{ nginx_path }}/etc:/etc/nginx:ro"
+      - "/srv/http/letsencrypt:/srv/http/letsencrypt:z"
+      - "/etc/letsencrypt:/etc/letsencrypt:ro"
+  tags: nginx

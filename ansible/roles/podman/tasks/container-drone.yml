@@ -8,7 +8,7 @@
     group: "{{ podman_user }}"
     mode: 0755
   notify: restorecon podman
-  with_items:
+  loop:
     - "{{ drone_path }}/data"
   tags: drone
 
@@ -20,12 +20,14 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: drone
-    image: docker.io/drone/drone:latest
+    image: docker.io/drone/drone:2.11.1
     recreate: false
     restart: true
     restart_policy: on-failure
     log_driver: journald
     env:
+      DRONE_LOGS_DEBUG: "true"
+      DRONE_RPC_DEBUG: "true"
       DRONE_GITHUB_CLIENT_ID: "{{ drone_gh_client_id }}"
       DRONE_GITHUB_CLIENT_SECRET: "{{ drone_gh_client_sec }}"
       DRONE_GIT_ALWAYS_AUTH: "true"
@@ -39,12 +41,18 @@
       - "8080:80"
   tags: drone
 
+- name: create systemd startup job for drone
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: drone
+  tags: drone
+
 - name: create drone-ci worker container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: drone-runner
-    image: docker.io/80x86/drone-runner-podman:latest
+    image: docker.io/drone/drone-runner-docker:1.8.1
     recreate: false
     restart: true
     restart_policy: on-failure
@@ -55,7 +63,13 @@
       DRONE_RPC_PROTO: "{{ drone_server_proto }}"
       DRONE_RUNNER_CAPACITY: "{{ drone_runner_capacity }}"
     volumes:
-      - /run/user/1002/podman/podman.sock:/run/podman/podman.sock
+      - "/run/user/1002/podman/podman.sock:/var/run/docker.sock"
     ports:
       - "3000:3000"
+  tags: drone
+
+- name: create systemd startup job for drone-runner
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: drone-runner
   tags: drone

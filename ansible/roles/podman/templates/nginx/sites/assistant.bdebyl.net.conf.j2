@@ -1,13 +1,13 @@
-upstream shinobi {
-  server 127.0.0.1:8085;
+upstream hass {
+  server 127.0.0.1:8123;
 }
-
 server {
+  resolver 192.168.1.12 ipv6=off;
   modsecurity on;
-  modsecurity_rules_file {{ nginx_path }}/modsec_includes.conf;
+  modsecurity_rules_file /etc/nginx/modsec_includes.conf;
 
   listen 80;
-  server_name {{ video_server_name }};
+  server_name {{ assistant_server_name }};
 
   location / {
     allow 192.168.1.0/24;
@@ -19,6 +19,6 @@ server {
     proxy_set_header Connection      $connection_upgrade;
 
     proxy_buffering off;
-    proxy_pass http://shinobi;
+    proxy_pass http://hass;
   }
 }

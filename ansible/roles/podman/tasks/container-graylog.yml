@@ -1,0 +1,128 @@
+---
+- name: create required graylog volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ graylog_path }}/mongo"
+    - "{{ graylog_path }}/elastic"
+    - "{{ graylog_path }}/conf"
+    - "{{ graylog_path }}/bin"
+  tags: graylog
+
+- name: copy configuration files
+  become: true
+  ansible.builtin.copy:
+    src: "files/graylog/{{ item.src }}"
+    dest: "{{ graylog_path }}/{{ item.dest }}"
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  loop:
+    - src: "graylogctl"
+      dest: "bin/graylogctl"
+    - src: "graylog.conf"
+      dest: "conf/graylog.conf"
+  notify: restorecon podman
+  tags: graylog
+
+- name: unshare chown the elastic volume
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.command: |
+    podman unshare chown -R 1000:1000 {{ graylog_path }}/elastic
+  tags: graylog
+
+- meta: flush_handlers
+  tags: graylog
+
+- name: create graylog mongodb container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog-mongo
+    image: docker.io/mongo:4.2
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    network:
+      - shared
+    volumes:
+      - "{{ graylog_path }}/mongo:/data/db"
+  tags: graylog
+
+- name: create systemd startup job for graylog-mongo
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: graylog-mongo
+  tags: graylog
+
+- name: create graylog elasticsearch container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog-elastic
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    recreate: true
+    restart: false
+    restart_policy: on-failure
+    network:
+      - shared
+    volumes:
+      - "{{ graylog_path }}/elastic:/usr/share/elasticsearch/data"
+    env:
+      http.host: "0.0.0.0"
+      transport.host: "localhost"
+      network.host: "0.0.0.0"
+      cluster.name: "graylog"
+      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx2048m"
+  tags: graylog
+
+- name: create systemd startup job for graylog-elastic
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: graylog-elastic
+  tags: graylog
+
+- name: create graylog container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog
+    image: docker.io/graylog/graylog:4.2
+    recreate: false
+    restart: true
+    restart_policy: on-failure
+    sysctl:
+      net.ipv6.conf.all.disable_ipv6: 1
+      net.ipv6.conf.default.disable_ipv6: 1
+    network:
+      - shared
+      - host
+    volumes:
+      - "{{ graylog_path }}/conf:/usr/share/graylog/data/config"
+      - "{{ graylog_path }}/bin:/usr/share/graylog/bin"
+    env:
+      GRAYLOG_PASSWORD_SECRET: "{{ graylog_secret }}"
+      GRAYLOG_ROOT_PASSWORD_SHA2: "{{ graylog_root_pass_sha2 }}"
+      GRAYLOG_HTTP_EXTERNAL_URI: http://{{ ansible_default_ipv4.address }}:9000/
+      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+      GRAYLOG_MONGODB_URI: mongodb://graylog-mongo/graylog
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://graylog-elastic:9200
+    ports:
+      - "{{ graylog_port }}:9000"
+      - "{{ syslog_udp_default }}:{{ syslog_udp_default }}/udp"
+      - "{{ syslog_udp_unifi }}:{{ syslog_udp_unifi }}/udp"
+      - "{{ syslog_udp_error }}:{{ syslog_udp_error }}/udp"
+  tags: graylog
+
+- name: create systemd startup job for graylog
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: graylog
+  tags: graylog
