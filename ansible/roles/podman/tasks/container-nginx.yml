@@ -23,3 +23,9 @@
       - "/srv/http/letsencrypt:/srv/http/letsencrypt:z"
       - "/etc/letsencrypt:/etc/letsencrypt:ro"
   tags: nginx
+
+- name: create systemd startup job for nginx
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: nginx
+  tags: nginx

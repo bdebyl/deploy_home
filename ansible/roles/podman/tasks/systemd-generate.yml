@@ -3,7 +3,7 @@
   become: true
   become_user: "{{ podman_user }}"
   ansible.builtin.shell: |
-    podman generate systemd {{ container_name }} > {{ podman_home}}/.config/systemd/user/{{ container_name }}.service
+    podman generate systemd --name {{ container_name }} > {{ podman_home}}/.config/systemd/user/{{ container_name }}.service
   tags: systemd
 
 - name: enable systemd startup job for {{ container_name }}
@@ -13,5 +13,11 @@
     name: "{{ container_name }}.service"
     daemon_reload: true
     enabled: true
+    state: restarted
     scope: user
+  register: result
+  retries: 3
+  delay: 1
+  until: result is not failed
+  ignore_errors: true
   tags: systemd
