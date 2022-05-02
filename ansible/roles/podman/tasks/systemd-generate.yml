@@ -2,8 +2,9 @@
 - name: create systemd startup job for {{ container_name }}
   become: true
   become_user: "{{ podman_user }}"
+  changed_when: false
   ansible.builtin.shell: |
-    podman generate systemd --name {{ container_name }} > {{ podman_home}}/.config/systemd/user/{{ container_name }}.service
+    podman generate systemd --name {{ container_name }} > {{ podman_home }}/.config/systemd/user/{{ container_name }}.service
   tags: systemd
 
 - name: enable systemd startup job for {{ container_name }}

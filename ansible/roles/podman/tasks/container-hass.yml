@@ -27,7 +27,8 @@
     - automations.yaml
   tags: hass
 
-- meta: flush_handlers
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
   tags: hass
 
 - name: create home-assistant server container

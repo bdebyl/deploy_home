@@ -34,11 +34,13 @@
 - name: unshare chown the elastic volume
   become: true
   become_user: "{{ podman_user }}"
+  changed_when: false
   ansible.builtin.command: |
     podman unshare chown -R 1000:1000 {{ graylog_path }}/elastic
   tags: graylog
 
-- meta: flush_handlers
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
   tags: graylog
 
 - name: create graylog mongodb container
@@ -103,7 +105,6 @@
       net.ipv6.conf.default.disable_ipv6: 1
     network:
       - shared
-      - host
     volumes:
       - "{{ graylog_path }}/conf:/usr/share/graylog/data/config"
       - "{{ graylog_path }}/bin:/usr/share/graylog/bin"

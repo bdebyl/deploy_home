@@ -76,7 +76,8 @@
     - "{{ podman_volumes }}"
   tags: podman
 
-- meta: flush_handlers
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
   tags: podman
 
 - name: create podman shared network
@@ -98,7 +99,8 @@
 
 - name: fetch subuid of {{ podman_user }}
   become: true
+  changed_when: false
   ansible.builtin.shell: |
-    cat /etc/subuid | awk -F':' '/{{ podman_user }}/{ print $2 }' | head -n 1
+    set -o pipefail && cat /etc/subuid | awk -F':' '/{{ podman_user }}/{ print $2 }' | head -n 1
   register: podman_subuid
   tags: always

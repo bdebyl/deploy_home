@@ -12,7 +12,8 @@
     - "{{ drone_path }}/data"
   tags: drone
 
-- meta: flush_handlers
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
   tags: drone
 
 - name: create drone-ci server container

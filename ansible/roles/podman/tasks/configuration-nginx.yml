@@ -15,7 +15,8 @@
 - import_tasks: configuration-nginx-https.yml
 - import_tasks: configuration-nginx-modsec.yml
 
-- meta: flush_handlers
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
   tags:
     - http
     - modsec
