@@ -6,3 +6,12 @@
     state: started
     enabled: true
     daemon_reload: true
+  tags: git
+
+- name: restorecon git
+  become: true
+  ansible.builtin.command: |
+    restorecon -Frv {{ git_home }}
+  tags:
+    - git
+    - selinux

@@ -62,7 +62,7 @@
     mode: 0644
   loop:
     - "{{ ci_server_name }}.http.conf"
-    # - "{{ pi_server_name }}.conf"
+    - "{{ pi_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
     - "{{ video_server_name }}.conf"
@@ -83,7 +83,7 @@
     state: link
   loop:
     - "{{ ci_server_name }}.http.conf"
-    # - "{{ pi_server_name }}.conf"
+    - "{{ pi_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"

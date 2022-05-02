@@ -6,5 +6,6 @@
 - import_tasks: container-drone.yml
 - import_tasks: container-hass.yml
 - import_tasks: container-partkeepr.yml
-- import_tasks: container-nginx.yml
 - import_tasks: container-graylog.yml
+- import_tasks: container-pihole.yml
+- import_tasks: container-nginx.yml

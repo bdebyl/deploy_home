@@ -5,7 +5,7 @@
   changed_when: false
   ansible.builtin.shell: |
     podman generate systemd --name {{ container_name }} > {{ podman_home }}/.config/systemd/user/{{ container_name }}.service
-  tags: systemd
+  tags: always
 
 - name: enable systemd startup job for {{ container_name }}
   become: true
@@ -21,4 +21,4 @@
   delay: 1
   until: result is not failed
   ignore_errors: true
-  tags: systemd
+  tags: always

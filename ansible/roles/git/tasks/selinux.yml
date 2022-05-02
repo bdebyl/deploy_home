@@ -1,0 +1,14 @@
+---
+- name: configure selinux git directories
+  become: true
+  community.general.sefcontext:
+    target: "{{ item.target }}(/.*)?"
+    setype: "{{ item.setype }}"
+    state: present
+  notify: restorecon git
+  loop:
+    - { target: "{{ git_home }}", setype: "user_home_dir_t" }
+    - { target: "{{ git_home }}/.ssh", setype: "ssh_home_t" }
+  tags:
+    - git
+    - selinux

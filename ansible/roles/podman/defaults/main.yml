@@ -4,6 +4,7 @@ graylog_path: "{{ podman_volumes }}/graylog"
 hass_path: "{{ podman_volumes }}/hass"
 nginx_path: "{{ podman_volumes }}/nginx"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
+pihole_path: "{{ podman_volumes }}/pihole"
 
 drone_server_proto: "https"
 drone_runner_capacity: "4"
