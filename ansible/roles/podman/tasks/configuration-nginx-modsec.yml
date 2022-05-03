@@ -99,9 +99,9 @@
 - name: activate mod-security
   become: true
   ansible.builtin.lineinfile:
-    path: /etc/nginx/modsecurity.conf
+    path: "{{ nginx_path }}/etc/modsecurity.conf"
     regexp: "{{ item.regex }}"
     line: "{{ item.line }}"
   loop: "{{ modsec_conf_replaces }} "
-  notify: restart_nginx
+  notify: restart nginx
   tags: modsec
