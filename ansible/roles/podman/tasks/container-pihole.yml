@@ -30,20 +30,19 @@
     cap_add:
       - CAP_NET_BIND_SERVICE
       - NET_ADMIN
-    network:
-      - host
     env:
       DNSMASQ_USER: "root"
+      INTERFACE: "tap0"
       PIHOLE_UID: 0
       TZ: "America/New_York"
+      VIRTUAL_HOST: "{{ pi_server_name }}"
       WEBPASSWORD: "{{ pihole_password }}"
-      WEB_PORT: 8082
     volumes:
       - "{{ pihole_path }}/config:/etc/pihole"
       - "{{ pihole_path }}/dnsmasq:/etc/dnsmasq.d"
     ports:
-      - 53:53/udp
-      - 53:53/tcp
+      - 1153:53/udp
+      - 1153:53/tcp
       - 8082:80
   tags: pihole
 
@@ -52,3 +51,22 @@
   vars:
     container_name: pihole
   tags: pihole
+
+- name: Redirect DNS, DHCP, HTTP and HTTPS to pihole
+  become: true
+  ansible.builtin.iptables:
+    table: nat
+    chain: PREROUTING
+    in_interface: eno1
+    protocol: "{{ item }}"
+    match: "{{ item }}"
+    destination_port: 53
+    jump: REDIRECT
+    to_ports: 1153
+    comment: Redirect DNS traffic to port 1153
+  loop:
+    - udp
+    - tcp
+  tags:
+    - pihole
+    - firewall
