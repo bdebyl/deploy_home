@@ -10,7 +10,7 @@ server {
   listen 80 default_server;
   server_name {{ home_server_name }};
   if ($whitelisted = 1) {
-    return 302 http://{{ ansible_default_ipv4.address }};
+    return 302 http://pi.bdebyl.net;
   }
 
   if ($whitelisted = 0) {

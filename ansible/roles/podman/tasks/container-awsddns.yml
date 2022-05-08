@@ -5,7 +5,7 @@
   diff: false
   containers.podman.podman_container:
     name: awsddns
-    image: docker.io/bdebyl/awsddns
+    image: docker.io/bdebyl/awsddns:1.0.10
     recreate: false
     restart: true
     restart_policy: on-failure

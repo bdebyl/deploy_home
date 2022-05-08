@@ -27,11 +27,10 @@
     restart_policy: on-failure
     log_driver: journald
     env:
-      DRONE_LOGS_DEBUG: "true"
-      DRONE_RPC_DEBUG: "true"
+      DRONE_LOGS_DEBUG: "false"
+      DRONE_RPC_DEBUG: "false"
       DRONE_GITHUB_CLIENT_ID: "{{ drone_gh_client_id }}"
       DRONE_GITHUB_CLIENT_SECRET: "{{ drone_gh_client_sec }}"
-      DRONE_GIT_ALWAYS_AUTH: "true"
       DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
       DRONE_SERVER_HOST: "{{ ci_server_name }}"
       DRONE_SERVER_PROTO: "{{ drone_server_proto }}"

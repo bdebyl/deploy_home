@@ -70,3 +70,12 @@
   tags:
     - pihole
     - firewall
+
+- name: Save state of iptables for IPv4
+  become: true
+  community.general.iptables_state:
+    state: saved
+    path: /etc/sysconfig/iptables
+  tags:
+    - pihole
+    - firewall
