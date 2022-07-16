@@ -10,12 +10,12 @@ server {
   listen 80;
   server_name {{ parts_server_name }};
 
-	location /.well-known {
-		root /srv/http/letsencrypt;
-		try_files $uri $uri/ =404;
-	}
+  location '/.well-known/acme-challenge' {
+   default_type "text/plain";
+   root /srv/http/letsencrypt;
+  }
 
   location / {
-	  return 302 https://$host$request_uri;
+   return 302 https://$host$request_uri;
   }
 }

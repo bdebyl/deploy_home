@@ -1,13 +1,13 @@
 server {
-	listen 80;
-	server_name {{ ci_server_name }};
+ listen 80;
+ server_name {{ ci_server_name }};
 
-	location /.well-known {
-		root /srv/http/letsencrypt;
-		try_files $uri $uri/ =404;
-	}
+ location '/.well-known/acme-challenge' {
+  default_type "text/plain";
+  root /srv/http/letsencrypt;
+ }
 
   location / {
-	  return 301 https://$host$request_uri;
+   return 301 https://$host$request_uri;
   }
 }
