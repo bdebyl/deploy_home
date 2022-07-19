@@ -25,10 +25,6 @@ server {
   ssl_stapling              on;
   ssl_stapling_verify       on;
 
-  if ($whitelisted = 0) {
-    return 302 $scheme://skudakrennsport.com$request_uri;
-  }
-
   location / {
     add_header Referrer-Policy           "same-origin"                                                                                                                                                                            always;
     # add_header Strict-Transport-Security "max-age=630720000; includeSubDomains"                                                                                                                                                   always;
