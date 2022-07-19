@@ -1,4 +1,5 @@
 ---
+bookstack_path: "{{ podman_volumes }}/bookstack"
 drone_path: "{{ podman_volumes }}/drone"
 graylog_path: "{{ podman_volumes }}/graylog"
 hass_path: "{{ podman_volumes }}/hass"
@@ -13,6 +14,7 @@ drone_runner_capacity: "4"
 ci_server_name: ci.bdebyl.net
 pi_server_name: pi.bdebyl.net
 assistant_server_name: assistant.bdebyl.net
+bookstack_server_name: wiki.skudakrennsport.com
 home_server_name: home.bdebyl.net
 parts_server_name: parts.bdebyl.net
 video_server_name: video.bdebyl.net

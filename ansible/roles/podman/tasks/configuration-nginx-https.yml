@@ -36,6 +36,7 @@
   loop:
     - "{{ ci_server_name }}.https.conf"
     - "{{ parts_server_name }}.https.conf"
+    - "{{ bookstack_server_name }}.https.conf"
   notify:
     - restorecon podman
     - restart nginx
@@ -52,6 +53,7 @@
   loop:
     - "{{ ci_server_name }}.https.conf"
     - "{{ parts_server_name }}.https.conf"
+    - "{{ bookstack_server_name }}.https.conf"
   notify:
     - restorecon podman
     - restart nginx

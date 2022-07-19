@@ -1,0 +1,80 @@
+---
+- name: create required bookstack volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ bookstack_path }}/mysql"
+  tags: bookstack
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: bookstack
+
+- name: create bookstack-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: bookstack-db
+    image: docker.io/mysql:5.7.21
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ bookstack_db_root_pass }}"
+      TZ: "America/New_York"
+      MYSQL_DATABASE: bookstack
+      MYSQL_USER: bookstack
+      MYSQL_PASSWORD: "{{ bookstack_db_pass }}"
+    volumes:
+      - "{{ bookstack_path }}/mysql:/var/lib/mysql"
+  tags: bookstack
+
+- name: create systemd startup job for bookstack-db
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: bookstack-db
+  tags: bookstack
+
+- name: create bookstack container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: bookstack
+    image: docker.io/solidnerd/bookstack:22.04
+    recreate: true
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - shared
+    env:
+      APP_URL: "https://wiki.skudakrennsport.com"
+      DB_HOST: "bookstack-db"
+      DB_USERNAME: "bookstack"
+      DB_DATABASE: "bookstack"
+      DB_PASSWORD: "{{ bookstack_db_pass }}"
+      MAIL_DRIVER: "smtp"
+      MAIL_HOST: "{{ bookstack_mail_host }}"
+      MAIL_PORT: 465
+      MAIL_ENCRYPTION: "ssl"
+      MAIL_USERNAME: "{{ bookstack_mail_user }}"
+      MAIL_PASSWORD: "{{ bookstack_mail_pass }}"
+      MAIL_FROM: "{{ bookstack_mail_user }}"
+      MAIL_FROM_NAME: "Skudak Wiki"
+    ports:
+      - "6875:8080"
+  tags: bookstack
+#- name: create systemd startup job for bookstack
+#  include_tasks: systemd-generate.yml
+#  vars:
+#    container_name: bookstack
+#  tags: bookstack
