@@ -6,7 +6,7 @@ server {
   modsecurity on;
   modsecurity_rules_file /etc/nginx/modsec_includes.conf;
 
-  resolver 127.0.0.1 127.0.0.53 9.9.9.9 valid=60s;
+  resolver 9.9.9.9 valid=60s;
 
   listen 443 ssl http2;
   server_name {{ bookstack_server_name }};

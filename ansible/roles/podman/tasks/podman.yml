@@ -85,6 +85,8 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_network:
     name: shared
+    internal: false
+    disable_dns: false
   tags: podman
 
 - name: allow unprivileged ports to lower number

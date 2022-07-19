@@ -60,7 +60,7 @@
   containers.podman.podman_container:
     name: bookstack
     image: docker.io/solidnerd/bookstack:22.04
-    recreate: false
+    recreate: true
     restart: false
     restart_policy: on-failure
     log_driver: journald

@@ -112,7 +112,7 @@ crs_rule_links:
   - name: REQUEST-944-APPLICATION-ATTACK-JAVA
     enabled: true
   - name: REQUEST-949-BLOCKING-EVALUATION
-    enabled: true
+    enabled: false
   - name: RESPONSE-950-DATA-LEAKAGES
     enabled: true
   - name: RESPONSE-951-DATA-LEAKAGES-SQL

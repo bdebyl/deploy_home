@@ -48,7 +48,9 @@
     mode: 0644
     remote_src: true
   loop: "{{ modsec_conf_links }}"
-  notify: restorecon podman
+  notify:
+    - restorecon podman
+    - restart nginx
   tags: modsec
 
 - name: setup coreruleset rules
@@ -63,7 +65,23 @@
     remote_src: true
   when: item.enabled
   loop: "{{ crs_rule_links }}"
-  notify: restorecon podman
+  notify:
+    - restorecon podman
+    - restart nginx
+  tags:
+    - modsec
+    - modsec_rules
+
+- name: removed disabled coreruleset rules
+  become: true
+  ansible.builtin.file:
+    path: "{{ modsec_rules_path }}/{{ item.name }}.conf"
+    state: absent
+  when: not item.enabled
+  loop: "{{ crs_rule_links }}"
+  notify:
+    - restorecon podman
+    - restart nginx
   tags:
     - modsec
     - modsec_rules
@@ -79,7 +97,9 @@
     mode: 0644
     remote_src: true
   loop: "{{ crs_data_links }}"
-  notify: restorecon podman
+  notify:
+    - restorecon podman
+    - restart nginx
   tags:
     - modsec
     - modsec_rules
