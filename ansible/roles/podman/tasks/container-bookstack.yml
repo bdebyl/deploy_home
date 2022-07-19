@@ -10,6 +10,8 @@
   notify: restorecon podman
   loop:
     - "{{ bookstack_path }}/mysql"
+    - "{{ bookstack_path }}/public"
+    - "{{ bookstack_path }}/storage"
   tags: bookstack
 
 - name: flush handlers
@@ -50,7 +52,7 @@
   containers.podman.podman_container:
     name: bookstack
     image: docker.io/solidnerd/bookstack:22.04
-    recreate: true
+    recreate: false
     restart: false
     restart_policy: on-failure
     log_driver: journald
@@ -72,9 +74,13 @@
       MAIL_FROM_NAME: "Skudak Wiki"
     ports:
       - "6875:8080"
+    volumes:
+      - "{{ bookstack_path }}/public:/var/www/bookstack/public/uploads"
+      - "{{ bookstack_path }}/storage:/var/www/bookstack/storage/uploads"
   tags: bookstack
-#- name: create systemd startup job for bookstack
-#  include_tasks: systemd-generate.yml
-#  vars:
-#    container_name: bookstack
-#  tags: bookstack
+
+- name: create systemd startup job for bookstack
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: bookstack
+  tags: bookstack
