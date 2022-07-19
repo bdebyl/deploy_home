@@ -18,6 +18,14 @@
   ansible.builtin.meta: flush_handlers
   tags: bookstack
 
+- name: unshare chown the bookstack upload volumes
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 33:33 {{ bookstack_path }}/public {{ bookstack_path }}/storage
+  tags: bookstack
+
 - name: create bookstack-db container
   become: true
   become_user: "{{ podman_user }}"
