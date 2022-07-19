@@ -5,7 +5,7 @@
     path: /srv/http/letsencrypt
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
-    mode: 0644
+    mode: 0755
     state: directory
   tags:
     - ssl

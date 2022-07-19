@@ -11,6 +11,7 @@
   loop:
     - "{{ pihole_path }}/config"
     - "{{ pihole_path }}/dnsmasq"
+    - "/srv/http/letsencrypt"
   tags: pihole
 
 - name: flush handlers
