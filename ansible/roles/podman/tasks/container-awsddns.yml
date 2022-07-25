@@ -1,5 +1,5 @@
 ---
-- name: create awsddns server container
+- name: create home.bdebyl.net awsddns server container
   become: true
   become_user: "{{ podman_user }}"
   diff: false
@@ -19,6 +19,31 @@
   tags: ddns
 
 - name: create systemd startup job for awsddns
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: awsddns
+  tags: ddns
+
+- name: create wiki.skudakrennsport.com awsddns server container
+  become: true
+  become_user: "{{ podman_user }}"
+  diff: false
+  containers.podman.podman_container:
+    name: awsddns-skudak
+    image: docker.io/bdebyl/awsddns:1.0.10
+    recreate: false
+    restart: true
+    restart_policy: on-failure
+    log_driver: journald
+    env:
+      AWS_ZONE_ID: "{{ aws_skudak_zone_id }}"
+      AWS_ZONE_HOSTNAME: "{{ aws_skudak_zone_hostname }}"
+      AWS_ACCESS_KEY_ID: "{{ aws_skudak_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ aws_skudak_secret_access_key }}"
+      AWS_DEFAULT_REGION: "{{ aws_default_region }}"
+  tags: ddns
+
+- name: create systemd startup job for awsddns-skudak
   include_tasks: systemd-generate.yml
   vars:
     container_name: awsddns
