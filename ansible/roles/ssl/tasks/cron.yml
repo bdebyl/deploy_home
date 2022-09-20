@@ -5,5 +5,5 @@
     name: certbot_renew
     special_time: weekly
     job: >-
-      certbot renew --post-hook "su -s /bin/sh podman -c 'cd; podman restart nginx'"
+      certbot renew --post-hook "chown -R {{ podman_user }}:{{ podman_user }} /etc/letsencrypt && su -s /bin/sh podman -c 'cd; podman restart nginx'"
   tags: cron
