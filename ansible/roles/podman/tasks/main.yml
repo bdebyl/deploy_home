@@ -9,4 +9,5 @@
 - import_tasks: container-graylog.yml
 - import_tasks: container-pihole.yml
 - import_tasks: container-bookstack.yml
+- import_tasks: container-cloud.yml
 - import_tasks: container-nginx.yml

@@ -6,3 +6,4 @@
     - role: common
     - role: git
     - role: podman
+    - role: ssl

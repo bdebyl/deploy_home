@@ -60,6 +60,16 @@
     - podman
     - selinux
 
+- name: selinux allow podman samba
+  become: true
+  ansible.posix.seboolean:
+    name: virt_use_samba
+    state: true
+    persistent: true
+  tags:
+    - podman
+    - selinux
+
 - name: create podman system directories
   become: true
   become_user: "{{ podman_user }}"

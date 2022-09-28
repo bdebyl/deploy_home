@@ -8,9 +8,10 @@
   args:
     creates: "/etc/letsencrypt/live/{{ item }}"
   loop:
-    - "{{ ci_server_name }}"
-    - "{{ parts_server_name }}"
     - "{{ bookstack_server_name }}"
+    - "{{ ci_server_name }}"
+    - "{{ cloud_server_name }}"
+    - "{{ parts_server_name }}"
   tags: ssl
 
 - name: set group ownership for /etc/letsencrypt/

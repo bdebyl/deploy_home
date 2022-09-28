@@ -5,6 +5,7 @@ graylog_path: "{{ podman_volumes }}/graylog"
 hass_path: "{{ podman_volumes }}/hass"
 nginx_path: "{{ podman_volumes }}/nginx"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
+cloud_path: "{{ podman_volumes }}/cloud"
 pihole_path: "{{ podman_volumes }}/pihole"
 
 drone_server_proto: "https"
@@ -15,6 +16,7 @@ ci_server_name: ci.bdebyl.net
 pi_server_name: pi.bdebyl.net
 assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
+cloud_server_name: cloud.bdebyl.net
 home_server_name: home.bdebyl.net
 parts_server_name: parts.bdebyl.net
 video_server_name: video.bdebyl.net
