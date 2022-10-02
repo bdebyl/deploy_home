@@ -4,8 +4,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ podman_user }}"
-    group: "{{ podman_user }}"
+    owner: "{{ podman_subuid.stdout }}"
     mode: 0755
   notify: restorecon podman
   loop:

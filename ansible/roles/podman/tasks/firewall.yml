@@ -20,3 +20,20 @@
     - 80/tcp
   notify: restart firewalld
   tags: firewall
+
+- name: unset non-required podman firewall rules
+  become: true
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    zone: "public"
+    state: disabled
+  loop:
+    - 9093/tcp
+    - 9092/tcp
+    - 9091/tcp
+    - 9091/udp
+    - 9092/udp
+  notify: restart firewalld
+  tags: firewall

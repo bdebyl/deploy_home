@@ -68,7 +68,7 @@
     - "{{ bookstack_server_name }}.conf"
     - "{{ video_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
-    - "{{ cloud_server_name }}.conf"
+    - "{{ photos_server_name }}.conf"
     - "{{ logs_server_name }}.conf"
   notify:
     - restorecon podman
@@ -87,7 +87,7 @@
     - "{{ ci_server_name }}.http.conf"
     - "{{ pi_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
-    - "{{ cloud_server_name }}.conf"
+    - "{{ photos_server_name }}.conf"
     - "{{ home_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
     - "{{ bookstack_server_name }}.conf"

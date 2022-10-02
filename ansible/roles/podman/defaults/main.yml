@@ -1,26 +1,28 @@
 ---
 bookstack_path: "{{ podman_volumes }}/bookstack"
+cloud_path: "{{ podman_volumes }}/cloud"
 drone_path: "{{ podman_volumes }}/drone"
 graylog_path: "{{ podman_volumes }}/graylog"
 hass_path: "{{ podman_volumes }}/hass"
 nginx_path: "{{ podman_volumes }}/nginx"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
-cloud_path: "{{ podman_volumes }}/cloud"
+photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
 
 drone_server_proto: "https"
 drone_runner_capacity: "4"
 
 # nginx and modsec configuration
-ci_server_name: ci.bdebyl.net
-pi_server_name: pi.bdebyl.net
 assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
+ci_server_name: ci.bdebyl.net
 cloud_server_name: cloud.bdebyl.net
 home_server_name: home.bdebyl.net
-parts_server_name: parts.bdebyl.net
-video_server_name: video.bdebyl.net
 logs_server_name: logs.bdebyl.net
+parts_server_name: parts.bdebyl.net
+photos_server_name: photos.bdebyl.net
+pi_server_name: pi.bdebyl.net
+video_server_name: video.bdebyl.net
 
 nginx_conf_path: "{{ nginx_path }}/etc/conf"
 modsec_log_path: /var/log/nginx/modsec_audit.log

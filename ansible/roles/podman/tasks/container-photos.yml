@@ -1,5 +1,5 @@
 ---
-- name: create required cloud volumes
+- name: create required photos volumes
   become: true
   ansible.builtin.file:
     path: "{{ item }}"
@@ -9,29 +9,29 @@
     mode: 0755
   notify: restorecon podman
   loop:
-    - "{{ cloud_path }}/mysql"
-    - "{{ cloud_path }}/storage"
-  tags: cloud
+    - "{{ photos_path }}/mysql"
+    - "{{ photos_path }}/storage"
+  tags: photos
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: cloud
+  tags: photos
 
-- name: mount cloud cifs
+- name: mount photos cifs
   become: true
   ansible.posix.mount:
-    src: "{{ cloud_cifs_src }}"
-    path: "{{ cloud_path }}/storage"
+    src: "{{ photos_cifs_src }}"
+    path: "{{ photos_path }}/storage"
     fstype: cifs
-    opts: "username=cloud,password={{ cloud_cifs_pass }},uid={{ podman_subuid.stdout }},gid={{ podman_subuid.stdout }}"
+    opts: "username=photos,password={{ photos_cifs_pass }},uid={{ podman_subuid.stdout }},gid={{ podman_subuid.stdout }}"
     state: mounted
-  tags: cloud
+  tags: photos
 
-- name: create cloud-db container
+- name: create photos-db container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: cloud-db
+    name: photos-db
     image: docker.io/mariadb:10.8
     recreate: false
     restart: false
@@ -41,25 +41,25 @@
       - shared
     env:
       MARIADB_AUTO_UPGRADE: "1"
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: cloud
-      MYSQL_USER: cloud
-      MYSQL_PASSWORD: "{{ cloud_db_pass }}"
+      MYSQL_ROOT_PASSWORD: "{{ photos_db_root_pass }}"
+      MYSQL_DATABASE: photos
+      MYSQL_USER: photos
+      MYSQL_PASSWORD: "{{ photos_db_pass }}"
     volumes:
-      - "{{ cloud_path }}/mysql:/var/lib/mysql"
-  tags: cloud
+      - "{{ photos_path }}/mysql:/var/lib/mysql"
+  tags: photos
 
-- name: create systemd startup job for cloud-db
+- name: create systemd startup job for photos-db
   include_tasks: systemd-generate.yml
   vars:
-    container_name: cloud-db
-  tags: cloud
+    container_name: photos-db
+  tags: photos
 
-- name: create cloud container
+- name: create photos container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: cloud
+    name: photos
     image: docker.io/photoprism/photoprism:220901-bookworm
     recreate: false
     restart: false
@@ -68,7 +68,7 @@
     network:
       - shared
     env:
-      PHOTOPRISM_ADMIN_PASSWORD: "{{ cloud_user_pass }}"
+      PHOTOPRISM_ADMIN_PASSWORD: "{{ photos_user_pass }}"
       PHOTOPRISM_AUTH_MODE: "password"
       PHOTOPRISM_SITE_URL: "http://localhost:2342/"
       PHOTOPRISM_ORIGINALS_LIMIT: 5000
@@ -88,21 +88,21 @@
       PHOTOPRISM_DETECT_NSFW: "false"
       PHOTOPRISM_UPLOAD_NSFW: "true"
       PHOTOPRISM_DATABASE_DRIVER: "mysql"
-      PHOTOPRISM_DATABASE_SERVER: "cloud-db:3306"
-      PHOTOPRISM_DATABASE_NAME: "cloud"
-      PHOTOPRISM_DATABASE_USER: "cloud"
-      PHOTOPRISM_DATABASE_PASSWORD: "{{ cloud_db_pass }}"
+      PHOTOPRISM_DATABASE_SERVER: "photos-db:3306"
+      PHOTOPRISM_DATABASE_NAME: "photos"
+      PHOTOPRISM_DATABASE_USER: "photos"
+      PHOTOPRISM_DATABASE_PASSWORD: "{{ photos_db_pass }}"
       PHOTOPRISM_SITE_CAPTION: "AI-Powered Photos App"
       PHOTOPRISM_SITE_DESCRIPTION: ""
       PHOTOPRISM_SITE_AUTHOR: "Bastian D."
     volumes:
-      - "{{ cloud_path }}/storage:/photoprism/"
+      - "{{ photos_path }}/storage:/photoprism/"
     ports:
       - "8088:2342"
-  tags: cloud
+  tags: photos
 
-- name: create systemd startup job for cloud
+- name: create systemd startup job for photos
   include_tasks: systemd-generate.yml
   vars:
-    container_name: cloud
-  tags: cloud
+    container_name: photos
+  tags: photos
