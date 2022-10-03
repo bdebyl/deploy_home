@@ -28,6 +28,16 @@
   register: cloud_owner
   tags: cloud
 
+- name: mount cloud cifs
+  become: true
+  ansible.posix.mount:
+    src: "{{ cloud_cifs_src }}"
+    path: "{{ cloud_path }}/data"
+    fstype: cifs
+    opts: "username=cloud,password={{ cloud_cifs_pass }},uid={{ cloud_owner.stat.uid }},gid={{ cloud_owner.stat.uid }}"
+    state: mounted
+  tags: cloud
+
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
   tags: cloud
