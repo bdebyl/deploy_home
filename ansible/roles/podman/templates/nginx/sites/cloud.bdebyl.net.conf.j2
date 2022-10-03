@@ -1,0 +1,16 @@
+server {
+  modsecurity on;
+  modsecurity_rules_file /etc/nginx/modsec_includes.conf;
+
+  listen 80;
+  server_name {{ cloud_server_name }};
+
+  location '/.well-known/acme-challenge' {
+   default_type "text/plain";
+   root /srv/http/letsencrypt;
+  }
+
+  location / {
+   return 302 https://$host$request_uri;
+  }
+}

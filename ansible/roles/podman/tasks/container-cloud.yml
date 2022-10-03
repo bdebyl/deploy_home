@@ -1,0 +1,89 @@
+---
+- name: create required cloud volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_subuid.stdout }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ cloud_path }}/mysql"
+    - "{{ cloud_path }}/data"
+  tags: cloud
+
+- name: unshare chown the elastic volume
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 33:33 {{ cloud_path }}/data
+  tags: cloud
+
+- name: get user/group id from unshare
+  become: true
+  ansible.builtin.stat:
+    path: "{{ cloud_path }}/data"
+  register: cloud_owner
+  tags: cloud
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: cloud
+
+- name: create cloud-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: cloud-db
+    image: docker.io/mariadb:10.5
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ cloud_db_root_pass }}"
+      MYSQL_DATABASE: cloud
+      MYSQL_PASSWORD: "{{ cloud_db_pass }}"
+      MYSQL_USER: cloud
+    volumes:
+      - "{{ cloud_path }}/mysql:/var/lib/mysql"
+  tags: cloud
+
+- name: create systemd startup job for cloud-db
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: cloud-db
+  tags: cloud
+
+- name: create cloud container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: cloud
+    image: docker.io/nextcloud:24.0.5-apache
+    recreate: false
+    restart: false
+    restart_policy: on-failure
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MYSQL_PASSWORD: "{{ cloud_db_pass }}"
+      MYSQL_DATABASE: cloud
+      MYSQL_HOST: cloud-db
+      MYSQL_USER: cloud
+    volumes:
+      - "{{ cloud_path }}/data:/var/www/html/data"
+    ports:
+      - "8089:80"
+  tags: cloud
+
+- name: create systemd startup job for cloud
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: cloud
+  tags: cloud

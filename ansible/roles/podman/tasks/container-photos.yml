@@ -70,7 +70,7 @@
     env:
       PHOTOPRISM_ADMIN_PASSWORD: "{{ photos_user_pass }}"
       PHOTOPRISM_AUTH_MODE: "password"
-      PHOTOPRISM_SITE_URL: "http://localhost:2342/"
+      PHOTOPRISM_SITE_URL: "https://photos.bdebyl.net/"
       PHOTOPRISM_ORIGINALS_LIMIT: 5000
       PHOTOPRISM_HTTP_COMPRESSION: "gzip"
       PHOTOPRISM_LOG_LEVEL: "info"
