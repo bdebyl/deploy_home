@@ -11,6 +11,7 @@
   loop:
     - "{{ cloud_path }}/mysql"
     - "{{ cloud_path }}/data"
+    - "{{ cloud_path }}/config"
   tags: cloud
 
 - name: unshare chown the elastic volume
@@ -18,7 +19,7 @@
   become_user: "{{ podman_user }}"
   changed_when: false
   ansible.builtin.command: |
-    podman unshare chown -R 33:33 {{ cloud_path }}/data
+    podman unshare chown -R 33:33 {{ cloud_path }}/data {{ cloud_path}}/config
   tags: cloud
 
 - name: get user/group id from unshare
@@ -88,6 +89,7 @@
       MYSQL_USER: cloud
     volumes:
       - "{{ cloud_path }}/data:/var/www/html/data"
+      - "{{ cloud_path }}/config:/var/www/html/config"
     ports:
       - "8089:80"
   tags: cloud
