@@ -14,7 +14,7 @@
     - "{{ cloud_path }}/config"
   tags: cloud
 
-- name: unshare chown the elastic volume
+- name: unshare chown the nextcloud volumes
   become: true
   become_user: "{{ podman_user }}"
   changed_when: false
