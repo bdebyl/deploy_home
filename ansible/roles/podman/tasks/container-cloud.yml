@@ -9,9 +9,10 @@
     mode: 0755
   notify: restorecon podman
   loop:
-    - "{{ cloud_path }}/mysql"
-    - "{{ cloud_path }}/data"
+    - "{{ cloud_path }}/apps"
     - "{{ cloud_path }}/config"
+    - "{{ cloud_path }}/data"
+    - "{{ cloud_path }}/mysql"
   tags: cloud
 
 - name: unshare chown the nextcloud volumes
@@ -88,6 +89,7 @@
       MYSQL_HOST: cloud-db
       MYSQL_USER: cloud
     volumes:
+      - "{{ cloud_path }}/apps:/var/www/html/custom_apps"
       - "{{ cloud_path }}/data:/var/www/html/data"
       - "{{ cloud_path }}/config:/var/www/html/config"
     ports:
