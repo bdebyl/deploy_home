@@ -10,7 +10,7 @@ server {
   server_name {{ video_server_name }};
 
   location / {
-    allow 192.168.1.0/24;
+    allow 192.168.0.0/16;
     allow 127.0.0.1;
     deny all;
 

@@ -2,7 +2,7 @@ upstream hass {
   server 127.0.0.1:8123;
 }
 server {
-  resolver 192.168.1.12 ipv6=off;
+  resolver 192.168.2.10 ipv6=off;
   modsecurity on;
   modsecurity_rules_file /etc/nginx/modsec_includes.conf;
 
@@ -10,7 +10,7 @@ server {
   server_name {{ assistant_server_name }};
 
   location / {
-    allow 192.168.1.0/24;
+    allow 192.168.0.0/16;
     allow 127.0.0.1;
     deny all;
 

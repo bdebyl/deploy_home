@@ -9,8 +9,8 @@ partkeepr_path: "{{ podman_volumes }}/partkeepr"
 photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
 
-drone_server_proto: "https"
-drone_runner_capacity: "4"
+drone_server_proto: "http"
+drone_runner_capacity: "8"
 
 # nginx and modsec configuration
 assistant_server_name: assistant.bdebyl.net
@@ -36,10 +36,10 @@ crs_path: "{{ install_path }}/coreruleset"
 crs_rules_path: "{{ crs_path }}/rules"
 
 modsec_whitelist_local_re: >-
-  ^SecRule.*REMOTE_ADDR.*192\.168\.1\.1/24.*$
+  ^SecRule.*REMOTE_ADDR.*192\.168\.0\.0/16.*$
 
 modsec_whitelist_local: >-
-  SecRule REMOTE_ADDR "@ipMatch 192.168.1.1/24"
+  SecRule REMOTE_ADDR "@ipMatch 192.168.0.0/16"
   "id:1,phase:1,nolog,allow,ctl:ruleEngine=Off"
 
 modsec_git_urls:
