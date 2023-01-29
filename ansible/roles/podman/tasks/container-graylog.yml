@@ -96,7 +96,7 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: graylog
-    image: docker.io/graylog/graylog:4.3
+    image: docker.io/graylog/graylog:4.3.11
     recreate: true
     restart: true
     restart_policy: on-failure

@@ -60,7 +60,7 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: photos
-    image: docker.io/photoprism/photoprism:220901-bookworm
+    image: docker.io/photoprism/photoprism:221118-jammy
     recreate: false
     restart: false
     restart_policy: on-failure

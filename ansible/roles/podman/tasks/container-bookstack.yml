@@ -59,7 +59,7 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: bookstack
-    image: docker.io/solidnerd/bookstack:22.04
+    image: docker.io/solidnerd/bookstack:22.11.1
     recreate: true
     restart: false
     restart_policy: on-failure

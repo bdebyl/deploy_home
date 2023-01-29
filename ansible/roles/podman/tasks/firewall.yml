@@ -30,6 +30,8 @@
     zone: "public"
     state: disabled
   loop:
+    - 2456/udp
+    - 2457/udp
     - 9093/tcp
     - 9092/tcp
     - 9091/tcp

@@ -8,6 +8,7 @@ nginx_path: "{{ podman_volumes }}/nginx"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
 photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
+valheim_path: "{{ podman_volumes }}/valheim"
 
 drone_server_proto: "http"
 drone_runner_capacity: "8"
