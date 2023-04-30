@@ -34,7 +34,7 @@
     image: docker.io/mysql:5.7.21
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
@@ -62,7 +62,7 @@
     image: docker.io/solidnerd/bookstack:22.11.1
     recreate: true
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared

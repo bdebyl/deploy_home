@@ -1,0 +1,46 @@
+---
+- name: create satisfactory host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ satisfactory_path }}/config"
+  tags: satisfactory
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: satisfactory
+
+- name: create satisfactory server container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: satisfactory
+    image: docker.io/wolveix/satisfactory-server:latest
+    recreate: true
+    restart: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    memory: 16g
+    memory_reservation: 12g
+    volumes:
+      - "{{ satisfactory_path }}/config:/config"
+    env:
+      MAXPLAYERS: 4
+      STEAMBETA: "false"
+    ports:
+      - "7777:7777/udp"
+      - "15000:15000/udp"
+      - "15777:15777/udp"
+  tags: satisfactory
+
+- name: create systemd startup job for satisfactory
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: satisfactory
+  tags: satisfactory

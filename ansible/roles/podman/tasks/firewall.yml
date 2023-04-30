@@ -18,6 +18,10 @@
     - 53/udp
     - 6875/tcp
     - 80/tcp
+    # satisfactory
+    - 7777/udp
+    - 15000/udp
+    - 15777/udp
   notify: restart firewalld
   tags: firewall
 

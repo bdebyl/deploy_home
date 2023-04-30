@@ -24,7 +24,7 @@
     image: docker.io/mariadb:10.0
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
@@ -51,7 +51,7 @@
     image: docker.io/bdebyl/partkeepr:0.1.10
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared

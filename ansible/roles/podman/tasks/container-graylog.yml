@@ -51,7 +51,7 @@
     image: docker.io/mongo:4.2
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     network:
       - shared
     volumes:
@@ -72,7 +72,7 @@
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     network:
       - shared
     volumes:
@@ -99,7 +99,7 @@
     image: docker.io/graylog/graylog:4.3.11
     recreate: true
     restart: true
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     sysctl:
       net.ipv6.conf.all.disable_ipv6: 1
       net.ipv6.conf.default.disable_ipv6: 1

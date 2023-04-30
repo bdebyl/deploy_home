@@ -52,7 +52,7 @@
     image: docker.io/mariadb:10.5
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
@@ -79,7 +79,7 @@
     image: docker.io/nextcloud:24.0.5-apache
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared

@@ -8,7 +8,7 @@
     image: docker.io/bdebyl/awsddns:1.0.34
     recreate: false
     restart: true
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     env:
       AWS_ZONE_TTL: 60
@@ -34,7 +34,7 @@
     image: docker.io/bdebyl/awsddns:1.0.34
     recreate: false
     restart: true
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     env:
       AWS_ZONE_TTL: 60

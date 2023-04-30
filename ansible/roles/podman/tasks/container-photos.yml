@@ -35,7 +35,7 @@
     image: docker.io/mariadb:10.8
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
@@ -63,7 +63,7 @@
     image: docker.io/photoprism/photoprism:221118-jammy
     recreate: false
     restart: false
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared

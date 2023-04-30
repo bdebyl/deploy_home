@@ -71,6 +71,7 @@
     - "{{ photos_server_name }}.conf"
     - "{{ pi_server_name }}.conf"
     - "{{ video_server_name }}.conf"
+    - "{{ api_debyltech_server_name }}.conf"
   notify:
     - restorecon podman
     - restart nginx
@@ -95,6 +96,7 @@
     - "{{ photos_server_name }}.conf"
     - "{{ pi_server_name }}.conf"
     - "{{ video_server_name }}.conf"
+    - "{{ api_debyltech_server_name }}.conf"
   notify:
     - restorecon podman
     - restart nginx

@@ -1,0 +1,51 @@
+---
+- name: create required debyltech volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_subuid.stdout }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ debyltech_path }}/api"
+    - "{{ debyltech_path }}/api/config"
+  tags: debyltech
+
+- name: template api.debyltech.com files
+  become: true
+  ansible.builtin.template:
+    src: "debyltech/{{ item }}.j2"
+    dest: "{{ debyltech_path }}/api/config/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  loop:
+    - "config.json"
+  tags: debyltech
+
+- name: create api.debyltech.com container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: apidebyltech
+    image: docker.io/debyltech/go-snipcart-webhook:0.1.34
+    command: --config /conf/config.json --release
+    recreate: true
+    restart: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    volumes:
+      - "{{ debyltech_path }}/api/config:/conf"
+    ports:
+      - "8040:8080"
+  tags: debyltech
+
+- name: create systemd startup job for api.debyltech.com
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: apidebyltech
+  tags: debyltech

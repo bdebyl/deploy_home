@@ -13,6 +13,7 @@
     - "{{ cloud_server_name }}"
     - "{{ parts_server_name }}"
     - "{{ photos_server_name }}"
+    - "{{ api_debyltech_server_name }}"
   tags: ssl
 
 - name: set group ownership for /etc/letsencrypt/

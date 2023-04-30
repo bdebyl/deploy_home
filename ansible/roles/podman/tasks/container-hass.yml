@@ -39,7 +39,7 @@
     image: ghcr.io/home-assistant/home-assistant:stable
     recreate: false
     restart: true
-    restart_policy: on-failure
+    restart_policy: on-failure:3
     log_driver: journald
     cap_add:
       - CAP_NET_RAW
