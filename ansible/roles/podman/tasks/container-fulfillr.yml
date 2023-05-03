@@ -1,0 +1,54 @@
+---
+- name: create fulfillr host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ fulfillr_path }}"
+  tags: fulfillr
+
+- name: template fulfillr config
+  become: true
+  ansible.builtin.template:
+    src: "templates/fulfillr/{{ item }}.j2"
+    dest: "{{ fulfillr_path }}/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  loop:
+    - production.json
+  notify:
+    - restorecon podman
+  tags: fulfillr
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: fulfillr
+
+- name: create fulfillr server container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: fulfillr
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20230503.1557"
+    command: --config /config/production.json
+    recreate: true
+    restart: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    volumes:
+      - "{{ fulfillr_path }}:/config"
+    ports:
+      - 9054:8080/tcp
+  tags: fulfillr
+
+- name: create systemd startup job for fulfillr
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: fulfillr
+  tags: fulfillr

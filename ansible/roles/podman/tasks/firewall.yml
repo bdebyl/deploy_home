@@ -5,23 +5,29 @@
     port: "{{ item }}"
     permanent: true
     immediate: true
-    zone: "public"
     state: enabled
   loop:
     - "{{ syslog_udp_default }}/udp"
     - "{{ syslog_udp_error }}/udp"
     - "{{ syslog_udp_unifi }}/udp"
-    - 1153/tcp
-    - 1153/udp
+    # nginx
+    - 80/tcp
     - 443/tcp
+    # pihole (unused?)
     - 53/tcp
     - 53/udp
+    # pihole (iptables preroute)
+    - 1153/tcp
+    - 1153/udp
+    # ???
     - 6875/tcp
-    - 80/tcp
-    # satisfactory
+    # Satisfactory
     - 7777/udp
     - 15000/udp
     - 15777/udp
+    # Factorio
+    - 27015/tcp
+    - 34197/udp
   notify: restart firewalld
   tags: firewall
 
@@ -31,7 +37,6 @@
     port: "{{ item }}"
     permanent: true
     immediate: true
-    zone: "public"
     state: disabled
   loop:
     - 2456/udp

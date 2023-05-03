@@ -9,7 +9,8 @@ nginx_path: "{{ podman_volumes }}/nginx"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
 photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
-satisfactory_path: "{{ podman_volumes }}/satisfactory"
+factorio_path: "{{ podman_volumes }}/factorio"
+fulfillr_path: "{{ podman_volumes }}/fulfillr"
 
 drone_server_proto: "http"
 drone_runner_capacity: "8"
@@ -20,6 +21,7 @@ assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
 ci_server_name: ci.bdebyl.net
 cloud_server_name: cloud.bdebyl.net
+fulfillr_server_name: fulfillr.debyltech.com
 home_server_name: home.bdebyl.net
 logs_server_name: logs.bdebyl.net
 parts_server_name: parts.bdebyl.net

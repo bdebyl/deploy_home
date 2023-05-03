@@ -1,0 +1,48 @@
+---
+- name: create factorio host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ factorio_path }}"
+  tags: factorio
+
+- name: unshare chown the elastic volume
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 845:845 {{ factorio_path }}
+  tags: factorio
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: factorio
+
+- name: create factorio server container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: factorio
+    image: docker.io/factoriotools/factorio:1.1.80
+    recreate: true
+    restart: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    volumes:
+      - "{{ factorio_path }}:/factorio"
+    ports:
+      - 34197:34197/udp
+      - 27015:27015/tcp
+  tags: factorio
+
+- name: create systemd startup job for factorio
+  include_tasks: systemd-generate.yml
+  vars:
+    container_name: factorio
+  tags: factorio
