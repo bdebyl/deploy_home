@@ -1,2 +1,5 @@
 rules:
   braces: disable
+
+ignore:
+  - ansible/roles/podman/files/hass/configuration.yaml
