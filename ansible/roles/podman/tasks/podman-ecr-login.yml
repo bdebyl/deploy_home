@@ -1,0 +1,25 @@
+---
+- name: fetch aws ecr auth token
+  become: true
+  become_user: podman
+  shell: |
+    aws ecr get-authorization-token --region us-east-1
+  register: ecr_command
+  tags: always
+
+- set_fact:
+    ecr_authorization_data: "{{ (ecr_command.stdout | from_json).authorizationData[0] }}"
+  tags: always
+
+- set_fact:
+    ecr_credentials: "{{ (ecr_authorization_data.authorizationToken | b64decode).split(':') }}"
+  tags: always
+
+- name: podman login to AWS ECR
+  become: true
+  become_user: podman
+  containers.podman.podman_login:
+    registry: "{{ aws_ecr_endpoint }}"
+    username: "{{ ecr_credentials[0] }}"
+    password: "{{ ecr_credentials[1] }}"
+  tags: always

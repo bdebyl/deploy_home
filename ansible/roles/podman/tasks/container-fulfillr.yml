@@ -1,4 +1,6 @@
 ---
+- import_tasks: podman-ecr-login.yml
+
 - name: create fulfillr host directory volumes
   become: true
   ansible.builtin.file:
@@ -35,7 +37,7 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: fulfillr
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20230503.1628"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20230505.1608"
     command: --config /config/production.json
     recreate: true
     restart: true
