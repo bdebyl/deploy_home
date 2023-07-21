@@ -14,3 +14,4 @@
 - import_tasks: container-fulfillr.yml
 - import_tasks: container-nginx.yml
 - import_tasks: container-factorio.yml
+- import_tasks: container-sshpass-cron.yml

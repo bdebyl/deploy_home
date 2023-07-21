@@ -11,6 +11,7 @@ photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
 factorio_path: "{{ podman_volumes }}/factorio"
 fulfillr_path: "{{ podman_volumes }}/fulfillr"
+sshpass_cron_path: "{{ podman_volumes }}/sshpass_cron"
 
 drone_server_proto: "http"
 drone_runner_capacity: "8"

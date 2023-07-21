@@ -37,7 +37,7 @@
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: fulfillr
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20230710.1937"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20230711.1654"
     image_strict: true
     command: --config /config/production.json
     recreate: true
