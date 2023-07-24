@@ -11,7 +11,6 @@
   loop:
     - "{{ hass_path }}/media"
     - "{{ hass_path }}/config"
-  tags: hass
 
 - name: copy configuration and automations
   become: true
@@ -25,20 +24,21 @@
   loop:
     - configuration.yaml
     - automations.yaml
-  tags: hass
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: hass
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: hass
+    container_image: "{{ image }}"
 
 - name: create home-assistant server container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: hass
-    image: ghcr.io/home-assistant/home-assistant:stable
-    recreate: false
-    restart: true
+    image: "{{ image }}" 
     restart_policy: on-failure:3
     log_driver: journald
     cap_add:
@@ -49,10 +49,8 @@
       - "{{ hass_path }}/media:/share"
     ports:
       - "8123:8123"
-  tags: hass
 
 - name: create systemd startup job for hass
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: hass
-  tags: hass

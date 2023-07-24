@@ -1,14 +1,17 @@
 ---
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: nginx
+    container_image: "{{ image }}"
+
 - name: create nginx container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: nginx
-    image: docker.io/owasp/modsecurity:nginx
+    image: "{{ image }}"
     entrypoint: ""
     command: ["nginx", "-g", "daemon off;"]
-    recreate: false
-    restart: true
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -22,10 +25,8 @@
       - "{{ nginx_path }}/etc:/etc/nginx:ro"
       - "/srv/http/letsencrypt:/srv/http/letsencrypt:z"
       - "/etc/letsencrypt:/etc/letsencrypt:ro"
-  tags: nginx
 
 - name: create systemd startup job for nginx
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: nginx
-  tags: nginx

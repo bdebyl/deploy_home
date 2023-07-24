@@ -1,0 +1,20 @@
+---
+- name: get container info
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container_info:
+    name: "{{ container_name }}"
+  register: container
+
+- name: check
+  debug:
+    msg: "image '{{ container.containers[0]['ImageName'] }}' not equivalent to '{{ container_image }}'!"
+  when: container.containers[0]["ImageName"] != container_image
+
+- name: delete container if necessary
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    state: absent
+  when: container.containers[0]["ImageName"] != container_image

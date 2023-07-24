@@ -12,11 +12,9 @@
     - "{{ bookstack_path }}/mysql"
     - "{{ bookstack_path }}/public"
     - "{{ bookstack_path }}/storage"
-  tags: bookstack
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: bookstack
 
 - name: unshare chown the bookstack upload volumes
   become: true
@@ -24,16 +22,18 @@
   changed_when: false
   ansible.builtin.command: |
     podman unshare chown -R 33:33 {{ bookstack_path }}/public {{ bookstack_path }}/storage
-  tags: bookstack
 
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: bookstack-db
+    container_image: "{{ db_image }}"
+    
 - name: create bookstack-db container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: bookstack-db
-    image: docker.io/mysql:5.7.21
-    recreate: false
-    restart: false
+    image: "{{ db_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -46,22 +46,23 @@
       MYSQL_PASSWORD: "{{ bookstack_db_pass }}"
     volumes:
       - "{{ bookstack_path }}/mysql:/var/lib/mysql"
-  tags: bookstack
 
 - name: create systemd startup job for bookstack-db
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: bookstack-db
-  tags: bookstack
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: bookstack
+    container_image: "{{ image }}"
 
 - name: create bookstack container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: bookstack
-    image: docker.io/solidnerd/bookstack:23.6
-    recreate: true
-    restart: false
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -85,10 +86,8 @@
     volumes:
       - "{{ bookstack_path }}/public:/var/www/bookstack/public/uploads"
       - "{{ bookstack_path }}/storage:/var/www/bookstack/storage/uploads"
-  tags: bookstack
 
 - name: create systemd startup job for bookstack
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: bookstack
-  tags: bookstack

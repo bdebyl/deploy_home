@@ -1,17 +1,71 @@
 ---
 - import_tasks: podman.yml
-- import_tasks: configuration-nginx.yml
 - import_tasks: firewall.yml
+
 - import_tasks: container-awsddns.yml
+  vars:
+    image: docker.io/bdebyl/awsddns:1.0.34
+  tags: ddns
+
 - import_tasks: container-drone.yml
+  vars:
+    runner_image: docker.io/drone/drone-runner-docker:1.8.3
+    image: docker.io/drone/drone:2.16.0
+  tags: drone
+
 - import_tasks: container-hass.yml
+  vars:
+    image: ghcr.io/home-assistant/home-assistant:stable
+  tags: hass
+
 - import_tasks: container-partkeepr.yml
+  vars:
+    db_image: docker.io/library/mariadb:10.0
+    image: docker.io/bdebyl/partkeepr:0.1.10
+  tags: partkeepr
+
 - import_tasks: container-graylog.yml
-- import_tasks: container-pihole.yml
+  vars:
+    db_image: docker.io/library/mongo:4.2
+    es_image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    image: docker.io/graylog/graylog:4.3.11
+  tags: graylog
+
 - import_tasks: container-bookstack.yml
+  vars:
+    db_image: docker.io/library/mysql:5.7.21
+    image: docker.io/solidnerd/bookstack:23.6
+  tags: bookstack
+
 - import_tasks: container-photos.yml
+  vars:
+    db_image: docker.io/library/mariadb:10.8
+    image: docker.io/photoprism/photoprism:230625-ce
+  tags: photos
+
 - import_tasks: container-cloud.yml
+  vars:
+    db_image: docker.io/library/mariadb:10.5
+    image: docker.io/library/nextcloud:24.0.5-apache
+  tags: cloud
+
 - import_tasks: container-fulfillr.yml
+  vars:
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20230711.1654"
+  tags: fulfillr
+
+- import_tasks: configuration-nginx.yml
 - import_tasks: container-nginx.yml
-- import_tasks: container-factorio.yml
+  vars:
+    image: docker.io/owasp/modsecurity:nginx
+  tags: nginx
+
 - import_tasks: container-sshpass-cron.yml
+  vars:
+    image: docker.io/bdebyl/sshpass-cron:1.0.11
+  tags: sshpass_cron
+
+- import_tasks: container-factorio.yml
+  vars:
+    image: docker.io/factoriotools/factorio:1.1.80
+  tags: factorio

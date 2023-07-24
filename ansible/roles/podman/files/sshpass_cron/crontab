@@ -1,4 +1,4 @@
-0 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@Garage.localdomain 'reboot'
-15 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@LivingRoom.localdomain 'reboot'
-30 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@FrontYard.localdomain 'reboot'
-45 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@Office.localdomain 'reboot'
+0 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.254 'reboot'
+15 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.253 'reboot'
+30 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.252 'reboot'
+45 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.251 'reboot'

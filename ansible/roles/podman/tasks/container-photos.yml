@@ -11,11 +11,9 @@
   loop:
     - "{{ photos_path }}/mysql"
     - "{{ photos_path }}/storage"
-  tags: photos
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: photos
 
 - name: mount photos cifs
   become: true
@@ -25,16 +23,18 @@
     fstype: cifs
     opts: "username=photos,password={{ photos_cifs_pass }},uid={{ podman_subuid.stdout }},gid={{ podman_subuid.stdout }}"
     state: mounted
-  tags: photos
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: photos-db
+    container_image: "{{ db_image }}"
 
 - name: create photos-db container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: photos-db
-    image: docker.io/mariadb:10.8
-    recreate: false
-    restart: false
+    image: "{{ db_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -47,22 +47,23 @@
       MYSQL_PASSWORD: "{{ photos_db_pass }}"
     volumes:
       - "{{ photos_path }}/mysql:/var/lib/mysql"
-  tags: photos
 
 - name: create systemd startup job for photos-db
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: photos-db
-  tags: photos
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: photos
+    container_image: "{{ image }}"
 
 - name: create photos container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: photos
-    image: docker.io/photoprism/photoprism:230625-ce
-    recreate: false
-    restart: false
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -99,10 +100,8 @@
       - "{{ photos_path }}/storage:/photoprism/"
     ports:
       - "8088:2342"
-  tags: photos
 
 - name: create systemd startup job for photos
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: photos
-  tags: photos

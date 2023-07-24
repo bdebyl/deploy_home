@@ -10,7 +10,6 @@
   notify: restorecon podman
   loop:
     - "{{ sshpass_cron_path }}"
-  tags: sshpass_cron
 
 - name: copy sshpass_cron crontab
   become: true
@@ -24,7 +23,6 @@
     - crontab
   notify:
     - restorecon podman
-  tags: sshpass_cron
 
 - name: create sshpass_cron password file
   become: true
@@ -36,29 +34,29 @@
     mode: 0400
   notify:
     - restorecon podman
-  tags: sshpass_cron
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: sshpass_cron
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: sshpass_cron
+    container_image: "{{ image }}"
 
 - name: create sshpass_cron container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: sshpass_cron
-    image: docker.io/bdebyl/sshpass-cron:1.0.9
-    image_strict: true
-    recreate: true
-    restart: true
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     volumes:
       - "{{ sshpass_cron_path }}:/mnt"
-  tags: sshpass_cron
+    env:
+      TZ: "America/New_York"
 
 - name: create systemd startup job for sshpass_cron
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: sshpass_cron
-  tags: sshpass_cron

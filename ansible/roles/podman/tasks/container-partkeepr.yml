@@ -10,20 +10,21 @@
   notify: restorecon podman
   loop:
     - "{{ partkeepr_path }}/mysql"
-  tags: partkeepr
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: partkeepr
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: partkeepr-db
+    container_image: "{{ db_image }}"
 
 - name: create partkeepr-db container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: partkeepr-db
-    image: docker.io/mariadb:10.0
-    recreate: false
-    restart: false
+    image: "{{ db_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -35,32 +36,31 @@
       MYSQL_PASSWORD: "{{ partkeepr_mysql_password }}"
     volumes:
       - "{{ partkeepr_path }}/mysql:/var/lib/mysql"
-  tags: partkeepr
 
 - name: create systemd startup job for partkeepr-db
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: partkeepr-db
-  tags: partkeepr
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: partkeepr
+    container_image: "{{ image }}"
 
 - name: create partkeepr container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: partkeepr
-    image: docker.io/bdebyl/partkeepr:0.1.10
-    recreate: false
-    restart: false
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
     ports:
       - "8081:80"
-  tags: partkeepr
 
 - name: create systemd startup job for partkeepr
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: partkeepr
-  tags: partkeepr

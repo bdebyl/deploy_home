@@ -1,13 +1,16 @@
 ---
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: awsddns
+    container_image: "{{ image }}"
+
 - name: create home.bdebyl.net awsddns server container
   become: true
   become_user: "{{ podman_user }}"
   diff: false
   containers.podman.podman_container:
     name: awsddns
-    image: docker.io/bdebyl/awsddns:1.0.34
-    recreate: false
-    restart: true
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     env:
@@ -17,13 +20,16 @@
       AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
       AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
       AWS_DEFAULT_REGION: "{{ aws_default_region }}"
-  tags: ddns
 
 - name: create systemd startup job for awsddns
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: awsddns
-  tags: ddns
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: awsddns-skudak
+    container_image: "{{ image }}"
 
 - name: create wiki.skudakrennsport.com awsddns server container
   become: true
@@ -31,9 +37,7 @@
   diff: false
   containers.podman.podman_container:
     name: awsddns-skudak
-    image: docker.io/bdebyl/awsddns:1.0.34
-    recreate: false
-    restart: true
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     env:
@@ -43,10 +47,8 @@
       AWS_ACCESS_KEY_ID: "{{ aws_skudak_access_key_id }}"
       AWS_SECRET_ACCESS_KEY: "{{ aws_skudak_secret_access_key }}"
       AWS_DEFAULT_REGION: "{{ aws_default_region }}"
-  tags: ddns
 
 - name: create systemd startup job for awsddns-skudak
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: awsddns
-  tags: ddns

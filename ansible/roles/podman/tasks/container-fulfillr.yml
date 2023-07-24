@@ -1,5 +1,5 @@
 ---
-- import_tasks: podman-ecr-login.yml
+- import_tasks: ecr/podman-ecr-login.yml
 
 - name: create fulfillr host directory volumes
   become: true
@@ -12,7 +12,6 @@
   notify: restorecon podman
   loop:
     - "{{ fulfillr_path }}"
-  tags: fulfillr
 
 - name: template fulfillr config
   become: true
@@ -26,32 +25,31 @@
     - production.json
   notify:
     - restorecon podman
-  tags: fulfillr
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: fulfillr
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: fulfillr
+    container_image: "{{ image }}"
 
 - name: create fulfillr server container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: fulfillr
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20230711.1654"
+    image: "{{ image }}"
     image_strict: true
     command: --config /config/production.json
-    recreate: true
-    restart: true
     restart_policy: on-failure:3
     log_driver: journald
     volumes:
       - "{{ fulfillr_path }}:/config"
     ports:
       - 9054:8080/tcp
-  tags: fulfillr
 
 - name: create systemd startup job for fulfillr
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: fulfillr
-  tags: fulfillr

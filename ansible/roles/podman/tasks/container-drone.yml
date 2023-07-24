@@ -10,20 +10,21 @@
   notify: restorecon podman
   loop:
     - "{{ drone_path }}/data"
-  tags: drone
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags: drone
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: drone
+    container_image: "{{ image }}"
 
 - name: create drone-ci server container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: drone
-    image: docker.io/drone/drone:2.16.0
-    recreate: true
-    restart: true
+    image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -41,22 +42,23 @@
       - "{{ drone_path }}/data:/data"
     ports:
       - "8080:80"
-  tags: drone
 
 - name: create systemd startup job for drone
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: drone
-  tags: drone
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: drone-runner
+    container_image: "{{ runner_image }}"
 
 - name: create drone-ci worker container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
     name: drone-runner
-    image: docker.io/drone/drone-runner-docker:1.8.3
-    recreate: false
-    restart: true
+    image: "{{ runner_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
@@ -70,10 +72,8 @@
       - "/run/user/1002/podman/podman.sock:/var/run/docker.sock"
     ports:
       - "3000:3000"
-  tags: drone
 
 - name: create systemd startup job for drone-runner
-  include_tasks: systemd-generate.yml
+  include_tasks: podman/systemd-generate.yml
   vars:
     container_name: drone-runner
-  tags: drone
