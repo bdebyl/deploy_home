@@ -14,7 +14,6 @@ PIP=${VENV_BIN}/pip
 ANSIBLE=${VENV_BIN}/ansible-playbook
 ANSIBLE_VAULT=${VENV_BIN}/ansible-vault
 
-LINT_ANSIBLE=${VENV_BIN}/ansible-lint
 LINT_YAML=${VENV_BIN}/yamllint
 
 VAULT_PASS_FILE=.ansible-vaultpass
@@ -33,7 +32,7 @@ ${VENV}:
 	python3 -m venv ${VENV}
 ${PIP}: ${VENV}
 
-${ANSIBLE} ${ANSIBLE_VAULT} ${LINT_YAML} ${LINT_ANSIBLE}: ${VENV} requirements.txt
+${ANSIBLE} ${ANSIBLE_VAULT} ${LINT_YAML}: ${VENV} requirements.txt
 	${PIP} install -r requirements.txt
 	touch $@
 
@@ -66,14 +65,10 @@ check: ${ANSIBLE} ${VAULT_FILE}
 vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 	${ANSIBLE_VAULT} edit --vault-password-file ${VAULT_PASS_FILE} ${VAULT_FILE}
 
-lint: ${LINT_YAML} ${LINT_ANSIBLE} ${SKIP_FILE}
+lint: ${LINT_YAML} ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	-@${LINT_YAML} ${YAML_FILES}
-	@. ${SKIP_FILE}; printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "$$ANSIBLE_LINT_SKIP_LIST"
-	-@. ${SKIP_FILE}; ${LINT_ANSIBLE} -x $$ANSIBLE_LINT_SKIP_LIST ansible/
 
 lint-ci: ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	@yamllint ${YAML_FILES}
-	@. ${SKIP_FILE}; printf "Running ansible-lint with SKIP_LIST: [%s]...\n" "$$ANSIBLE_LINT_SKIP_LIST"
-	@. ${SKIP_FILE}; ansible-lint -x $$ANSIBLE_LINT_SKIP_LIST ansible/

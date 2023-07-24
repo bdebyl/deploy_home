@@ -51,4 +51,4 @@
 - name: create systemd startup job for awsddns-skudak
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: awsddns
+    container_name: awsddns-skudak
