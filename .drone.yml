@@ -7,7 +7,8 @@ steps:
   - name: lint
     image: docker.io/bdebyl/yamllint:1.0.87
     pull: always
-    command: ansible/
+    command:
+      - ansible/
 
 trigger:
   event:
@@ -15,6 +16,6 @@ trigger:
     - pull_request
 ---
 kind: signature
-hmac: 846bdca2dc2121d8ec446f3e1f42ec0d61f64141e5fa2f62fbbb556790c132f7
+hmac: 9513e0026cb3c7468b184164e008f6a0c2065c62e78aeb035c87ae09a77e082a
 
 ...
