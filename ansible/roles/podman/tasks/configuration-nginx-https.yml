@@ -39,7 +39,6 @@
     - "{{ cloud_server_name }}.https.conf"
     - "{{ parts_server_name }}.https.conf"
     - "{{ photos_server_name }}.https.conf"
-    - "{{ api_debyltech_server_name }}.https.conf"
   notify:
     - restorecon podman
     - restart nginx
@@ -59,7 +58,6 @@
     - "{{ cloud_server_name }}.https.conf"
     - "{{ parts_server_name }}.https.conf"
     - "{{ photos_server_name }}.https.conf"
-    - "{{ api_debyltech_server_name }}.https.conf"
   notify:
     - restorecon podman
     - restart nginx

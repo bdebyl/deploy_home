@@ -10,6 +10,7 @@
   debug:
     msg: "image '{{ container.containers[0]['ImageName'] }}' not equivalent to '{{ container_image }}'!"
   when: container.containers[0]["ImageName"] != container_image
+  ignore_errors: true
 
 - name: delete container if necessary
   become: true
@@ -18,3 +19,4 @@
     name: "{{ container_name }}"
     state: absent
   when: container.containers[0]["ImageName"] != container_image
+  ignore_errors: true

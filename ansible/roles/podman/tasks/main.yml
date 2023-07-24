@@ -10,7 +10,7 @@
 - import_tasks: container-drone.yml
   vars:
     runner_image: docker.io/drone/drone-runner-docker:1.8.3
-    image: docker.io/drone/drone:2.16.0
+    image: docker.io/drone/drone:2.18.0
   tags: drone
 
 - import_tasks: container-hass.yml

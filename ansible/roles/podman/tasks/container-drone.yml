@@ -66,7 +66,7 @@
     env:
       DRONE_RPC_SECRET: "{{ drone_rpc_secret }}"
       DRONE_RPC_HOST: "drone"
-      DRONE_RPC_PROTO: "{{ drone_server_proto }}"
+      DRONE_RPC_PROTO: "{{ drone_runner_proto }}"
       DRONE_RUNNER_CAPACITY: "{{ drone_runner_capacity }}"
     volumes:
       - "/run/user/1002/podman/podman.sock:/var/run/docker.sock"
