@@ -8,7 +8,7 @@ steps:
     image: docker.io/bdebyl/yamllint:1.0.88
     pull: always
     commands:
-      - yamllint ansible/
+      - yamllint -c .yamllint.yml --list-files ansible/
 
 trigger:
   event:
@@ -16,6 +16,6 @@ trigger:
     - pull_request
 ---
 kind: signature
-hmac: 92b44bfb500ce873eb00d47a1c0c317bdad75374081f5fe34d8c35031dd685e6
+hmac: a46331cb776bdedaf3584f833730a81fe16cf429880fe3480f8a4412247cf006
 
 ...
