@@ -68,7 +68,3 @@ vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 lint: ${LINT_YAML} ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	-@${LINT_YAML} ${YAML_FILES}
-
-lint-ci: ${SKIP_FILE}
-	@printf "Running yamllint...\n"
-	@yamllint ${YAML_FILES}

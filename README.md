@@ -31,5 +31,4 @@ updates in newest versions, etc._)
 | `deploy`    | Deploys everything, or only tasks specified in `TAGS=` environment variable          |
 | `check`     | Runs `deploy` in a "dry-run", showing diff-style outputs on tasks indicating changes |
 | `vault`     | Opens the Ansible vault file for editing                                             |
-| `lint-ci`   | Meant for use with `bdebyl/yamllint` (_see `.drone.yml`_)                            |
 

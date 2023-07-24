@@ -5,10 +5,10 @@ name: default
 
 steps:
   - name: lint
-    image: bdebyl/yamllint
+    image: docker.io/bdebyl/yamllint:1.0.87
     pull: always
     command:
-      - make lint-ci
+      - yamllint ansible/
 
 trigger:
   event:
@@ -16,6 +16,6 @@ trigger:
     - pull_request
 ---
 kind: signature
-hmac: 12a8371679582716620cf0d32554684aabb0e86bdda3c849eca3e9dc55738b84
+hmac: 082ae2026ee2c326e1b088e1ee9739af23a3fdf3585dd9bc3fc5c033084be840
 
 ...
