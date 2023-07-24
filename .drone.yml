@@ -7,8 +7,7 @@ steps:
   - name: lint
     image: docker.io/bdebyl/yamllint:1.0.87
     pull: always
-    command:
-      - yamllint ansible/
+    command: ansible/
 
 trigger:
   event:
