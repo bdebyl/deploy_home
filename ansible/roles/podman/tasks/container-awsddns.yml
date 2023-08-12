@@ -52,3 +52,30 @@
   include_tasks: podman/systemd-generate.yml
   vars:
     container_name: awsddns-skudak
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: awsddns-fulfillr
+    container_image: "{{ image }}"
+
+- name: create fulfillr.debyltech.com awsddns server container
+  become: true
+  become_user: "{{ podman_user }}"
+  diff: false
+  containers.podman.podman_container:
+    name: awsddns-fulfillr
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      AWS_ZONE_TTL: 60
+      AWS_ZONE_ID: "{{ fulfillr_zone_id }}"
+      AWS_ZONE_HOSTNAME: "{{ fulfillr_server_name }}"
+      AWS_ACCESS_KEY_ID: "{{ fulfillr_access_key }}"
+      AWS_SECRET_ACCESS_KEY: "{{ fulfillr_secret_key }}"
+      AWS_DEFAULT_REGION: "{{ fulfillr_region }}"
+
+- name: create systemd startup job for awsddns-fulfillr
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: awsddns-fulfillr
