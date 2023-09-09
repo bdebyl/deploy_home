@@ -1,4 +1,5 @@
-0 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.254 'reboot'
+30 4 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' -o 'HostKeyAlgorithms=+ssh-rsa' root@192.168.1.1 'reboot'
+0  5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.254 'reboot'
 15 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.253 'reboot'
 30 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.252 'reboot'
 45 5 * * * sshpass -f /mnt/unifi-pass ssh -o 'StrictHostKeyChecking=no' ubnt@192.168.1.251 'reboot'
