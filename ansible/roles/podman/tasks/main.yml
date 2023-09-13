@@ -51,7 +51,7 @@
 
 - import_tasks: container-fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20230828.2117"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20230913.2009"
   tags: fulfillr
 
 - import_tasks: configuration-nginx.yml
