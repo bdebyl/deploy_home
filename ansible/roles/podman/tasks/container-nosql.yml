@@ -1,0 +1,44 @@
+---
+- name: create nosql host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ nosql_path }}/conf"
+    - "{{ nosql_path }}/data"
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: nosql
+    container_image: "{{ image }}"
+
+- name: create nosql container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: nosql
+    image: "{{ image }}"
+    command: redis-server --requirepass {{ nosql_password }} 
+    restart_policy: on-failure:3
+    log_driver: journald
+    volumes:
+      - "{{ nosql_path }}/conf:/usr/local/etc/redis/"
+      - "{{ nosql_path }}/data:/var/lib/redis"
+    env:
+      TZ: America/New_York
+      REDIS_REPLICATION_MODE: master
+    ports:
+      - 6379:6379/tcp
+
+- name: create systemd startup job for nosql
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: nosql

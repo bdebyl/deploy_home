@@ -16,9 +16,8 @@
     # pihole (unused?)
     - 53/tcp
     - 53/udp
-    # pihole (iptables preroute)
-    - 1153/tcp
-    - 1153/udp
+    # nosql/redis
+    - 6379/tcp
     # ???
     - 6875/tcp
     # Satisfactory
@@ -39,6 +38,9 @@
     immediate: true
     state: disabled
   loop:
+    - 1153/tcp
+    - 1153/udp
+    - 2000/udp
     - 2456/udp
     - 2457/udp
     - 9093/tcp
