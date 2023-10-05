@@ -1,6 +1,7 @@
 ---
 bookstack_path: "{{ podman_volumes }}/bookstack"
 cloud_path: "{{ podman_volumes }}/cloud"
+cloud_skudak_path: "{{ podman_volumes }}/skudakcloud"
 debyltech_path: "{{ podman_volumes }}/debyltech"
 drone_path: "{{ podman_volumes }}/drone"
 factorio_path: "{{ podman_volumes }}/factorio"
@@ -23,6 +24,7 @@ assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
 ci_server_name: ci.bdebyl.net
 cloud_server_name: cloud.bdebyl.net
+cloud_skudak_server_name: cloud.skudakrennsport.com
 fulfillr_server_name: fulfillr.debyltech.com
 home_server_name: home.bdebyl.net
 logs_server_name: logs.bdebyl.net

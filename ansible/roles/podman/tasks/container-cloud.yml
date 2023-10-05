@@ -19,7 +19,7 @@
   become_user: "{{ podman_user }}"
   changed_when: false
   ansible.builtin.command: |
-    podman unshare chown -R 33:33 {{ cloud_path }}/data {{ cloud_path}}/config
+    podman unshare chown -R 33:33 {{ cloud_path }}/apps {{ cloud_path }}/data {{ cloud_path}}/config
 
 - name: get user/group id from unshare
   become: true
@@ -33,7 +33,7 @@
     src: "{{ cloud_cifs_src }}"
     path: "{{ cloud_path }}/data"
     fstype: cifs
-    opts: "username=cloud,password={{ cloud_cifs_pass }},uid={{ cloud_owner.stat.uid }},gid={{ cloud_owner.stat.uid }}"
+    opts: "username=cloud,password={{ cloud_cifs_pass }},uid={{ cloud_owner.stat.uid }},gid={{ cloud_owner.stat.uid }},file_mode=0770,dir_mode=0770"
     state: mounted
 
 - name: flush handlers

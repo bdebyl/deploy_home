@@ -11,6 +11,7 @@
     - "{{ bookstack_server_name }}"
     - "{{ ci_server_name }}"
     - "{{ cloud_server_name }}"
+    - "{{ cloud_skudak_server_name }}"
     - "{{ fulfillr_server_name }}"
     - "{{ parts_server_name }}"
     - "{{ photos_server_name }}"

@@ -1,0 +1,100 @@
+---
+- name: create required skudak cloud volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_subuid.stdout }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ cloud_skudak_path }}/apps"
+    - "{{ cloud_skudak_path }}/config"
+    - "{{ cloud_skudak_path }}/data"
+    - "{{ cloud_skudak_path }}/mysql"
+
+- name: unshare chown the skudak cloud volumes
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 33:33 {{ cloud_skudak_path }}/apps {{ cloud_skudak_path }}/data {{ cloud_skudak_path}}/config
+
+- name: get user/group id from unshare
+  become: true
+  ansible.builtin.stat:
+    path: "{{ cloud_skudak_path }}/data"
+  register: cloud_skudak_owner
+
+- name: mount cloud cifs
+  become: true
+  ansible.posix.mount:
+    src: "{{ cloud_skudak_cifs_src }}"
+    path: "{{ cloud_skudak_path }}/data"
+    fstype: cifs
+    opts: "username=skucloud,password={{ cloud_skudak_cifs_pass }},uid={{ cloud_skudak_owner.stat.uid }},gid={{ cloud_skudak_owner.stat.uid }},file_mode=0770,dir_mode=0770"
+    state: mounted
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: skudak-cloud-db
+    container_image: "{{ db_image }}"
+
+- name: create skudak-cloud-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: skudak-cloud-db
+    image: "{{ db_image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ cloud_skudak_db_root_pass }}"
+      MYSQL_DATABASE: skucloud
+      MYSQL_PASSWORD: "{{ cloud_skudak_db_pass }}"
+      MYSQL_USER: skucloud
+    volumes:
+      - "{{ cloud_skudak_path }}/mysql:/var/lib/mysql"
+
+- name: create systemd startup job for skudak-cloud-db
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: skudak-cloud-db
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: skudak-cloud
+    container_image: "{{ image }}"
+
+- name: create skudak cloud container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: skudak-cloud
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MYSQL_PASSWORD: "{{ cloud_skudak_db_pass }}"
+      MYSQL_DATABASE: skucloud
+      MYSQL_HOST: skudak-cloud-db
+      MYSQL_USER: skucloud
+    volumes:
+      - "{{ cloud_skudak_path }}/apps:/var/www/html/custom_apps"
+      - "{{ cloud_skudak_path }}/data:/var/www/html/data"
+      - "{{ cloud_skudak_path }}/config:/var/www/html/config"
+    ports:
+      - "8090:80"
+
+- name: create systemd startup job for cloud
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: skudak-cloud

@@ -49,6 +49,12 @@
     image: docker.io/library/nextcloud:24.0.5-apache
   tags: cloud
 
+- import_tasks: container-cloud-skudak.yml
+  vars:
+    db_image: docker.io/library/mariadb:10.5
+    image: docker.io/library/nextcloud:24.0.5-apache
+  tags: skucloud
+
 - import_tasks: container-fulfillr.yml
   vars:
     image: "{{ aws_ecr_endpoint }}/fulfillr:20231005.1415"
