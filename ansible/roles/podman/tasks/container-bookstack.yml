@@ -69,6 +69,7 @@
       - shared
     env:
       APP_URL: "https://wiki.skudakrennsport.com"
+      APP_KEY: "{{ bookstack_app_key }}"
       DB_HOST: "bookstack-db"
       DB_USERNAME: "bookstack"
       DB_DATABASE: "bookstack"

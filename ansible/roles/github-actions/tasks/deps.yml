@@ -1,0 +1,14 @@
+---
+- name: enable required dnf repositories
+  become: true
+  ansible.builtin.shell:
+    cmd: dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    creates: /etc/yum.repos.d/hashicorp.repo
+
+- name: install github dependencies
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - awscli
+      - terraform
+    state: present

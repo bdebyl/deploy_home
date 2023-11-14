@@ -1,0 +1,60 @@
+---
+- name: create github actions user
+  become: true
+  ansible.builtin.user:
+    name: "{{ runner_user }}"
+    shell: /usr/bin/nologin
+    createhome: true
+    home: "{{ runner_dir }}"
+
+- name: set ulimits for github user
+  become: true
+  community.general.pam_limits:
+    domain: "{{ runner_user }}"
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - name: memlock
+      type: soft
+      value: "unlimited"
+    - name: memlock
+      type: hard
+      value: "unlimited"
+    - name: nofile
+      type: soft
+      value: 39693561
+    - name: memlock
+      type: hard
+      value: 39693561
+  tags: github
+
+- name: check if github user lingering enabled
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/systemd/linger/{{ runner_user }}"
+  register: user_lingering
+  tags: github
+
+- name: enable github user lingering
+  become: true
+  become_user: "{{ runner_user }}"
+  ansible.builtin.command: |
+    loginctl enable-linger {{ runner_user }}
+  when:
+    - not user_lingering.stat.exists
+  tags: github
+
+- name: selinux context for github directories
+  become: true
+  community.general.sefcontext:
+    target: "{{ item.target }}(/.*)?"
+    setype: "{{ item.setype }}"
+    state: present
+  notify: restorecon podman
+  loop:
+    - { target: "{{ runner_dir }}", setype: "user_home_dir_t" }
+    - { target: "{{ runner_dir }}/.local/share", setype: "container_file_t" }
+  tags:
+    - github
+    - selinux

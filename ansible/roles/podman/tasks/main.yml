@@ -15,7 +15,7 @@
 
 - import_tasks: container-hass.yml
   vars:
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: ghcr.io/home-assistant/home-assistant:2023.11
   tags: hass
 
 - import_tasks: container-partkeepr.yml
@@ -34,30 +34,30 @@
 - import_tasks: container-bookstack.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
-    image: docker.io/solidnerd/bookstack:23.6
-  tags: bookstack
+    image: docker.io/solidnerd/bookstack:23.10
+  tags: skuwiki
 
 - import_tasks: container-photos.yml
   vars:
     db_image: docker.io/library/mariadb:10.8
-    image: docker.io/photoprism/photoprism:230625-ce
+    image: docker.io/photoprism/photoprism:231021-ce
   tags: photos
 
 - import_tasks: container-cloud.yml
   vars:
-    db_image: docker.io/library/mariadb:10.5
-    image: docker.io/library/nextcloud:24.0.5-apache
+    db_image: docker.io/library/mariadb:10.6
+    image: docker.io/library/nextcloud:27.1.3-apache
   tags: cloud
 
 - import_tasks: container-cloud-skudak.yml
   vars:
-    db_image: docker.io/library/mariadb:10.5
-    image: docker.io/library/nextcloud:24.0.5-apache
+    db_image: docker.io/library/mariadb:10.6
+    image: docker.io/library/nextcloud:27.1.3-apache
   tags: skucloud
 
 - import_tasks: container-fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20231005.1415"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20231113.1809"
   tags: fulfillr
 
 - import_tasks: configuration-nginx.yml

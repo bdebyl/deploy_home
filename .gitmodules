@@ -1,0 +1,3 @@
+[submodule "ansible/roles/monolithprojects.github_actions_runner"]
+	path = ansible/roles/monolithprojects.github_actions_runner
+	url = https://github.com/MonolithProjects/ansible-github_actions_runner.git

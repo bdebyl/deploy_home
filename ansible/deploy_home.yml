@@ -1,4 +1,3 @@
----
 - hosts: all
   vars_files:
     - vars/vault.yml
@@ -7,3 +6,4 @@
     - role: git
     - role: podman
     - role: ssl
+    - role: github-actions
