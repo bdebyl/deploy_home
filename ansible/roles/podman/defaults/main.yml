@@ -1,5 +1,6 @@
 ---
 bookstack_path: "{{ podman_volumes }}/bookstack"
+cam2ip_path: "{{ podman_volumes }}/cam2ip"
 cloud_path: "{{ podman_volumes }}/cloud"
 cloud_skudak_path: "{{ podman_volumes }}/skudakcloud"
 debyltech_path: "{{ podman_volumes }}/debyltech"
@@ -14,6 +15,7 @@ partkeepr_path: "{{ podman_volumes }}/partkeepr"
 photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
 sshpass_cron_path: "{{ podman_volumes }}/sshpass_cron"
+palworld_path: "{{ podman_volumes }}/palworld"
 
 drone_server_proto: "https"
 drone_runner_proto: "http"

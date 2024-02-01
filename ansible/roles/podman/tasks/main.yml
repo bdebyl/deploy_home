@@ -1,82 +1,83 @@
 ---
-- import_tasks: podman.yml
 - import_tasks: firewall.yml
+- import_tasks: podman/podman.yml
 
-- import_tasks: container-awsddns.yml
+- import_tasks: containers/base/conf-nginx.yml
+- import_tasks: containers/base/nginx.yml
+  vars:
+    image: docker.io/owasp/modsecurity:nginx
+  tags: nginx
+
+
+- import_tasks: containers/base/awsddns.yml
   vars:
     image: docker.io/bdebyl/awsddns:1.0.34
   tags: ddns
 
-- import_tasks: container-drone.yml
+- import_tasks: containers/home/drone.yml
   vars:
     runner_image: docker.io/drone/drone-runner-docker:1.8.3
     image: docker.io/drone/drone:2.18.0
   tags: drone
 
-- import_tasks: container-hass.yml
+- import_tasks: containers/home/hass.yml
   vars:
     image: ghcr.io/home-assistant/home-assistant:2023.11
   tags: hass
 
-- import_tasks: container-partkeepr.yml
+- import_tasks: containers/home/partkeepr.yml
   vars:
     db_image: docker.io/library/mariadb:10.0
     image: docker.io/bdebyl/partkeepr:0.1.10
   tags: partkeepr
 
-- import_tasks: container-graylog.yml
+- import_tasks: containers/home/graylog.yml
   vars:
     db_image: docker.io/library/mongo:4.2
     es_image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
     image: docker.io/graylog/graylog:4.3.11
   tags: graylog
 
-- import_tasks: container-bookstack.yml
+- import_tasks: containers/skudak/wiki.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
-    image: docker.io/solidnerd/bookstack:23.10
-  tags: skuwiki
+    image: docker.io/solidnerd/bookstack:23.12
+  tags: skudak, skudak-wiki
 
-- import_tasks: container-photos.yml
+- import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/library/mariadb:10.8
     image: docker.io/photoprism/photoprism:231021-ce
   tags: photos
 
-- import_tasks: container-cloud.yml
+- import_tasks: containers/home/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:27.1.3-apache
+    image: docker.io/library/nextcloud:28.0.1-apache
   tags: cloud
 
-- import_tasks: container-cloud-skudak.yml
+- import_tasks: containers/skudak/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:27.1.3-apache
-  tags: skucloud
+    image: docker.io/library/nextcloud:28.0.1-apache
+  tags: skudak, skudak-cloud
 
-- import_tasks: container-fulfillr.yml
+- import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20231113.1809"
-  tags: fulfillr
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20240101.1715"
+  tags: debyltech, fulfillr
 
-- import_tasks: configuration-nginx.yml
-- import_tasks: container-nginx.yml
-  vars:
-    image: docker.io/owasp/modsecurity:nginx
-  tags: nginx
-
-- import_tasks: container-nosql.yml
+- import_tasks: containers/home/nosql.yml
   vars:
     image: docker.io/redis:7.2.1-alpine
   tags: nosql
 
-- import_tasks: container-sshpass-cron.yml
-  vars:
-    image: docker.io/bdebyl/sshpass-cron:1.0.11
-  tags: sshpass_cron
-
-- import_tasks: container-factorio.yml
+- import_tasks: containers/games/factorio.yml
   vars:
     image: docker.io/factoriotools/factorio:1.1.80
   tags: factorio
+
+- import_tasks: containers/games/palworld.yml
+  vars:
+    image: docker.io/jammsen/palworld-dedicated-server:d2822bf
+  tags: palworld

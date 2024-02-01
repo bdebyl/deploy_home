@@ -71,8 +71,8 @@
       AWS_ZONE_TTL: 60
       AWS_ZONE_ID: "{{ fulfillr_zone_id }}"
       AWS_ZONE_HOSTNAME: "{{ fulfillr_server_name }}"
-      AWS_ACCESS_KEY_ID: "{{ fulfillr_access_key }}"
-      AWS_SECRET_ACCESS_KEY: "{{ fulfillr_secret_key }}"
+      AWS_ACCESS_KEY_ID: "{{ fulfillr_dns_access_key }}"
+      AWS_SECRET_ACCESS_KEY: "{{ fulfillr_dns_secret_key }}"
       AWS_DEFAULT_REGION: "{{ fulfillr_region }}"
 
 - name: create systemd startup job for awsddns-fulfillr
