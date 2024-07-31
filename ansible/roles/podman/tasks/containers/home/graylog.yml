@@ -10,7 +10,7 @@
   notify: restorecon podman
   loop:
     - "{{ graylog_path }}/mongo"
-    - "{{ graylog_path }}/elastic"
+    - "{{ graylog_path }}/opensearch"
     - "{{ graylog_path }}/conf"
     - "{{ graylog_path }}/bin"
 
@@ -29,12 +29,12 @@
       dest: "conf/graylog.conf"
   notify: restorecon podman
 
-- name: unshare chown the elastic volume
+- name: unshare chown the opensearch volume
   become: true
   become_user: "{{ podman_user }}"
   changed_when: false
   ansible.builtin.command: |
-    podman unshare chown -R 1000:1000 {{ graylog_path }}/elastic
+    podman unshare chown -R 1000:1000 {{ graylog_path }}/opensearch
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
@@ -63,31 +63,33 @@
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: graylog-elastic
-    container_image: "{{ es_image }}"
+    container_name: graylog-opensearch
+    container_image: "{{ os_image }}"
 
-- name: create graylog elasticsearch container
+- name: create graylog opensearch container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: graylog-elastic
-    image: "{{ es_image }}" 
+    name: graylog-opensearch
+    image: "{{ os_image }}" 
     restart_policy: on-failure:3
     network:
       - shared
     volumes:
-      - "{{ graylog_path }}/elastic:/usr/share/elasticsearch/data"
+      - "{{ graylog_path }}/opensearch:/usr/share/opensearch/data"
     env:
-      http.host: "0.0.0.0"
-      transport.host: "localhost"
-      network.host: "0.0.0.0"
-      cluster.name: "graylog"
-      ES_JAVA_OPTS: "-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx2048m"
+      OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
+      bootstrap.memory_lock: "true"
+      discovery.type: "single-node"
+      action.auto_create_index: "false"
+      plugins.security.ssl.http.enabled: "false"
+      plugins.security.disabled: "true"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "{{ graylog_secret }}"
 
-- name: create systemd startup job for graylog-elastic
+- name: create systemd startup job for graylog-opensearch
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: graylog-elastic
+    container_name: graylog-opensearch
 
 - import_tasks: podman/podman-check.yml
   vars:
@@ -115,7 +117,8 @@
       GRAYLOG_HTTP_EXTERNAL_URI: http://{{ ansible_default_ipv4.address }}:9000/
       GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
       GRAYLOG_MONGODB_URI: mongodb://graylog-mongo/graylog
-      GRAYLOG_ELASTICSEARCH_HOSTS: http://graylog-elastic:9200
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://graylog-opensearch:9200
+      GRAYLOG_REPORT_DISABLE_SANDBOX: "true"
     ports:
       - "{{ graylog_port }}:9000"
       - "{{ syslog_udp_default }}:{{ syslog_udp_default }}/udp"

@@ -22,7 +22,7 @@
 
 - import_tasks: containers/home/hass.yml
   vars:
-    image: ghcr.io/home-assistant/home-assistant:2023.11
+    image: ghcr.io/home-assistant/home-assistant:2024.6.4
   tags: hass
 
 - import_tasks: containers/home/partkeepr.yml
@@ -33,15 +33,15 @@
 
 - import_tasks: containers/home/graylog.yml
   vars:
-    db_image: docker.io/library/mongo:4.2
-    es_image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-    image: docker.io/graylog/graylog:4.3.11
+    db_image: docker.io/library/mongo:6.0.14
+    os_image: docker.io/opensearchproject/opensearch:2.12.0
+    image: docker.io/graylog/graylog:5.2
   tags: graylog
 
 - import_tasks: containers/skudak/wiki.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
-    image: docker.io/solidnerd/bookstack:23.12
+    image: docker.io/solidnerd/bookstack:24.5
   tags: skudak, skudak-wiki
 
 - import_tasks: containers/home/photos.yml

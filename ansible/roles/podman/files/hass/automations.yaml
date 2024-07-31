@@ -1,9 +1,10 @@
-- id: '1649042254031'
-  alias: Office Lights Morning
+- id: '1707432654697'
+  alias: Lights on Sunset
   description: ''
   trigger:
-  - platform: time
-    at: '10:30:00'
+  - platform: sun
+    event: sunset
+    offset: 0
   condition: []
   action:
   - type: turn_on
@@ -35,7 +36,191 @@
   condition: []
   action:
   - type: turn_off
-    device_id: 04a5b4bea0caafe63bca3fb31c49091b
-    entity_id: light.bastian_s_office_lights
+    device_id: 1fa1aca8f90daf94a2a7baf8a3abc158
+    entity_id: 58d101e63456fd8e088d3a3b63f3a0f9
+    domain: switch
+  - type: turn_on
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+    brightness_pct: 100
+  - type: turn_on
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+    brightness_pct: 100
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 75
+  - type: turn_on
+    device_id: 3a93dada310aaf58c77d7225df0669a0
+    entity_id: b3a8c8ff3198fed36a0bfb6dc6173725
+    domain: switch
+  - type: turn_on
+    device_id: e9ee0a688d335e87c1c5a0910cb10369
+    entity_id: f48c6c15253ffdff064a01994e3a2778
+    domain: switch
+  - type: turn_on
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+    brightness_pct: 100
+  mode: single
+- id: '1707432903086'
+  alias: Driveway String Lights Off
+  description: ''
+  trigger:
+  - platform: time
+    at: '22:30:00'
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 1fa1aca8f90daf94a2a7baf8a3abc158
+    entity_id: 58d101e63456fd8e088d3a3b63f3a0f9
+    domain: switch
+  mode: single
+- id: '1707433130493'
+  alias: Kitchen Dim - Early
+  description: ''
+  trigger:
+  - platform: time
+    at: '20:30:00'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+    brightness_pct: 50
+  - type: turn_on
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+    brightness_pct: 50
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 50
+  - type: turn_on
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+    brightness_pct: 50
+  mode: single
+- id: '1707433185560'
+  alias: Kitchen Dim - Mid
+  description: ''
+  trigger:
+  - platform: time
+    at: '21:00:00'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+    brightness_pct: 50
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+    brightness_pct: 25
+  mode: single
+- id: '1707433226166'
+  alias: Kitchen Dim - Late
+  description: ''
+  trigger:
+  - platform: time
+    at: '22:00:00'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+    brightness_pct: 1
+  - type: turn_on
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+    brightness_pct: 1
+  - type: turn_on
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 10
+  - type: turn_on
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+    brightness_pct: 10
+  mode: single
+- id: '1711218890065'
+  alias: Lights Out
+  description: ''
+  trigger:
+  - platform: time
+    at: 01:00:00
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+  - type: turn_off
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+  - type: turn_off
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+  - type: turn_off
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+  - type: turn_off
+    device_id: 03eb359bf2344a58bebfe1e9c5bcfadd
+    entity_id: a30b2da3cd80a5b4c927e1608b91eb65
+    domain: light
+  - type: turn_off
+    device_id: 3a93dada310aaf58c77d7225df0669a0
+    entity_id: b3a8c8ff3198fed36a0bfb6dc6173725
+    domain: switch
+  - type: turn_off
+    device_id: e9ee0a688d335e87c1c5a0910cb10369
+    entity_id: f48c6c15253ffdff064a01994e3a2778
+    domain: switch
+  - type: turn_off
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
     domain: light
   mode: single

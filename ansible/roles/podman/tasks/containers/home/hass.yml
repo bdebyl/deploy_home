@@ -15,6 +15,7 @@
 - name: copy configuration and automations
   become: true
   ansible.builtin.copy:
+    backup: true
     src: "files/hass/{{ item }}"
     dest: "{{ hass_path }}/config/{{ item }}"
     owner: "{{ podman_user }}"

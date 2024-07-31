@@ -27,9 +27,9 @@
     # Factorio
     - 27015/tcp
     - 34197/udp
-    # Palworld
-    - 8211/udp
-    - 25575/udp
+    # Zomboid
+    - 16261/udp
+    - 16262/udp
   notify: restart firewalld
   tags: firewall
 
@@ -54,5 +54,8 @@
     # cam2ip
     - 56000/tcp
     - 56000/udp
+    # Palworld
+    - 8211/udp
+    - 25575/udp
   notify: restart firewalld
   tags: firewall
