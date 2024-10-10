@@ -30,6 +30,11 @@
     # Zomboid
     - 16261/udp
     - 16262/udp
+    # crafty
+    - 8443/tcp
+    # minecraft
+    - 25565/tcp
+    - 25565/udp
   notify: restart firewalld
   tags: firewall
 

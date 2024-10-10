@@ -1,24 +1,13 @@
-upstream hass {
-  server 127.0.0.1:8123;
-}
 server {
-  resolver 192.168.1.10 ipv6=off;
-  modsecurity on;
-  modsecurity_rules_file /etc/nginx/modsec_includes.conf;
-
   listen 80;
   server_name {{ assistant_server_name }};
 
+  location '/.well-known/acme-challenge' {
+    default_type "text/plain";
+    root /srv/http/letsencrypt;
+  }
+
   location / {
-    allow 192.168.0.0/16;
-    allow 127.0.0.1;
-    deny all;
-
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_set_header Upgrade         $http_upgrade;
-    proxy_set_header Connection      $connection_upgrade;
-
-    proxy_buffering off;
-    proxy_pass http://hass;
+    return 301 https://$host$request_uri;
   }
 }

@@ -22,7 +22,7 @@
 
 - import_tasks: containers/home/hass.yml
   vars:
-    image: ghcr.io/home-assistant/home-assistant:2024.6.4
+    image: ghcr.io/home-assistant/home-assistant:2024.8.2
   tags: hass
 
 - import_tasks: containers/home/partkeepr.yml
@@ -47,24 +47,24 @@
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/library/mariadb:10.8
-    image: docker.io/photoprism/photoprism:231021-ce
+    image: docker.io/photoprism/photoprism:240711-ce
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:28.0.1-apache
+    image: docker.io/library/nextcloud:28.0.4-apache
   tags: cloud
 
 - import_tasks: containers/skudak/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:28.0.1-apache
+    image: docker.io/library/nextcloud:28.0.4-apache
   tags: skudak, skudak-cloud
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20240101.1715"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20241010.0018"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/home/nosql.yml
