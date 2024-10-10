@@ -35,6 +35,7 @@ server {
   }
 
   location /api {
+    add_header Access-Control-Allow-Origin "$http_origin";
     add_header Referrer-Policy           "same-origin"                                                                                                                                                                            always;
     # add_header Strict-Transport-Security "max-age=630720000; includeSubDomains"                                                                                                                                                   always;
     add_header X-Content-Type-Options    "nosniff"                                                                                                                                                                                always;
