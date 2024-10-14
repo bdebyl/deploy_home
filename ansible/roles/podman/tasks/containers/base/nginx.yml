@@ -25,6 +25,7 @@
       - "{{ nginx_path }}/etc:/etc/nginx:ro"
       - "/srv/http/letsencrypt:/srv/http/letsencrypt:z"
       - "/etc/letsencrypt:/etc/letsencrypt:ro"
+      - "/usr/local/share/fulfillr-site:/usr/local/share/fulfillr-site:ro"
 
 - name: create systemd startup job for nginx
   include_tasks: podman/systemd-generate.yml

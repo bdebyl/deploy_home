@@ -64,7 +64,7 @@
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20241010.1500"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20241011.1840"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/home/nosql.yml

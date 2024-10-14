@@ -1,6 +1,15 @@
 ---
 - import_tasks: ecr/podman-ecr-login.yml
 
+- name: create nginx fulfillr-site directory
+  become: true
+  ansible.builtin.file:
+    path: /usr/local/share/fulfillr-site
+    state: directory
+    owner: "fedora"
+    group: "wheel"
+    mode: 0755
+
 - name: create fulfillr host directory volumes
   become: true
   ansible.builtin.file:

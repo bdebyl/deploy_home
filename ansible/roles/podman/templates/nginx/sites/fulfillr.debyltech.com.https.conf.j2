@@ -34,8 +34,11 @@ server {
     return 302 $scheme://bdebyl.net$request_uri;
   }
 
+  root /usr/local/share/fulfillr-site;
+  index index.html;
+
   location /api {
-    add_header Access-Control-Allow-Origin "$http_origin";
+    add_header Access-Control-Allow-Origin * always;
     add_header Referrer-Policy           "same-origin"                                                                                                                                                                            always;
     # add_header Strict-Transport-Security "max-age=630720000; includeSubDomains"                                                                                                                                                   always;
     add_header X-Content-Type-Options    "nosniff"                                                                                                                                                                                always;
@@ -54,5 +57,9 @@ server {
     proxy_redirect     off;
 
     chunked_transfer_encoding off;
+  }
+  
+  location / {
+    try_files $uri $uri/ =404;
   }
 }
