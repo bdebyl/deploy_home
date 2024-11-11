@@ -22,7 +22,7 @@
 
 - import_tasks: containers/home/hass.yml
   vars:
-    image: ghcr.io/home-assistant/home-assistant:2024.8.2
+    image: ghcr.io/home-assistant/home-assistant:2024.11.0
   tags: hass
 
 - import_tasks: containers/home/partkeepr.yml
@@ -41,30 +41,30 @@
 - import_tasks: containers/skudak/wiki.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
-    image: docker.io/solidnerd/bookstack:24.5
+    image: docker.io/solidnerd/bookstack:24.10
   tags: skudak, skudak-wiki
 
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/library/mariadb:10.8
-    image: docker.io/photoprism/photoprism:240711-ce
+    image: docker.io/photoprism/photoprism:240915-ce
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:28.0.4-apache
+    image: docker.io/library/nextcloud:30.0-apache
   tags: cloud
 
 - import_tasks: containers/skudak/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:28.0.4-apache
+    image: docker.io/library/nextcloud:30.0-apache
   tags: skudak, skudak-cloud
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20241011.1840"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20241028.1847"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/home/nosql.yml
