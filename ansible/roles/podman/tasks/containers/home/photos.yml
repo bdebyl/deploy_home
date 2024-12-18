@@ -9,8 +9,10 @@
     mode: 0755
   notify: restorecon podman
   loop:
-    - "{{ photos_path }}/mysql"
+    - "{{ photos_path }}/psql"
+    - "{{ photos_path }}/mlcache"
     - "{{ photos_path }}/storage"
+    - "{{ photos_path }}/immich"
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
@@ -24,84 +26,116 @@
     opts: "username=photos,password={{ photos_cifs_pass }},uid={{ podman_subuid.stdout }},gid={{ podman_subuid.stdout }}"
     state: mounted
 
+- name: mount immich cifs
+  become: true
+  ansible.posix.mount:
+    src: "{{ immich_cifs_src }}"
+    path: "{{ photos_path }}/immich"
+    fstype: cifs
+    opts: "username=photos,password={{ photos_cifs_pass }},uid={{ podman_subuid.stdout }},gid={{ podman_subuid.stdout }}"
+    state: mounted
+
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: photos-db
-    container_image: "{{ db_image }}"
+    container_name: immich_machine_learning
+    container_image: "{{ ml_image }}"
 
-- name: create photos-db container
+- name: create immich-ml container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: photos-db
+    name: immich_machine_learning
+    image: "{{ ml_image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    volumes:
+      - "{{ photos_path }}/mlcache:/cache"
+
+- name: create systemd startup job for immich_machine_learning
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: immich_machine_learning
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: immich_redis
+    container_image: "{{ redis_image }}"
+
+- name: create immich-redis container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: immich_redis
+    image: "{{ redis_image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+
+- name: create systemd startup job for immich_redis
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: immich_redis
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: immich_postgres
+    container_image: "{{ db_image }}"
+
+- name: create immich-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: immich_postgres
     image: "{{ db_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
     env:
-      MARIADB_AUTO_UPGRADE: "1"
-      MYSQL_ROOT_PASSWORD: "{{ photos_db_root_pass }}"
-      MYSQL_DATABASE: photos
-      MYSQL_USER: photos
-      MYSQL_PASSWORD: "{{ photos_db_pass }}"
+      POSTGRES_DATABASE: photos
+      POSTGRES_USER: photos
+      POSTGRES_PASSWORD: "{{ photos_db_pass }}"
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     volumes:
-      - "{{ photos_path }}/mysql:/var/lib/mysql"
+      - "{{ photos_path }}/psql:/var/lib/postgresql/data"
 
-- name: create systemd startup job for photos-db
+- name: create systemd startup job for immich_postgres
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: photos-db
+    container_name: immich_postgres
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: photos
+    container_name: immich_server
     container_image: "{{ image }}"
 
-- name: create photos container
+- name: create immich container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: photos
+    name: immich_server
     image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
     env:
-      PHOTOPRISM_ADMIN_PASSWORD: "{{ photos_user_pass }}"
-      PHOTOPRISM_AUTH_MODE: "password"
-      PHOTOPRISM_SITE_URL: "https://photos.bdebyl.net/"
-      PHOTOPRISM_ORIGINALS_LIMIT: 5000
-      PHOTOPRISM_HTTP_COMPRESSION: "gzip"
-      PHOTOPRISM_LOG_LEVEL: "info"
-      PHOTOPRISM_READONLY: "false"
-      PHOTOPRISM_EXPERIMENTAL: "false"
-      PHOTOPRISM_DISABLE_CHOWN: "false"
-      PHOTOPRISM_DISABLE_WEBDAV: "false"
-      PHOTOPRISM_DISABLE_SETTINGS: "false"
-      PHOTOPRISM_DISABLE_TENSORFLOW: "false"
-      PHOTOPRISM_DISABLE_FACES: "false"
-      PHOTOPRISM_DISABLE_CLASSIFICATION: "false"
-      PHOTOPRISM_DISABLE_RAW: "false"
-      PHOTOPRISM_RAW_PRESETS: "false"
-      PHOTOPRISM_JPEG_QUALITY: 85
-      PHOTOPRISM_DETECT_NSFW: "false"
-      PHOTOPRISM_UPLOAD_NSFW: "true"
-      PHOTOPRISM_DATABASE_DRIVER: "mysql"
-      PHOTOPRISM_DATABASE_SERVER: "photos-db:3306"
-      PHOTOPRISM_DATABASE_NAME: "photos"
-      PHOTOPRISM_DATABASE_USER: "photos"
-      PHOTOPRISM_DATABASE_PASSWORD: "{{ photos_db_pass }}"
-      PHOTOPRISM_SITE_CAPTION: "AI-Powered Photos App"
-      PHOTOPRISM_SITE_DESCRIPTION: ""
-      PHOTOPRISM_SITE_AUTHOR: "Bastian D."
+      REDIS_HOSTNAME: immich_redis
+      DB_HOSTNAME: immich_postgres
+      DB_DATABASE_NAME: photos
+      DB_USERNAME: photos
+      DB_PASSWORD: "{{ photos_db_pass }}"
+      IMMICH_PORT: 8088
     volumes:
-      - "{{ photos_path }}/storage:/photoprism/"
+      - "{{ photos_path }}/storage:/mnt/media/originals"
+      - "{{ photos_path }}/immich:/usr/src/app/upload"
     ports:
-      - "8088:2342"
+      - "8088:8088"
 
-- name: create systemd startup job for photos
+- name: create systemd startup job for immich_server
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: photos
+    container_name: immich_server

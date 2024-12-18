@@ -10,7 +10,7 @@ http:
   trusted_proxies:
     - 127.0.0.1
     - 10.0.0.0/8
-    - 10.0.2.100
+    - 192.168.1.0/24
 
 homeassistant:
   time_zone: America/New_York

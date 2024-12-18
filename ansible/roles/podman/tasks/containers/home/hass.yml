@@ -12,19 +12,19 @@
     - "{{ hass_path }}/media"
     - "{{ hass_path }}/config"
 
-# - name: copy configuration and automations
-#   become: true
-#   ansible.builtin.copy:
-#     backup: true
-#     src: "files/hass/{{ item }}"
-#     dest: "{{ hass_path }}/config/{{ item }}"
-#     owner: "{{ podman_user }}"
-#     group: "{{ podman_user }}"
-#     mode: 0644
-#   notify: restorecon podman
-#   loop:
-#     - configuration.yaml
-#     - automations.yaml
+- name: copy configuration and automations
+  become: true
+  ansible.builtin.copy:
+    backup: true
+    src: "files/hass/{{ item }}"
+    dest: "{{ hass_path }}/config/{{ item }}"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  notify: restorecon podman
+  loop:
+    - configuration.yaml
+    # - automations.yaml
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
