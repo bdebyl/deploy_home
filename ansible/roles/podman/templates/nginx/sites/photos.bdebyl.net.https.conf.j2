@@ -27,13 +27,15 @@ server {
   ssl_stapling_verify       on;
 
   location / {
-    add_header Referrer-Policy           "same-origin"                                                                                                                                                                            always;
-    # add_header Strict-Transport-Security "max-age=630720000; includeSubDomains"                                                                                                                                                   always;
-    add_header X-Content-Type-Options    "nosniff"                                                                                                                                                                                always;
+    # add_header Strict-Transport-Security "max-age=630720000; includeSubDomains" always;
+    add_header Referrer-Policy             "same-origin"                          always;
+    add_header X-Content-Type-Options      "nosniff"                              always;
+    add_header Access-Control-Allow-Origin '*'                                    always;
 
     proxy_set_header Host              $http_host;
     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     proxy_set_header Upgrade           $http_upgrade;
+    proxy_set_header Connection        $connection_upgrade;
 
     proxy_buffering    off;
     proxy_http_version 1.1;

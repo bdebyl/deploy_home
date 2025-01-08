@@ -37,14 +37,14 @@
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: immich_machine_learning
+    container_name: immich-machine-learning
     container_image: "{{ ml_image }}"
 
 - name: create immich-ml container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: immich_machine_learning
+    name: immich-machine-learning
     image: "{{ ml_image }}"
     restart_policy: on-failure:3
     log_driver: journald
@@ -53,42 +53,42 @@
     volumes:
       - "{{ photos_path }}/mlcache:/cache"
 
-- name: create systemd startup job for immich_machine_learning
+- name: create systemd startup job for immich-machine-learning
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: immich_machine_learning
+    container_name: immich-machine-learning
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: immich_redis
+    container_name: immich-redis
     container_image: "{{ redis_image }}"
 
 - name: create immich-redis container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: immich_redis
+    name: immich-redis
     image: "{{ redis_image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
 
-- name: create systemd startup job for immich_redis
+- name: create systemd startup job for immich-redis
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: immich_redis
+    container_name: immich-redis
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: immich_postgres
+    container_name: immich-postgres
     container_image: "{{ db_image }}"
 
 - name: create immich-db container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: immich_postgres
+    name: immich-postgres
     image: "{{ db_image }}"
     restart_policy: on-failure:3
     log_driver: journald
@@ -102,29 +102,29 @@
     volumes:
       - "{{ photos_path }}/psql:/var/lib/postgresql/data"
 
-- name: create systemd startup job for immich_postgres
+- name: create systemd startup job for immich-postgres
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: immich_postgres
+    container_name: immich-postgres
 
 - import_tasks: podman/podman-check.yml
   vars:
-    container_name: immich_server
+    container_name: immich-server
     container_image: "{{ image }}"
 
 - name: create immich container
   become: true
   become_user: "{{ podman_user }}"
   containers.podman.podman_container:
-    name: immich_server
+    name: immich-server
     image: "{{ image }}"
     restart_policy: on-failure:3
     log_driver: journald
     network:
       - shared
     env:
-      REDIS_HOSTNAME: immich_redis
-      DB_HOSTNAME: immich_postgres
+      REDIS_HOSTNAME: immich-redis
+      DB_HOSTNAME: immich-postgres
       DB_DATABASE_NAME: photos
       DB_USERNAME: photos
       DB_PASSWORD: "{{ photos_db_pass }}"
@@ -135,7 +135,7 @@
     ports:
       - "8088:8088"
 
-- name: create systemd startup job for immich_server
+- name: create systemd startup job for immich-server
   include_tasks: podman/systemd-generate.yml
   vars:
-    container_name: immich_server
+    container_name: immich-server
