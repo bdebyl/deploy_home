@@ -21,9 +21,12 @@
     # ???
     - 6875/tcp
     # Satisfactory
+    - 7777/tcp
     - 7777/udp
     - 15000/udp
+    - 15000/tcp
     - 15777/udp
+    - 15777/tcp
     # Factorio
     - 27015/tcp
     - 34197/udp

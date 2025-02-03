@@ -22,6 +22,7 @@ drone_runner_proto: "http"
 drone_runner_capacity: "8"
 
 # nginx and modsec configuration
+base_server_name: bdebyl.net
 assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
 ci_server_name: ci.bdebyl.net

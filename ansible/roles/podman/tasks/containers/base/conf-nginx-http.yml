@@ -61,6 +61,7 @@
     group: "{{ podman_user }}"
     mode: 0644
   loop:
+    - "{{ base_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
     - "{{ bookstack_server_name }}.conf"
     - "{{ ci_server_name }}.http.conf"
@@ -85,6 +86,7 @@
     group: "{{ podman_user }}"
     state: link
   loop:
+    - "{{ base_server_name }}.conf"
     - "{{ assistant_server_name }}.conf"
     - "{{ bookstack_server_name }}.conf"
     - "{{ ci_server_name }}.http.conf"

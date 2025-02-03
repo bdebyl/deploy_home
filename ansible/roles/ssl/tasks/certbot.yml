@@ -1,5 +1,5 @@
 ---
-- name: create ssl certificate for ci server
+- name: create ssl certificate for server
   become: true
   ansible.builtin.command: |
     certbot certonly --webroot --webroot-path=/srv/http/letsencrypt \
@@ -8,6 +8,7 @@
   args:
     creates: "/etc/letsencrypt/live/{{ item }}"
   loop:
+    - "{{ base_server_name }}"
     - "{{ bookstack_server_name }}"
     - "{{ ci_server_name }}"
     - "{{ cloud_server_name }}"
