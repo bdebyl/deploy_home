@@ -75,12 +75,12 @@
       DB_DATABASE: "bookstack"
       DB_PASSWORD: "{{ bookstack_db_pass }}"
       MAIL_DRIVER: "smtp"
-      MAIL_HOST: "{{ bookstack_mail_host }}"
+      MAIL_HOST: "{{ skudaknoreply_mail_host }}"
       MAIL_PORT: 465
       MAIL_ENCRYPTION: "ssl"
-      MAIL_USERNAME: "{{ bookstack_mail_user }}"
-      MAIL_PASSWORD: "{{ bookstack_mail_pass }}"
-      MAIL_FROM: "{{ bookstack_mail_user }}"
+      MAIL_USERNAME: "{{ skudaknoreply_mail_user }}"
+      MAIL_PASSWORD: "{{ skudaknoreply_mail_pass }}"
+      MAIL_FROM: "{{ skudaknoreply_mail_user }}"
       MAIL_FROM_NAME: "Skudak Wiki"
     ports:
       - "6875:8080"

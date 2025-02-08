@@ -1,0 +1,89 @@
+---
+- name: create required bitwarden volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_subuid.stdout }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ bitwarden_path }}/mysql"
+    - "{{ bitwarden_path }}/bitwarden"
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: bitwarden-db
+    container_image: "{{ db_image }}"
+
+- name: create bitwarden-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: bitwarden-db
+    image: "{{ db_image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    env:
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+      MARIADB_DATABASE: bitwarden_vault
+      MARIADB_PASSWORD: "{{ bitwarden_db_pass }}"
+      MARIADB_USER: bitwarden
+    volumes:
+      - "{{ bitwarden_path }}/mysql:/var/lib/mysql"
+
+- name: create systemd startup job for bitwarden-db
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: bitwarden-db
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: bitwarden
+    container_image: "{{ image }}"
+
+- name: create bitwarden container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: bitwarden
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    env:
+      BW_ENABLE_SSL: "false"
+      BW_ENABLE_SSL_CA: "false"
+      BW_PORT_HTTP: "8092"
+      BW_DOMAIN: "{{ bitwarden_server_name }}"
+      BW_DB_PROVIDER: mysql
+      BW_DB_SERVER: bitwarden-db
+      BW_DB_DATABASE: bitwarden_vault
+      BW_DB_USERNAME: bitwarden
+      BW_DB_PASSWORD: "{{ bitwarden_db_pass }}"
+      BW_INSTALLATION_ID: "{{ bitwarden_id }}"
+      BW_INSTALLATION_KEY: "{{ bitwarden_key }}"
+      globalSettings__mail__replyToEmail: "{{ skudaknoreply_mail_user }}"
+      globalSettings__mail__smtp__host: "{{ skudaknoreply_mail_host }}"
+      globalSettings__mail__smtp__port: 587
+      globalSettings__mail__smtp__ssl: "true"
+      globalSettings__mail__smtp__username: "{{ skudaknoreply_mail_user }}"
+      globalSettings__mail__smtp__password: "{{ skudaknoreply_mail_pass }}"
+      globalSettings__disableUserRegistration: "true"
+      adminSettings__admins: "{{ bitwarden_admins }}"
+    volumes:
+      - "{{ bitwarden_path }}/bitwarden:/etc/bitwarden"
+    ports:
+      - "8092:8092"
+
+- name: create systemd startup job for bitwarden
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: bitwarden

@@ -1,5 +1,6 @@
 ---
 bookstack_path: "{{ podman_volumes }}/bookstack"
+bitwarden_path: "{{ podman_volumes }}/bitwarden"
 cam2ip_path: "{{ podman_volumes }}/cam2ip"
 cloud_path: "{{ podman_volumes }}/cloud"
 cloud_skudak_path: "{{ podman_volumes }}/skudakcloud"
@@ -25,6 +26,7 @@ drone_runner_capacity: "8"
 base_server_name: bdebyl.net
 assistant_server_name: assistant.bdebyl.net
 bookstack_server_name: wiki.skudakrennsport.com
+bitwarden_server_name: bitwarden.skudakrennsport.com
 ci_server_name: ci.bdebyl.net
 cloud_server_name: cloud.bdebyl.net
 cloud_skudak_server_name: cloud.skudakrennsport.com
