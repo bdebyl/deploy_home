@@ -10,7 +10,6 @@
   loop:
     - "{{ base_server_name }}"
     - "{{ bookstack_server_name }}"
-    - "{{ bitwarden_server_name }}"
     - "{{ ci_server_name }}"
     - "{{ cloud_server_name }}"
     - "{{ cloud_skudak_server_name }}"

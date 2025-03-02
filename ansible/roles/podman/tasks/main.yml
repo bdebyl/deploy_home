@@ -31,13 +31,6 @@
     image: docker.io/bdebyl/partkeepr:0.1.10
   tags: partkeepr
 
-- import_tasks: containers/home/graylog.yml
-  vars:
-    db_image: docker.io/library/mongo:6.0.14
-    os_image: docker.io/opensearchproject/opensearch:2.12.0
-    image: docker.io/graylog/graylog:5.2
-  tags: graylog
-
 - import_tasks: containers/skudak/wiki.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
@@ -47,9 +40,9 @@
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
-    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.126.1
+    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.128.0
     redis_image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
-    image: ghcr.io/immich-app/immich-server:v1.126.1
+    image: ghcr.io/immich-app/immich-server:v1.128.0
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
@@ -64,12 +57,6 @@
     image: docker.io/library/nextcloud:30.0-apache
   tags: skudak, skudak-cloud
 
-- import_tasks: containers/skudak/bitwarden.yml
-  vars:
-    db_image: docker.io/library/mariadb:10.6
-    image: docker.io/bitwarden/self-host:2025.1.3-beta
-  tags: skudak, bitwarden
-
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
     image: "{{ aws_ecr_endpoint }}/fulfillr:20241028.1847"
@@ -79,13 +66,3 @@
   vars:
     image: docker.io/redis:7.2.1-alpine
   tags: nosql
-
-- import_tasks: containers/games/factorio.yml
-  vars:
-    image: docker.io/factoriotools/factorio:1.1.80
-  tags: factorio
-
-- import_tasks: containers/games/palworld.yml
-  vars:
-    image: docker.io/jammsen/palworld-dedicated-server:d2822bf
-  tags: palworld
