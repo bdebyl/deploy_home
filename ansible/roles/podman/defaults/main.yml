@@ -28,7 +28,6 @@ cloud_server_name: cloud.bdebyl.net
 cloud_skudak_server_name: cloud.skudakrennsport.com
 fulfillr_server_name: fulfillr.debyltech.com
 home_server_name: home.bdebyl.net
-logs_server_name: logs.bdebyl.net
 parts_server_name: parts.bdebyl.net
 photos_server_name: photos.bdebyl.net
 

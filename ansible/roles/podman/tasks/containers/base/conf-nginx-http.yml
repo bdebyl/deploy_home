@@ -69,7 +69,6 @@
     - "{{ cloud_skudak_server_name }}.conf"
     - "{{ fulfillr_server_name }}.conf"
     - "{{ home_server_name }}.conf"
-    - "{{ logs_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
     - "{{ photos_server_name }}.conf"
   notify:
@@ -94,7 +93,6 @@
     - "{{ cloud_skudak_server_name }}.conf"
     - "{{ fulfillr_server_name }}.conf"
     - "{{ home_server_name }}.conf"
-    - "{{ logs_server_name }}.conf"
     - "{{ parts_server_name }}.conf"
     - "{{ photos_server_name }}.conf"
   notify:
