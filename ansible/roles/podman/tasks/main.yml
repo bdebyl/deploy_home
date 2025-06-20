@@ -40,9 +40,9 @@
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
-    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.134.0
+    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.135.2
     redis_image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
-    image: ghcr.io/immich-app/immich-server:v1.134.0
+    image: ghcr.io/immich-app/immich-server:v1.135.2
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
