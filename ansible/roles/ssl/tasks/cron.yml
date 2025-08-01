@@ -7,3 +7,12 @@
     job: >-
       certbot renew --post-hook "chown -R {{ podman_user }}:{{ podman_user }} /etc/letsencrypt && su -s /bin/sh podman -c 'cd; podman restart nginx'"
   tags: cron
+
+- name: monitor and fix letsencrypt permissions 
+  become: true
+  ansible.builtin.cron:
+    name: letsencrypt_permission_monitor
+    minute: "*/5"
+    job: >-
+      if [ "$(stat -c '%U:%G' /etc/letsencrypt)" != "{{ podman_user }}:{{ podman_user }}" ]; then chown -R {{ podman_user }}:{{ podman_user }} /etc/letsencrypt && logger "Fixed letsencrypt permissions for podman user" && sudo -H -u {{ podman_user }} bash -c 'cd; podman restart nginx' 2>/dev/null || true; fi
+  tags: cron
