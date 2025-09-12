@@ -10,7 +10,7 @@
     - "{{ syslog_udp_default }}/udp"
     - "{{ syslog_udp_error }}/udp"
     - "{{ syslog_udp_unifi }}/udp"
-    # nginx
+    # web server (Caddy)
     - 80/tcp
     - 443/tcp
     # pihole (unused?)
@@ -65,5 +65,9 @@
     # Palworld
     - 8211/udp
     - 25575/udp
+    # bunkerweb waf test ports
+    - 1080/tcp
+    - 1443/tcp
+    - 7000/tcp
   notify: restart firewalld
   tags: firewall

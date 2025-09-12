@@ -13,8 +13,8 @@
   ansible.builtin.systemd:
     name: "{{ container_name }}.service"
     daemon_reload: true
-    enabled: true
-    state: restarted
+    enabled: "{{ service_enabled | default(true) }}"
+    state: "{{ 'started' if (service_enabled | default(true)) else 'stopped' }}"
     scope: user
   register: result
   retries: 3

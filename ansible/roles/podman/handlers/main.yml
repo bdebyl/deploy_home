@@ -7,17 +7,7 @@
     - podman
     - selinux
 
-- name: restart nginx
-  become: true
-  become_user: "{{ podman_user }}"
-  ansible.builtin.command: |
-    podman restart nginx
-  tags:
-    - nginx
-    - http
-    - https
-    - modsec
-    - modsec_rules
+# nginx handler removed - nginx infrastructure decommissioned
 
 - name: restart firewalld
   become: true
@@ -26,3 +16,20 @@
     state: restarted
   tags:
     - firewall
+
+- name: restart caddy
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.command: |
+    podman restart caddy
+  tags:
+    - caddy
+
+- name: reload caddy
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.command: |
+    podman exec caddy caddy reload --config /etc/caddy/Caddyfile
+  tags:
+    - caddy
+    - caddy-config

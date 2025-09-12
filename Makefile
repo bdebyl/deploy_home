@@ -27,6 +27,7 @@ ANSIBLE_INVENTORY=ansible/inventories/home/hosts.yml
 TAGS?=all
 SKIP_TAGS?=none
 TARGET?=all
+EXTRA_VARS?=
 
 ${VENV}:
 	python3 -m venv ${VENV}
@@ -51,7 +52,7 @@ SKIP_FILE=./.lint-vars.sh
 
 # Targets
 deploy: ${ANSIBLE} ${VAULT_FILE}
-	${ANSIBLE} --diff -t ${TAGS} --skip-tags ${SKIP_TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+	${ANSIBLE} --diff -t ${TAGS} --skip-tags ${SKIP_TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} $(if ${EXTRA_VARS},-e "${EXTRA_VARS}") ansible/deploy.yml
 
 list-tags: ${ANSIBLE} ${VAULT_FILE}
 	${ANSIBLE} --list-tags -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
@@ -60,7 +61,7 @@ list-tasks: ${ANSIBLE} ${VAULT_FILE}
 	${ANSIBLE} --list-tasks -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
 
 check: ${ANSIBLE} ${VAULT_FILE}
-	${ANSIBLE} --check --diff --private-key -t ${TAGS} --skip-tags ${SKIP_TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} ansible/deploy.yml
+	${ANSIBLE} --check --diff -t ${TAGS} --skip-tags ${SKIP_TAGS} -i ${ANSIBLE_INVENTORY} -l ${TARGET} --vault-password-file ${VAULT_PASS_FILE} $(if ${EXTRA_VARS},-e "${EXTRA_VARS}") ansible/deploy.yml
 
 vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 	${ANSIBLE_VAULT} edit --vault-password-file ${VAULT_PASS_FILE} ${VAULT_FILE}

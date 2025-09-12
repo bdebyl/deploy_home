@@ -1,0 +1,228 @@
+# Caddy Configuration
+# Managed by Ansible - do not edit directly
+
+# Global options
+{
+	email {{ caddy_email }}
+	acme_ca {{ caddy_acme_ca }}
+	
+	# Admin API endpoint
+	admin 0.0.0.0:{{ caddy_admin_port }}
+	
+	# Global server options
+	servers {
+		protocols h1 h2 h3
+	}
+	
+	# Logging
+	log {
+		output file /var/log/caddy/caddy.log
+		format {{ caddy_log_format }}
+		level {{ caddy_log_level }}
+	}
+}
+
+# Import snippet for common security headers
+(common_headers) {
+	header {
+{% for header, value in caddy_security_headers.items() %}
+		{{ header }} "{{ value }}"
+{% endfor %}
+		-Server
+		-X-Powered-By
+	}
+}
+
+# Jinja2 macro for IP-restricted sites with redirect
+{% macro ip_restricted_site(networks=caddy_local_networks) %}
+	@local {
+		remote_ip {{ networks | join(' ') }}
+	}
+	
+	@denied {
+		not remote_ip {{ networks | join(' ') }}
+	}
+	
+	# Redirect non-local traffic
+	handle @denied {
+		redir https://debyl.io{uri} 302
+	}
+{% endmacro %}
+
+# ============================================================================
+# SITE CONFIGURATIONS
+# ============================================================================
+
+# Simple redirect: {{ base_server_name }} -> debyl.io
+{{ base_server_name }} {
+	redir https://debyl.io permanent
+}
+
+# ============================================================================
+# SIMPLE REVERSE PROXIES
+# ============================================================================
+
+# Photos service - {{ photos_server_name }}
+{{ photos_server_name }} {
+	import common_headers
+	reverse_proxy localhost:8088
+	
+	log {
+		output file /var/log/caddy/photos.log
+		format json
+	}
+}
+
+# Parts/PartKeepr - {{ parts_server_name }}
+{{ parts_server_name }} {
+	import common_headers
+	reverse_proxy localhost:8081
+	
+	log {
+		output file /var/log/caddy/parts.log
+		format json
+	}
+}
+
+# Wiki/BookStack - {{ bookstack_server_name }}
+{{ bookstack_server_name }} {
+	import common_headers
+	reverse_proxy localhost:6875
+	
+	log {
+		output file /var/log/caddy/wiki.log
+		format json
+	}
+}
+
+# ============================================================================
+# IP-RESTRICTED SITES
+# ============================================================================
+
+# Home Assistant - {{ assistant_server_name }}
+{{ assistant_server_name }} {
+{{ ip_restricted_site() }}
+	
+	handle @local {
+		reverse_proxy localhost:8123 {
+			# WebSocket support is automatic
+			flush_interval -1
+		}
+		
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains"
+			X-Content-Type-Options "nosniff"
+			Referrer-Policy "same-origin"
+		}
+	}
+	
+	log {
+		output file /var/log/caddy/assistant.log
+		format json
+	}
+}
+
+# CI/Drone - REMOVED
+# ci.bdebyl.net configuration removed - Drone CI infrastructure decommissioned
+
+# Home server - {{ home_server_name }}
+{{ home_server_name }} {
+{{ ip_restricted_site() }}
+	
+	handle @local {
+		respond "Home Server Access OK" 200
+	}
+}
+
+# ============================================================================
+# COMPLEX CONFIGURATIONS
+# ============================================================================
+
+# Nextcloud - {{ cloud_server_name }}
+{{ cloud_server_name }} {
+	request_body {
+		max_size {{ caddy_max_request_body_mb }}MB
+	}
+	
+	reverse_proxy localhost:8089 {
+		header_up Host {host}
+		header_up X-Real-IP {remote}
+		# X-Forwarded-For and X-Forwarded-Proto are automatic
+	}
+	
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-X-Powered-By
+	}
+	
+	# Nextcloud specific redirects
+	redir /.well-known/carddav /remote.php/dav 301
+	redir /.well-known/caldav /remote.php/dav 301
+	
+	log {
+		output file /var/log/caddy/cloud.log
+		format json
+	}
+}
+
+# Skudak Nextcloud - {{ cloud_skudak_server_name }}
+{{ cloud_skudak_server_name }} {
+	request_body {
+		max_size {{ caddy_max_request_body_mb }}MB
+	}
+	
+	reverse_proxy localhost:8090 {
+		header_up Host {host}
+		header_up X-Real-IP {remote}
+	}
+	
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-X-Powered-By
+	}
+	
+	# Nextcloud specific redirects
+	redir /.well-known/carddav /remote.php/dav 301
+	redir /.well-known/caldav /remote.php/dav 301
+	
+	log {
+		output file /var/log/caddy/cloud-skudak.log
+		format json
+	}
+}
+
+# Fulfillr - {{ fulfillr_server_name }} (Static + API with IP restrictions)
+{{ fulfillr_server_name }} {
+{{ ip_restricted_site() }}
+	
+	@api {
+		path /api/*
+	}
+	
+	# Handle API requests
+	handle @api {
+		reverse_proxy localhost:9054
+	}
+	
+	# Serve static files with SPA fallback
+	handle {
+		root * /usr/local/share/fulfillr-site
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+	
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+	}
+	
+	log {
+		output file /var/log/caddy/fulfillr.log
+		format json
+	}
+}

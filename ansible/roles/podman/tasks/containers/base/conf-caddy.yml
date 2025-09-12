@@ -1,0 +1,41 @@
+---
+- name: create caddy directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: '0755'
+  loop:
+    - "{{ caddy_path }}"
+    - "{{ caddy_path }}/data"
+    - "{{ caddy_path }}/config"
+    - "{{ caddy_path }}/logs"
+  tags:
+    - caddy
+
+- name: create letsencrypt shared root srv directory (for migration)
+  become: true
+  ansible.builtin.file:
+    path: /srv/http/letsencrypt
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: '0755'
+    state: directory
+  tags:
+    - caddy
+    - ssl
+
+- name: deploy caddyfile
+  become: true
+  ansible.builtin.template:
+    src: caddy/Caddyfile.j2
+    dest: "{{ caddy_path }}/config/Caddyfile"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: '0644'
+  notify: reload caddy
+  tags:
+    - caddy
+    - caddy-config

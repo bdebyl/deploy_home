@@ -2,11 +2,24 @@
 - import_tasks: firewall.yml
 - import_tasks: podman/podman.yml
 
-- import_tasks: containers/base/conf-nginx.yml
-- import_tasks: containers/base/nginx.yml
+# WEB SERVER: Caddy is the default and only web server
+# nginx has been completely replaced and removed
+
+# ===== WEB SERVER CONFIGURATION =====
+# Caddy is the default web server
+- import_tasks: containers/base/conf-caddy.yml
+  tags:
+    - caddy
+    - web
+
+- import_tasks: containers/base/caddy.yml
   vars:
-    image: docker.io/owasp/modsecurity:nginx
-  tags: nginx
+    image: docker.io/library/caddy:2.10.2
+  tags:
+    - caddy
+    - web
+
+# nginx cleanup completed - infrastructure removed
 
 
 - import_tasks: containers/base/awsddns.yml
@@ -14,15 +27,11 @@
     image: docker.io/bdebyl/awsddns:1.0.34
   tags: ddns
 
-- import_tasks: containers/home/drone.yml
-  vars:
-    runner_image: docker.io/drone/drone-runner-docker:1.8.3
-    image: docker.io/drone/drone:2.18.0
-  tags: drone
+# Drone CI infrastructure completely removed
 
 - import_tasks: containers/home/hass.yml
   vars:
-    image: ghcr.io/home-assistant/home-assistant:2025.6
+    image: ghcr.io/home-assistant/home-assistant:2025.9
   tags: hass
 
 - import_tasks: containers/home/partkeepr.yml
@@ -40,9 +49,9 @@
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
-    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.137.3
+    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.141.1
     redis_image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
-    image: ghcr.io/immich-app/immich-server:v1.137.3
+    image: ghcr.io/immich-app/immich-server:v1.141.1
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
@@ -59,7 +68,7 @@
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20250726.0057"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20250909.2013"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/home/nosql.yml

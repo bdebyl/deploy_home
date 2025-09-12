@@ -1,7 +1,0 @@
----
-- name: install ssl dependencies
-  become: true
-  ansible.builtin.package:
-    name: "{{ deps }}"
-    state: present
-  tags: deps

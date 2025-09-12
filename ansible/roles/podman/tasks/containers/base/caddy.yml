@@ -1,0 +1,38 @@
+---
+- name: pull caddy image
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_image:
+    name: "{{ image }}"
+    state: present
+  tags:
+    - caddy
+
+- name: create caddy container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: caddy
+    image: "{{ image }}"
+    state: started
+    recreate: true
+    network: host
+    volumes:
+      - "{{ caddy_path }}/config/Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "{{ caddy_path }}/data:/data:Z"
+      - "{{ caddy_path }}/config:/config:Z"
+      - "{{ caddy_path }}/logs:/var/log/caddy:Z"
+# Legacy volume mounts removed - Caddy manages certificates automatically
+      # Mount static site directories
+      - "/usr/local/share/fulfillr-site:/usr/local/share/fulfillr-site:ro"
+    env:
+      CADDY_ADMIN: "0.0.0.0:2019"
+    restart_policy: always
+  tags:
+    - caddy
+
+- import_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: caddy
+  tags:
+    - caddy

@@ -6,5 +6,6 @@
     - role: common
     - role: git
     - role: podman
-    - role: ssl
+# SSL certificates are now handled automatically by Caddy
+    # - role: ssl  # REMOVED - Caddy handles all certificate management
     - role: github-actions
