@@ -198,13 +198,28 @@
 # Fulfillr - {{ fulfillr_server_name }} (Static + API with IP restrictions)
 {{ fulfillr_server_name }} {
 {{ ip_restricted_site() }}
-	
+
 	@api {
 		path /api/*
 	}
-	
-	# Handle API requests
+
+	# Handle API requests with CORS for local development
 	handle @api {
+		header {
+			Access-Control-Allow-Origin "*"
+			Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+			Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+			Access-Control-Allow-Credentials "true"
+		}
+
+		# Handle preflight requests
+		@options {
+			method OPTIONS
+		}
+		handle @options {
+			respond "" 204
+		}
+
 		reverse_proxy localhost:9054
 	}
 	
