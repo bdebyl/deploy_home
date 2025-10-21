@@ -40,18 +40,23 @@
     image: docker.io/bdebyl/partkeepr:0.1.10
   tags: partkeepr
 
+- import_tasks: containers/home/partsy.yml
+  vars:
+    image: localhost/partsy:b8e4e92-dirty
+  tags: partsy
+
 - import_tasks: containers/skudak/wiki.yml
   vars:
     db_image: docker.io/library/mysql:5.7.21
-    image: docker.io/solidnerd/bookstack:25.5
+    image: docker.io/solidnerd/bookstack:25.7
   tags: skudak, skudak-wiki
 
 - import_tasks: containers/home/photos.yml
   vars:
     db_image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
-    ml_image: ghcr.io/immich-app/immich-machine-learning:v1.142.1
+    ml_image: ghcr.io/immich-app/immich-machine-learning:v2.1.0
     redis_image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
-    image: ghcr.io/immich-app/immich-server:v1.142.1
+    image: ghcr.io/immich-app/immich-server:v2.1.0
   tags: photos
 
 - import_tasks: containers/home/cloud.yml
@@ -68,10 +73,15 @@
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20250916.1905"
+    image: "{{ aws_ecr_endpoint }}/fulfillr:20251003.1533"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/home/nosql.yml
   vars:
     image: docker.io/redis:7.2.1-alpine
   tags: nosql
+
+- import_tasks: containers/home/gregtime.yml
+  vars:
+    image: docker.io/library/greg-time-bot:1.0.1
+  tags: gregtime

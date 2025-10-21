@@ -11,6 +11,7 @@ hass_path: "{{ podman_volumes }}/hass"
 # nginx_path: removed - nginx no longer used
 nosql_path: "{{ podman_volumes }}/nosql"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
+partsy_path: "{{ podman_volumes }}/partsy"
 photos_path: "{{ podman_volumes }}/photos"
 pihole_path: "{{ podman_volumes }}/pihole"
 sshpass_cron_path: "{{ podman_volumes }}/sshpass_cron"

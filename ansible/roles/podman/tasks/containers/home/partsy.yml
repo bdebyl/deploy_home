@@ -1,0 +1,49 @@
+---
+- name: create partsy host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0777
+  notify: restorecon podman
+  loop:
+    - "{{ partsy_path }}/data"
+    - "{{ partsy_path }}/backups"
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: partsy
+    container_image: "{{ image }}"
+
+- name: create partsy container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partsy
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    network:
+      - shared
+    env:
+      PARTSY_MODE: development
+      PARTSY_DATA_DIR: /data
+      PARTSY_BACKUP_DIR: /backups
+      PARTSY_PORT: "8080"
+      PARTSY_STATIC_DIR: /app/static
+      LOG_LEVEL: info
+    volumes:
+      - "{{ partsy_path }}/data:/data"
+      - "{{ partsy_path }}/backups:/backups"
+    ports:
+      - "8081:8080"
+
+- name: create systemd startup job for partsy
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: partsy

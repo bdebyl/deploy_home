@@ -73,16 +73,6 @@
 	}
 }
 
-# Parts/PartKeepr - {{ parts_server_name }}
-{{ parts_server_name }} {
-	import common_headers
-	reverse_proxy localhost:8081
-	
-	log {
-		output file /var/log/caddy/parts.log
-		format json
-	}
-}
 
 # Wiki/BookStack - {{ bookstack_server_name }}
 {{ bookstack_server_name }} {
@@ -128,9 +118,24 @@
 # Home server - {{ home_server_name }}
 {{ home_server_name }} {
 {{ ip_restricted_site() }}
-	
+
 	handle @local {
 		respond "Home Server Access OK" 200
+	}
+}
+
+# Parts/Partsy - {{ parts_server_name }}
+{{ parts_server_name }} {
+{{ ip_restricted_site() }}
+
+	handle @local {
+		import common_headers
+		reverse_proxy localhost:8081
+	}
+
+	log {
+		output file /var/log/caddy/parts.log
+		format json
 	}
 }
 

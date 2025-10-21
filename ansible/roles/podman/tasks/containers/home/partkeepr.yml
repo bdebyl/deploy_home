@@ -1,66 +1,59 @@
 ---
-- name: create required partkeepr volumes
+# PartKeepr has been replaced by Partsy
+# This playbook removes PartKeepr containers and services
+# Keeping MySQL data volume for historical reference only
+
+- name: stop and remove partkeepr container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partkeepr
+    state: absent
+
+- name: stop and remove partkeepr-db container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: partkeepr-db
+    state: absent
+
+- name: remove systemd service for partkeepr
+  become: true
+  ansible.builtin.systemd:
+    name: "podman-partkeepr.service"
+    state: stopped
+    enabled: false
+    daemon_reload: true
+  ignore_errors: true
+
+- name: remove systemd service for partkeepr-db
+  become: true
+  ansible.builtin.systemd:
+    name: "podman-partkeepr-db.service"
+    state: stopped
+    enabled: false
+    daemon_reload: true
+  ignore_errors: true
+
+- name: remove systemd service files for partkeepr
   become: true
   ansible.builtin.file:
     path: "{{ item }}"
+    state: absent
+  loop:
+    - "/etc/systemd/system/podman-partkeepr.service"
+    - "/etc/systemd/system/podman-partkeepr-db.service"
+  notify: systemd daemon-reload
+
+- name: preserve partkeepr mysql data volume for history
+  become: true
+  ansible.builtin.file:
+    path: "{{ partkeepr_path }}/mysql"
     state: directory
     owner: "{{ podman_subuid.stdout }}"
     group: "{{ podman_user }}"
     mode: 0755
   notify: restorecon podman
-  loop:
-    - "{{ partkeepr_path }}/mysql"
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-
-- import_tasks: podman/podman-check.yml
-  vars:
-    container_name: partkeepr-db
-    container_image: "{{ db_image }}"
-
-- name: create partkeepr-db container
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_container:
-    name: partkeepr-db
-    image: "{{ db_image }}"
-    restart_policy: on-failure:3
-    log_driver: journald
-    network:
-      - shared
-    env:
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: partkeepr
-      MYSQL_USER: partkeepr
-      MYSQL_PASSWORD: "{{ partkeepr_mysql_password }}"
-    volumes:
-      - "{{ partkeepr_path }}/mysql:/var/lib/mysql"
-
-- name: create systemd startup job for partkeepr-db
-  include_tasks: podman/systemd-generate.yml
-  vars:
-    container_name: partkeepr-db
-
-- import_tasks: podman/podman-check.yml
-  vars:
-    container_name: partkeepr
-    container_image: "{{ image }}"
-
-- name: create partkeepr container
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_container:
-    name: partkeepr
-    image: "{{ image }}"
-    restart_policy: on-failure:3
-    log_driver: journald
-    network:
-      - shared
-    ports:
-      - "8081:80"
-
-- name: create systemd startup job for partkeepr
-  include_tasks: podman/systemd-generate.yml
-  vars:
-    container_name: partkeepr
