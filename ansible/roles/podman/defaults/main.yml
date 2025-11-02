@@ -7,12 +7,14 @@ debyltech_path: "{{ podman_volumes }}/debyltech"
 # drone_path: removed - Drone CI decommissioned
 factorio_path: "{{ podman_volumes }}/factorio"
 fulfillr_path: "{{ podman_volumes }}/fulfillr"
+gregtime_path: "{{ podman_volumes }}/gregtime"
 hass_path: "{{ podman_volumes }}/hass"
 # nginx_path: removed - nginx no longer used
 nosql_path: "{{ podman_volumes }}/nosql"
 partkeepr_path: "{{ podman_volumes }}/partkeepr"
 partsy_path: "{{ podman_volumes }}/partsy"
 photos_path: "{{ podman_volumes }}/photos"
+uptime_kuma_path: "{{ podman_volumes }}/uptime-kuma"
 pihole_path: "{{ podman_volumes }}/pihole"
 sshpass_cron_path: "{{ podman_volumes }}/sshpass_cron"
 caddy_path: "{{ podman_volumes }}/caddy"
@@ -29,6 +31,7 @@ cloud_server_name: cloud.bdebyl.net
 cloud_skudak_server_name: cloud.skudakrennsport.com
 fulfillr_server_name: fulfillr.debyltech.com
 home_server_name: home.bdebyl.net
+uptime_kuma_server_name: uptime.debyltech.com
 parts_server_name: parts.bdebyl.net
 photos_server_name: photos.bdebyl.net
 

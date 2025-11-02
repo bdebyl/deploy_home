@@ -42,7 +42,7 @@
 
 - import_tasks: containers/home/partsy.yml
   vars:
-    image: localhost/partsy:b8e4e92-dirty
+    image: localhost/partsy:f3bb84a-45ae7ef
   tags: partsy
 
 - import_tasks: containers/skudak/wiki.yml
@@ -76,6 +76,11 @@
     image: "{{ aws_ecr_endpoint }}/fulfillr:20251003.1533"
   tags: debyltech, fulfillr
 
+- import_tasks: containers/debyltech/uptime-kuma.yml
+  vars:
+    image: docker.io/louislam/uptime-kuma:1
+  tags: debyltech, uptime-kuma
+
 - import_tasks: containers/home/nosql.yml
   vars:
     image: docker.io/redis:7.2.1-alpine
@@ -83,5 +88,5 @@
 
 - import_tasks: containers/home/gregtime.yml
   vars:
-    image: docker.io/library/greg-time-bot:1.0.1
+    image: localhost/greg-time-bot:1.2.0
   tags: gregtime

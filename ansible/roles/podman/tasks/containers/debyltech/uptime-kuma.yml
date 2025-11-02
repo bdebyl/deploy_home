@@ -1,0 +1,38 @@
+---
+- name: create uptime-kuma host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ uptime_kuma_path }}/data"
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: uptime-kuma
+    container_image: "{{ image }}"
+
+- name: create uptime-kuma container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: uptime-kuma
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    volumes:
+      - "{{ uptime_kuma_path }}/data:/app/data"
+    ports:
+      - "3001:3001/tcp"
+
+- name: create systemd startup job for uptime-kuma
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: uptime-kuma

@@ -139,6 +139,24 @@
 	}
 }
 
+# Uptime Kuma - {{ uptime_kuma_server_name }}
+{{ uptime_kuma_server_name }} {
+{{ ip_restricted_site() }}
+
+	handle @local {
+		import common_headers
+		reverse_proxy localhost:3001 {
+			# WebSocket support for live updates
+			flush_interval -1
+		}
+	}
+
+	log {
+		output file /var/log/caddy/uptime-kuma.log
+		format json
+	}
+}
+
 # ============================================================================
 # COMPLEX CONFIGURATIONS
 # ============================================================================

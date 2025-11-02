@@ -1,0 +1,45 @@
+---
+- name: create gregtime host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ gregtime_path }}/logs"
+
+- name: unshare chown the gregtime log volume
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 1000:1000 {{ gregtime_path }}/logs
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: gregtime
+    container_image: "{{ image }}"
+
+- name: create gregtime container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: gregtime
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      TZ: America/New_York
+    volumes:
+      - "{{ gregtime_path }}/logs:/app/logs"
+
+- name: create systemd startup job for gregtime
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: gregtime
