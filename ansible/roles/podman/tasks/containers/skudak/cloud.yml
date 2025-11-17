@@ -98,3 +98,13 @@
   include_tasks: podman/systemd-generate.yml
   vars:
     container_name: skudak-cloud
+
+- name: disable nextcloud signup link in config
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ cloud_skudak_path }}/config/config.php"
+    regexp: "^\\s*'simpleSignUpLink\\.shown'\\s*=>"
+    line: "  'simpleSignUpLink.shown' => false,"
+    insertbefore: '^\);'
+    create: false
+  failed_when: false

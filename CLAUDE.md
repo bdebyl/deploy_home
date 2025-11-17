@@ -17,6 +17,8 @@ This is a home infrastructure deployment repository using Ansible for automated 
 - `make vault` - Edit encrypted Ansible vault file
 - `make list-tags` - List all available Ansible tags
 - `make list-tasks` - List all Ansible tasks
+- `make git-crypt-backup` - Backup git-crypt symmetric key (encrypted with GPG)
+- `make git-crypt-restore` - Restore git-crypt symmetric key from backup
 
 ### Environment Setup
 The project uses Python virtualenv for dependency management:
@@ -54,6 +56,9 @@ Containers are organized in `ansible/roles/podman/tasks/containers/`:
 - Ansible vault for encrypted secrets management
 - Password sourced from external password manager
 - Git-crypt for repository-level encryption (see `.gitattributes`)
+  - Symmetric key can be backed up locally in `.git-crypt-backup/` (encrypted with GPG)
+  - Use `make git-crypt-backup` to create a local encrypted backup
+  - Use `make git-crypt-restore` to recover from git-crypt corruption
 - SSH key-based authentication to target hosts
 - Caddy provides automatic HTTPS with LetsEncrypt certificates
 - Built-in security headers and IP-based access restrictions
