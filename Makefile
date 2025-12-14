@@ -31,6 +31,7 @@ EXTRA_VARS?=
 
 ${VENV}:
 	python3 -m venv ${VENV}
+	${VENV_BIN}/python3 -m pip install --upgrade pip
 ${PIP}: ${VENV}
 
 ${ANSIBLE} ${ANSIBLE_VAULT} ${LINT_YAML}: ${VENV} requirements.txt
@@ -69,3 +70,17 @@ vault: ${ANSIBLE_VAULT} ${VAULT_FILE}
 lint: ${LINT_YAML} ${SKIP_FILE}
 	@printf "Running yamllint...\n"
 	-@${LINT_YAML} ${YAML_FILES}
+
+# Git-crypt management
+git-crypt-backup:
+	@printf "Backing up git-crypt symmetric key...\n"
+	@mkdir -p .git-crypt-backup
+	@gpg --batch --yes -e -r 70A4AA02555DBD559189B4E0F32BE05EADAA54FC -o .git-crypt-backup/symmetric-key.gpg .git/git-crypt/keys/default
+	@printf "Backup created at .git-crypt-backup/symmetric-key.gpg\n"
+
+git-crypt-restore:
+	@printf "Restoring git-crypt symmetric key from backup...\n"
+	@mkdir -p .git/git-crypt/keys
+	@gpg --batch --yes -d .git-crypt-backup/symmetric-key.gpg > .git/git-crypt/keys/default
+	@chmod 600 .git/git-crypt/keys/default
+	@printf "Key restored. Run 'git-crypt unlock' or just checkout files.\n"

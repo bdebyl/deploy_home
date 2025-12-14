@@ -62,13 +62,13 @@
 - import_tasks: containers/home/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:31.0.6-apache
+    image: docker.io/library/nextcloud:32.0.1-apache
   tags: cloud
 
 - import_tasks: containers/skudak/cloud.yml
   vars:
     db_image: docker.io/library/mariadb:10.6
-    image: docker.io/library/nextcloud:31.0.6-apache
+    image: docker.io/library/nextcloud:32.0.1-apache
   tags: skudak, skudak-cloud
 
 - import_tasks: containers/debyltech/fulfillr.yml
