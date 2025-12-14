@@ -24,7 +24,7 @@
   notify: restorecon podman
   loop:
     - configuration.yaml
-    # - automations.yaml
+    - automations.yaml
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
