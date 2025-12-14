@@ -15,6 +15,7 @@ partkeepr_path: "{{ podman_volumes }}/partkeepr"
 partsy_path: "{{ podman_volumes }}/partsy"
 photos_path: "{{ podman_volumes }}/photos"
 uptime_kuma_path: "{{ podman_volumes }}/uptime-kuma"
+zomboid_path: "{{ podman_volumes }}/zomboid"
 pihole_path: "{{ podman_volumes }}/pihole"
 sshpass_cron_path: "{{ podman_volumes }}/sshpass_cron"
 caddy_path: "{{ podman_volumes }}/caddy"
@@ -34,6 +35,14 @@ home_server_name: home.bdebyl.net
 uptime_kuma_server_name: uptime.debyltech.com
 parts_server_name: parts.bdebyl.net
 photos_server_name: photos.bdebyl.net
+
+# debyl.io domains (migration from bdebyl.net)
+base_server_name_io: debyl.io
+assistant_server_name_io: assistant.debyl.io
+cloud_server_name_io: cloud.debyl.io
+home_server_name_io: home.debyl.io
+parts_server_name_io: parts.debyl.io
+photos_server_name_io: photos.debyl.io
 
 # Legacy nginx/ModSecurity configuration removed - Caddy provides built-in security
 

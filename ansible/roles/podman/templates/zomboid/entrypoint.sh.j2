@@ -1,0 +1,103 @@
+#!/bin/bash
+set -e
+
+STEAMCMD="/home/steam/steamcmd/steamcmd.sh"
+INSTALL_DIR="/home/steam/pzserver"
+DATA_DIR="/home/steam/Zomboid"
+SERVER_NAME="${SERVER_NAME:-zomboid}"
+MIN_RAM="${MIN_RAM:-8g}"
+MAX_RAM="${MAX_RAM:-24g}"
+
+echo "=== Project Zomboid Build 42 Server ==="
+echo "Server Name: ${SERVER_NAME}"
+echo "RAM: ${MIN_RAM} - ${MAX_RAM}"
+
+# Fix ownership of mounted volumes (container runs as steam user, UID 1000)
+echo "=== Fixing volume permissions ==="
+chown -R steam:steam "${INSTALL_DIR}" || true
+chown -R steam:steam "${DATA_DIR}" || true
+chmod -R 755 "${INSTALL_DIR}" || true
+chmod -R 755 "${DATA_DIR}" || true
+
+# Create required subdirectories with correct ownership
+mkdir -p "${DATA_DIR}/Server"
+mkdir -p "${DATA_DIR}/Saves/Multiplayer"
+mkdir -p "${DATA_DIR}/db"
+chown -R steam:steam "${DATA_DIR}"
+
+# Ensure steam user has proper home directory setup
+export HOME=/home/steam
+
+# Initialize SteamCMD if needed (creates config directories)
+if [ ! -d "/home/steam/Steam" ]; then
+    echo "=== Initializing SteamCMD ==="
+    su -c "${STEAMCMD} +quit" steam || true
+fi
+
+# Update/Install PZ dedicated server with Build 42 unstable branch
+if [ "${AUTO_UPDATE:-true}" = "true" ]; then
+    echo "=== Updating Project Zomboid Server (Build 42 unstable) ==="
+    # Run steamcmd as steam user with proper quoting for beta flag
+    su -c "${STEAMCMD} +force_install_dir ${INSTALL_DIR} +login anonymous +app_update 380870 -beta unstable validate +quit" steam
+    echo "=== Update complete ==="
+fi
+
+# Ensure data directories exist (created earlier with correct permissions)
+
+# Configure server settings on first run
+SERVER_INI="${DATA_DIR}/Server/${SERVER_NAME}.ini"
+if [ ! -f "${SERVER_INI}" ]; then
+    echo "=== First run detected, server will generate default config ==="
+fi
+
+# Handle admin password for first run
+# PZ requires interactive password input on first run, so we create a db file
+ADMIN_DB="${DATA_DIR}/db/${SERVER_NAME}.db"
+if [ ! -f "${ADMIN_DB}" ] && [ -n "${ADMIN_PASSWORD}" ]; then
+    echo "=== Setting up admin account ==="
+    mkdir -p "${DATA_DIR}/db"
+    # The server will prompt for password on first run
+    # We'll use expect-like behavior or let it use defaults
+fi
+
+# Modify memory settings in ProjectZomboid64.json (Build 42 uses JSON config)
+PZ_JSON="${INSTALL_DIR}/ProjectZomboid64.json"
+if [ -f "${PZ_JSON}" ]; then
+    echo "=== Setting JVM memory: Xms=${MIN_RAM}, Xmx=${MAX_RAM} ==="
+    # Add -Xms if not present, otherwise update it
+    if grep -q "\-Xms" "${PZ_JSON}"; then
+        sed -i "s/-Xms[0-9]*[gGmM]*/-Xms${MIN_RAM}/g" "${PZ_JSON}"
+    else
+        # Insert -Xms before -Xmx
+        sed -i "s/\"-Xmx/\"-Xms${MIN_RAM}\",\n\t\t\"-Xmx/g" "${PZ_JSON}"
+    fi
+    sed -i "s/-Xmx[0-9]*[gGmM]*/-Xmx${MAX_RAM}/g" "${PZ_JSON}"
+fi
+
+# If server password is set, we'll need to configure it in the ini after first run
+# For now, store it for later configuration
+if [ -n "${SERVER_PASSWORD}" ]; then
+    echo "${SERVER_PASSWORD}" > "${DATA_DIR}/.server_password"
+fi
+
+if [ -n "${ADMIN_PASSWORD}" ]; then
+    echo "${ADMIN_PASSWORD}" > "${DATA_DIR}/.admin_password"
+fi
+
+# Change to install directory and start server
+cd "${INSTALL_DIR}"
+
+echo "=== Starting Project Zomboid Server ==="
+echo "Connect to: home.bdebyl.net:16261"
+
+# Start server - on first run this will prompt for admin password
+# We handle this by providing input via stdin if password file exists
+if [ -f "${DATA_DIR}/.admin_password" ] && [ ! -f "${ADMIN_DB}" ]; then
+    # First run with admin password
+    ADMIN_PASS=$(cat "${DATA_DIR}/.admin_password")
+    echo "=== First run: setting admin password ==="
+    printf "%s\n%s\n" "${ADMIN_PASS}" "${ADMIN_PASS}" | su -c "bash start-server.sh -servername ${SERVER_NAME}" steam
+else
+    # Normal run
+    exec su -c "bash start-server.sh -servername ${SERVER_NAME}" steam
+fi

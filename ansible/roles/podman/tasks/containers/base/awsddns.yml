@@ -79,3 +79,30 @@
   include_tasks: podman/systemd-generate.yml
   vars:
     container_name: awsddns-fulfillr
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: awsddns-debyl
+    container_image: "{{ image }}"
+
+- name: create home.debyl.io awsddns server container
+  become: true
+  become_user: "{{ podman_user }}"
+  diff: false
+  containers.podman.podman_container:
+    name: awsddns-debyl
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      AWS_ZONE_TTL: 60
+      AWS_ZONE_ID: "Z07501202A6AYMHCVP50A"
+      AWS_ZONE_HOSTNAME: "home.debyl.io"
+      AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+      AWS_DEFAULT_REGION: "{{ aws_default_region }}"
+
+- name: create systemd startup job for awsddns-debyl
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: awsddns-debyl

@@ -1,0 +1,106 @@
+---
+- name: create zomboid host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+  loop:
+    - "{{ zomboid_path }}/server"
+    - "{{ zomboid_path }}/data"
+    - "{{ zomboid_path }}/scripts"
+
+- name: copy zomboid entrypoint script
+  become: true
+  ansible.builtin.template:
+    src: zomboid/entrypoint.sh.j2
+    dest: "{{ zomboid_path }}/scripts/entrypoint.sh"
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0755
+  notify: restorecon podman
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: zomboid
+    container_image: "{{ image }}"
+
+- name: create zomboid container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: zomboid
+    image: "{{ image }}"
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      SERVER_NAME: zomboid
+      MIN_RAM: 8g
+      MAX_RAM: 24g
+      AUTO_UPDATE: "true"
+      ADMIN_PASSWORD: "{{ zomboid_admin_password }}"
+      SERVER_PASSWORD: "{{ zomboid_password }}"
+    volumes:
+      - "{{ zomboid_path }}/server:/home/steam/pzserver"
+      - "{{ zomboid_path }}/data:/home/steam/Zomboid"
+      - "{{ zomboid_path }}/scripts/entrypoint.sh:/entrypoint.sh:ro"
+    ports:
+      - "16261:16261/udp"
+      - "16262:16262/udp"
+    command: /bin/bash /entrypoint.sh
+
+- name: create systemd startup job for zomboid
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: zomboid
+
+# Ensure zomboid restarts on any exit (including admin-triggered restarts)
+- name: configure zomboid systemd to always restart
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.lineinfile:
+    path: "{{ podman_home }}/.config/systemd/user/zomboid.service"
+    regexp: "^Restart="
+    line: "Restart=always"
+  notify: reload zomboid systemd
+
+# Configuration management (requires server to have run once to generate ini)
+- name: configure zomboid server settings
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ zomboid_path }}/data/Server/zomboid.ini"
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "PublicName", value: "Modded Joboid" }
+    - { key: "MaxPlayers", value: "8" }
+    - { key: "Password", value: "{{ zomboid_password }}" }
+    - { key: "Mods", value: "PzkVanillaPlusCarPack;PZKExtendedVehicleZones;PZKCarzoneWorkshop;Pogo;Pogo;Pogo;LethalHeadHit;VanillaFoodsExpanded;VanillaFoodsExpanded;RebalancedPropMoving;GaelGunStore_B42;STA_PryOpen;tsarslib;Ahu;Ahu;Ahu;ModernStatus;StandardizedVehicleUpgrades3V;StandardizedVehicleUpgrades3Core;survivingthroughseasons;survivingthroughseasons;RVInteriorExpansionPart2;RVInteriorExpansion;TchernoLib;HereGoesTheSun;hf_point_blank;WayMoreCars;WaterGoesBad;WaterGoesBad;PROJECTRVInterior42;ClimbWall;amclub;RepairableWindows;RepairableWindows;StarlitLibrary;StarlitLibrary;StarlitLibrary;ImmersiveBlackouts;ModLoadOrderSorter_b42;NeatUI_Framework;SomewhatWater;SomewhatWaterBright;VanillaVehiclesAnimated;VanillaVehiclesAnimated_SVU;VVA_nascarlights;VVA_cullseats;VVA_slowdoors;kitsunelib;ChuckleberryFinnAlertSystem;ImmersiveVehiclePaint;darkerMap;SLDarkerSnowB42;BecomeBraveB42;Louisville spawn v42;ItemretexturePSC" }
+    - { key: "WorkshopItems", value: "3217685049;3058134369;3543588687;3577903007;2699828474;3616176188;3579640010;3402491515;3422418897;3451167732;3304582091;3403490889;2753086629;3622163276;3618427553;3389605231;3618557184;2990322197;3520758551;2849467715;3543229299;3389681224;3404737883;3378304610;3378285185;3607686447;3423660713;3508537032;3582960654;3281755175;3390453390;3077900375;3464606086;2939187818;3390411200;3388028737;3387071727;3618491765" }
+  tags: zomboid-conf
+
+# Sandbox settings (requires world reset to take effect)
+- name: configure zomboid sandbox settings
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ zomboid_path }}/data/Server/zomboid_SandboxVars.lua"
+    regexp: "^\\s*{{ item.key }} = "
+    line: "    {{ item.key }} = {{ item.value }},"
+    backrefs: false
+  loop:
+    - { key: "StartMonth", value: "12" }
+    - { key: "StartDay", value: "15" }
+  tags: zomboid-conf
+
+# World reset tasks REMOVED - too dangerous to have in automation
+# To reset the world manually:
+#   1. Stop the server: systemctl --user stop zomboid.service
+#   2. Delete saves: rm -rf /home/podman/.local/share/volumes/zomboid/data/Saves
+#   3. Delete db: rm -rf /home/podman/.local/share/volumes/zomboid/data/db
+#   4. Start the server: systemctl --user start zomboid.service

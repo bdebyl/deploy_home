@@ -53,20 +53,25 @@
 # SITE CONFIGURATIONS
 # ============================================================================
 
-# Simple redirect: {{ base_server_name }} -> debyl.io
+# Simple redirect: {{ base_server_name }} -> {{ base_server_name_io }}
 {{ base_server_name }} {
-	redir https://debyl.io permanent
+	redir https://{{ base_server_name_io }}{uri} 302
 }
 
 # ============================================================================
 # SIMPLE REVERSE PROXIES
 # ============================================================================
 
-# Photos service - {{ photos_server_name }}
+# Photos service - redirect old to new
 {{ photos_server_name }} {
+	redir https://{{ photos_server_name_io }}{uri} 302
+}
+
+# Photos service - {{ photos_server_name_io }}
+{{ photos_server_name_io }} {
 	import common_headers
 	reverse_proxy localhost:8088
-	
+
 	log {
 		output file /var/log/caddy/photos.log
 		format json
@@ -89,23 +94,28 @@
 # IP-RESTRICTED SITES
 # ============================================================================
 
-# Home Assistant - {{ assistant_server_name }}
+# Home Assistant - redirect old to new
 {{ assistant_server_name }} {
+	redir https://{{ assistant_server_name_io }}{uri} 302
+}
+
+# Home Assistant - {{ assistant_server_name_io }}
+{{ assistant_server_name_io }} {
 {{ ip_restricted_site() }}
-	
+
 	handle @local {
 		reverse_proxy localhost:8123 {
 			# WebSocket support is automatic
 			flush_interval -1
 		}
-		
+
 		header {
 			Strict-Transport-Security "max-age=31536000; includeSubDomains"
 			X-Content-Type-Options "nosniff"
 			Referrer-Policy "same-origin"
 		}
 	}
-	
+
 	log {
 		output file /var/log/caddy/assistant.log
 		format json
@@ -115,8 +125,13 @@
 # CI/Drone - REMOVED
 # ci.bdebyl.net configuration removed - Drone CI infrastructure decommissioned
 
-# Home server - {{ home_server_name }}
+# Home server - redirect old to new
 {{ home_server_name }} {
+	redir https://{{ home_server_name_io }}{uri} 302
+}
+
+# Home server - {{ home_server_name_io }}
+{{ home_server_name_io }} {
 {{ ip_restricted_site() }}
 
 	handle @local {
@@ -124,8 +139,13 @@
 	}
 }
 
-# Parts/Partsy - {{ parts_server_name }}
+# Parts/Partsy - redirect old to new
 {{ parts_server_name }} {
+	redir https://{{ parts_server_name_io }}{uri} 302
+}
+
+# Parts/Partsy - {{ parts_server_name_io }}
+{{ parts_server_name_io }} {
 {{ ip_restricted_site() }}
 
 	handle @local {
@@ -161,29 +181,34 @@
 # COMPLEX CONFIGURATIONS
 # ============================================================================
 
-# Nextcloud - {{ cloud_server_name }}
+# Nextcloud - redirect old to new
 {{ cloud_server_name }} {
+	redir https://{{ cloud_server_name_io }}{uri} 302
+}
+
+# Nextcloud - {{ cloud_server_name_io }}
+{{ cloud_server_name_io }} {
 	request_body {
 		max_size {{ caddy_max_request_body_mb }}MB
 	}
-	
+
 	reverse_proxy localhost:8089 {
 		header_up Host {host}
 		header_up X-Real-IP {remote}
 		# X-Forwarded-For and X-Forwarded-Proto are automatic
 	}
-	
+
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "same-origin"
 		-X-Powered-By
 	}
-	
+
 	# Nextcloud specific redirects
 	redir /.well-known/carddav /remote.php/dav 301
 	redir /.well-known/caldav /remote.php/dav 301
-	
+
 	log {
 		output file /var/log/caddy/cloud.log
 		format json
