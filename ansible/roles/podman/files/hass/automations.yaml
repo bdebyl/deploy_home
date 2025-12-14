@@ -1,41 +1,10 @@
-- id: '1707432654697'
-  alias: Lights on Sunset
-  description: ''
-  trigger:
-  - platform: sun
-    event: sunset
-    offset: 0
-  condition: []
-  action:
-  - type: turn_on
-    device_id: 04a5b4bea0caafe63bca3fb31c49091b
-    entity_id: light.bastian_s_office_lights
-    domain: light
-    brightness_pct: 100
-  mode: single
-- id: '1649042299713'
-  alias: Office Lights Evening
-  description: ''
-  trigger:
-  - platform: time
-    at: '17:00:00'
-  condition: []
-  action:
-  - type: turn_on
-    device_id: 04a5b4bea0caafe63bca3fb31c49091b
-    entity_id: light.bastian_s_office_lights
-    domain: light
-    brightness_pct: 1
-  mode: single
 - id: '1649042328061'
-  alias: Office Lights Off
+  alias: Lights - 01 - On
   description: ''
-  trigger:
-  - platform: time
-    at: '20:00:00'
-  condition: []
-  action:
-  - type: turn_off
+  triggers: []
+  conditions: []
+  actions:
+  - type: turn_on
     device_id: 1fa1aca8f90daf94a2a7baf8a3abc158
     entity_id: 58d101e63456fd8e088d3a3b63f3a0f9
     domain: switch
@@ -60,14 +29,6 @@
     domain: light
     brightness_pct: 75
   - type: turn_on
-    device_id: 3a93dada310aaf58c77d7225df0669a0
-    entity_id: b3a8c8ff3198fed36a0bfb6dc6173725
-    domain: switch
-  - type: turn_on
-    device_id: e9ee0a688d335e87c1c5a0910cb10369
-    entity_id: f48c6c15253ffdff064a01994e3a2778
-    domain: switch
-  - type: turn_on
     device_id: 21eb2bd28aba2ee361a22af92e8b2d16
     entity_id: 81c486d682afcc94e98e377475cc92fc
     domain: light
@@ -78,7 +39,7 @@
   description: ''
   trigger:
   - platform: time
-    at: '22:30:00'
+    at: '23:00:00'
   condition: []
   action:
   - type: turn_off
@@ -87,13 +48,11 @@
     domain: switch
   mode: single
 - id: '1707433130493'
-  alias: Kitchen Dim - Early
+  alias: Lights - 02 - Early Dim
   description: ''
-  trigger:
-  - platform: time
-    at: '20:30:00'
-  condition: []
-  action:
+  triggers: []
+  conditions: []
+  actions:
   - type: turn_on
     device_id: 03a12d2360d9954aed19c2449070725a
     entity_id: 7c1e7db73799cc3f90948b5118596985
@@ -116,13 +75,11 @@
     brightness_pct: 50
   mode: single
 - id: '1707433185560'
-  alias: Kitchen Dim - Mid
+  alias: Lights - 03 - Mid Dim
   description: ''
-  trigger:
-  - platform: time
-    at: '21:00:00'
-  condition: []
-  action:
+  triggers: []
+  conditions: []
+  actions:
   - type: turn_on
     device_id: f31e4f9bf8fa3687a07aeb4430eaef38
     entity_id: b79934d97f3bb9d8a3da47c76d03ded4
@@ -150,13 +107,11 @@
     brightness_pct: 25
   mode: single
 - id: '1707433226166'
-  alias: Kitchen Dim - Late
+  alias: Lights - 04 - Late Dim
   description: ''
-  trigger:
-  - platform: time
-    at: '22:00:00'
-  condition: []
-  action:
+  triggers: []
+  conditions: []
+  actions:
   - type: turn_on
     device_id: f31e4f9bf8fa3687a07aeb4430eaef38
     entity_id: b79934d97f3bb9d8a3da47c76d03ded4
@@ -182,15 +137,20 @@
     entity_id: 81c486d682afcc94e98e377475cc92fc
     domain: light
     brightness_pct: 10
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 1
+    target:
+      area_id: bedroom
+    enabled: false
   mode: single
 - id: '1711218890065'
-  alias: Lights Out
+  alias: Lights - 10 - Off
   description: ''
-  trigger:
-  - platform: time
-    at: 01:00:00
-  condition: []
-  action:
+  triggers: []
+  conditions: []
+  actions:
   - type: turn_off
     device_id: 3f7f65571d9bb0833433996f1f6725bd
     entity_id: 7407afe14783543252c666d5ff7c5d5c
@@ -212,13 +172,448 @@
     entity_id: a30b2da3cd80a5b4c927e1608b91eb65
     domain: light
   - type: turn_off
-    device_id: 3a93dada310aaf58c77d7225df0669a0
-    entity_id: b3a8c8ff3198fed36a0bfb6dc6173725
-    domain: switch
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+  mode: single
+- id: '1739912161794'
+  alias: Lights - 00 - Morning
+  description: ''
+  triggers:
+  - trigger: time
+    at: 09:00:00
+  conditions: []
+  actions:
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 100
+  mode: single
+- id: '1762116115638'
+  alias: Light - TV On
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 18a9bb7a2a32be4371da447767ef50a9
+    entity_id: c05688f2610e27e2d86380e2945ceae5
+    domain: remote
+    trigger: device
+  conditions: []
+  actions:
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.tv_mode
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 5
+    target:
+      area_id: living_room
   - type: turn_off
-    device_id: e9ee0a688d335e87c1c5a0910cb10369
-    entity_id: f48c6c15253ffdff064a01994e3a2778
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+  - type: turn_off
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+  - type: turn_off
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+  mode: single
+- id: new_tv_off
+  alias: Light - TV Off - Restore
+  description: Restores appropriate lighting level when TV turns off based on time
+  triggers:
+  - type: turned_off
+    device_id: 18a9bb7a2a32be4371da447767ef50a9
+    entity_id: c05688f2610e27e2d86380e2945ceae5
+    domain: remote
+    trigger: device
+  conditions: []
+  actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.tv_mode
+  - choose:
+    - conditions:
+      - condition: time
+        after: '22:30:00'
+        before: '23:45:00'
+      sequence:
+      # Late dim levels
+      - type: turn_on
+        device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+        entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+        domain: light
+        brightness_pct: 1
+      - type: turn_on
+        device_id: 03a12d2360d9954aed19c2449070725a
+        entity_id: 7c1e7db73799cc3f90948b5118596985
+        domain: light
+        brightness_pct: 1
+      - type: turn_on
+        device_id: 800eddbeeda071225f181a14cb9527e0
+        entity_id: 521a92ddd8be76c7eddfc544f81f6020
+        domain: light
+        brightness_pct: 25
+      - type: turn_on
+        device_id: 3f7f65571d9bb0833433996f1f6725bd
+        entity_id: 7407afe14783543252c666d5ff7c5d5c
+        domain: light
+        brightness_pct: 10
+      - type: turn_on
+        device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+        entity_id: 81c486d682afcc94e98e377475cc92fc
+        domain: light
+        brightness_pct: 10
+    - conditions:
+      - condition: time
+        after: '21:30:00'
+        before: '22:30:00'
+      sequence:
+      # Mid dim levels
+      - type: turn_on
+        device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+        entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+        domain: light
+        brightness_pct: 25
+      - type: turn_on
+        device_id: 03a12d2360d9954aed19c2449070725a
+        entity_id: 7c1e7db73799cc3f90948b5118596985
+        domain: light
+        brightness_pct: 25
+      - type: turn_on
+        device_id: 800eddbeeda071225f181a14cb9527e0
+        entity_id: 521a92ddd8be76c7eddfc544f81f6020
+        domain: light
+        brightness_pct: 50
+      - type: turn_on
+        device_id: 3f7f65571d9bb0833433996f1f6725bd
+        entity_id: 7407afe14783543252c666d5ff7c5d5c
+        domain: light
+        brightness_pct: 25
+      - type: turn_on
+        device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+        entity_id: 81c486d682afcc94e98e377475cc92fc
+        domain: light
+        brightness_pct: 25
+    - conditions:
+      - condition: time
+        after: '21:00:00'
+        before: '21:30:00'
+      sequence:
+      # Early dim levels
+      - type: turn_on
+        device_id: 03a12d2360d9954aed19c2449070725a
+        entity_id: 7c1e7db73799cc3f90948b5118596985
+        domain: light
+        brightness_pct: 50
+      - type: turn_on
+        device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+        entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+        domain: light
+        brightness_pct: 50
+      - type: turn_on
+        device_id: 3f7f65571d9bb0833433996f1f6725bd
+        entity_id: 7407afe14783543252c666d5ff7c5d5c
+        domain: light
+        brightness_pct: 50
+      - type: turn_on
+        device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+        entity_id: 81c486d682afcc94e98e377475cc92fc
+        domain: light
+        brightness_pct: 50
+    default:
+    # Full brightness (before 21:00 after sunset)
+    - type: turn_on
+      device_id: 800eddbeeda071225f181a14cb9527e0
+      entity_id: 521a92ddd8be76c7eddfc544f81f6020
+      domain: light
+      brightness_pct: 25
+    - type: turn_on
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+      domain: light
+      brightness_pct: 100
+    - type: turn_on
+      device_id: 03a12d2360d9954aed19c2449070725a
+      entity_id: 7c1e7db73799cc3f90948b5118596985
+      domain: light
+      brightness_pct: 100
+    - type: turn_on
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      entity_id: 7407afe14783543252c666d5ff7c5d5c
+      domain: light
+      brightness_pct: 75
+    - type: turn_on
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      entity_id: 81c486d682afcc94e98e377475cc92fc
+      domain: light
+      brightness_pct: 100
+  mode: single
+- id: 'sunset_lights_on'
+  alias: Lights - Sunset On
+  description: Turn on lights 1 hour before sunset
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: "-01:00:00"
+  conditions:
+  - condition: state
+    entity_id: input_boolean.tv_mode
+    state: 'off'
+  actions:
+  - type: turn_on
+    device_id: 1fa1aca8f90daf94a2a7baf8a3abc158
+    entity_id: 58d101e63456fd8e088d3a3b63f3a0f9
     domain: switch
+  - type: turn_on
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+    brightness_pct: 25
+  - type: turn_on
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+    brightness_pct: 100
+  - type: turn_on
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+    brightness_pct: 100
+  - type: turn_on
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+    brightness_pct: 75
+  - type: turn_on
+    device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+    entity_id: 81c486d682afcc94e98e377475cc92fc
+    domain: light
+    brightness_pct: 100
+  mode: single
+- id: 'evening_dim_2100'
+  alias: Lights - Evening Dim (21:00)
+  description: Dim lights at 21:00 - only affects lights that are ON
+  triggers:
+  - trigger: time
+    at: "21:00:00"
+  conditions:
+  - condition: state
+    entity_id: input_boolean.tv_mode
+    state: 'off'
+  actions:
+  - if:
+    - condition: device
+      device_id: 03a12d2360d9954aed19c2449070725a
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 03a12d2360d9954aed19c2449070725a
+      entity_id: 7c1e7db73799cc3f90948b5118596985
+      domain: light
+      brightness_pct: 50
+  - if:
+    - condition: device
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+      domain: light
+      brightness_pct: 50
+  - if:
+    - condition: device
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      entity_id: 7407afe14783543252c666d5ff7c5d5c
+      domain: light
+      brightness_pct: 50
+  - if:
+    - condition: device
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      entity_id: 81c486d682afcc94e98e377475cc92fc
+      domain: light
+      brightness_pct: 50
+  mode: single
+- id: 'mid_dim_2130'
+  alias: Lights - Mid Dim (21:30)
+  description: Dim lights at 21:30 - only affects lights that are ON
+  triggers:
+  - trigger: time
+    at: "21:30:00"
+  conditions:
+  - condition: state
+    entity_id: input_boolean.tv_mode
+    state: 'off'
+  actions:
+  - if:
+    - condition: device
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+      domain: light
+      brightness_pct: 25
+  - if:
+    - condition: device
+      device_id: 03a12d2360d9954aed19c2449070725a
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 03a12d2360d9954aed19c2449070725a
+      entity_id: 7c1e7db73799cc3f90948b5118596985
+      domain: light
+      brightness_pct: 25
+  - if:
+    - condition: device
+      device_id: 800eddbeeda071225f181a14cb9527e0
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 800eddbeeda071225f181a14cb9527e0
+      entity_id: 521a92ddd8be76c7eddfc544f81f6020
+      domain: light
+      brightness_pct: 50
+  - if:
+    - condition: device
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      entity_id: 7407afe14783543252c666d5ff7c5d5c
+      domain: light
+      brightness_pct: 25
+  - if:
+    - condition: device
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      entity_id: 81c486d682afcc94e98e377475cc92fc
+      domain: light
+      brightness_pct: 25
+  mode: single
+- id: 'late_dim_2230'
+  alias: Lights - Late Dim (22:30)
+  description: Dim lights at 22:30 - only affects lights that are ON
+  triggers:
+  - trigger: time
+    at: "22:30:00"
+  conditions:
+  - condition: state
+    entity_id: input_boolean.tv_mode
+    state: 'off'
+  actions:
+  - if:
+    - condition: device
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+      entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+      domain: light
+      brightness_pct: 1
+  - if:
+    - condition: device
+      device_id: 03a12d2360d9954aed19c2449070725a
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 03a12d2360d9954aed19c2449070725a
+      entity_id: 7c1e7db73799cc3f90948b5118596985
+      domain: light
+      brightness_pct: 1
+  - if:
+    - condition: device
+      device_id: 800eddbeeda071225f181a14cb9527e0
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 800eddbeeda071225f181a14cb9527e0
+      entity_id: 521a92ddd8be76c7eddfc544f81f6020
+      domain: light
+      brightness_pct: 25
+  - if:
+    - condition: device
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 3f7f65571d9bb0833433996f1f6725bd
+      entity_id: 7407afe14783543252c666d5ff7c5d5c
+      domain: light
+      brightness_pct: 10
+  - if:
+    - condition: device
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      domain: light
+      type: is_on
+    then:
+    - type: turn_on
+      device_id: 21eb2bd28aba2ee361a22af92e8b2d16
+      entity_id: 81c486d682afcc94e98e377475cc92fc
+      domain: light
+      brightness_pct: 10
+  mode: single
+- id: 'lights_out_2345'
+  alias: Lights - Out (23:45)
+  description: Turn off all lights at 23:45
+  triggers:
+  - trigger: time
+    at: "23:45:00"
+  conditions: []
+  actions:
+  - type: turn_off
+    device_id: 3f7f65571d9bb0833433996f1f6725bd
+    entity_id: 7407afe14783543252c666d5ff7c5d5c
+    domain: light
+  - type: turn_off
+    device_id: f31e4f9bf8fa3687a07aeb4430eaef38
+    entity_id: b79934d97f3bb9d8a3da47c76d03ded4
+    domain: light
+  - type: turn_off
+    device_id: 03a12d2360d9954aed19c2449070725a
+    entity_id: 7c1e7db73799cc3f90948b5118596985
+    domain: light
+  - type: turn_off
+    device_id: 800eddbeeda071225f181a14cb9527e0
+    entity_id: 521a92ddd8be76c7eddfc544f81f6020
+    domain: light
+  - type: turn_off
+    device_id: 03eb359bf2344a58bebfe1e9c5bcfadd
+    entity_id: a30b2da3cd80a5b4c927e1608b91eb65
+    domain: light
   - type: turn_off
     device_id: 21eb2bd28aba2ee361a22af92e8b2d16
     entity_id: 81c486d682afcc94e98e377475cc92fc
