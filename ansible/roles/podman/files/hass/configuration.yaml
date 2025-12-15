@@ -18,3 +18,9 @@ homeassistant:
     media: /share
 
 automation: !include automations.yaml
+
+input_boolean:
+  tv_mode:
+    name: TV Mode
+    initial: off
+    icon: mdi:television
