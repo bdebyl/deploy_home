@@ -23,6 +23,26 @@
     mode: 0755
   notify: restorecon podman
 
+- name: copy zomboid steamcmd install script
+  become: true
+  ansible.builtin.template:
+    src: zomboid/install.scmd.j2
+    dest: "{{ zomboid_path }}/scripts/install.scmd"
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_user }}"
+    mode: 0644
+  notify: restorecon podman
+
+# Set volume permissions for steam user (UID 1000) inside container
+# This uses podman unshare to set ownership correctly for rootless podman
+- name: set zomboid volume permissions for steam user
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.shell: |
+    podman unshare chown -R 1000:1000 {{ zomboid_path }}/server
+    podman unshare chown -R 1000:1000 {{ zomboid_path }}/data
+  changed_when: false
+
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
 
@@ -40,19 +60,23 @@
     restart_policy: on-failure:3
     log_driver: journald
     env:
-      SERVER_NAME: zomboid
+      SERVER_NAME: "{{ zomboid_server_names[zomboid_server_mode] }}"
       MIN_RAM: 8g
       MAX_RAM: 24g
       AUTO_UPDATE: "true"
       ADMIN_PASSWORD: "{{ zomboid_admin_password }}"
       SERVER_PASSWORD: "{{ zomboid_password }}"
+      PUID: "1000"
+      PGID: "1000"
     volumes:
-      - "{{ zomboid_path }}/server:/home/steam/pzserver"
-      - "{{ zomboid_path }}/data:/home/steam/Zomboid"
+      - "{{ zomboid_path }}/server:/project-zomboid"
+      - "{{ zomboid_path }}/data:/project-zomboid-config"
       - "{{ zomboid_path }}/scripts/entrypoint.sh:/entrypoint.sh:ro"
+      - "{{ zomboid_path }}/scripts/install.scmd:/home/steam/install.scmd:ro"
     ports:
       - "16261:16261/udp"
       - "16262:16262/udp"
+      - "{{ zomboid_rcon_port }}:{{ zomboid_rcon_port }}/tcp"
     command: /bin/bash /entrypoint.sh
 
 - name: create systemd startup job for zomboid
@@ -70,17 +94,73 @@
     line: "Restart=always"
   notify: reload zomboid systemd
 
+# Check if server INI exists (generated on first server run)
+- name: check if zomboid server ini exists
+  become: true
+  ansible.builtin.stat:
+    path: "{{ zomboid_path }}/data/Server/{{ zomboid_server_names[zomboid_server_mode] }}.ini"
+  register: zomboid_ini_stat
+  tags: zomboid-conf
+
 # Backup settings (requires server to have run once to generate ini)
 - name: configure zomboid backup settings
   become: true
   ansible.builtin.lineinfile:
-    path: "{{ zomboid_path }}/data/Server/zomboid.ini"
+    path: "{{ zomboid_path }}/data/Server/{{ zomboid_server_names[zomboid_server_mode] }}.ini"
     regexp: "^{{ item.key }}="
     line: "{{ item.key }}={{ item.value }}"
   loop:
     - { key: "SaveWorldEveryMinutes", value: "10" }
     - { key: "BackupsPeriod", value: "30" }
     - { key: "BackupsCount", value: "10" }
+    # B42 Linux server fix: disable Lua checksum to allow mods to load
+    - { key: "DoLuaChecksum", value: "false" }
+    # Server password
+    - { key: "Password", value: "{{ zomboid_password }}" }
+  when: zomboid_ini_stat.stat.exists
+  tags: zomboid-conf
+
+# Discord integration (uses Gregbot token, posts /all chat to Discord)
+- name: configure zomboid discord integration
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ zomboid_path }}/data/Server/{{ zomboid_server_names[zomboid_server_mode] }}.ini"
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "DiscordEnable", value: "true" }
+    - { key: "DiscordToken", value: "{{ zomboid_discord_token }}" }
+    - { key: "DiscordChannel", value: "zomboid" }
+    - { key: "DiscordChannelID", value: "{{ zomboid_discord_channel_id }}" }
+  when: zomboid_ini_stat.stat.exists
+  tags: zomboid-conf
+
+# RCON configuration for remote administration
+- name: configure zomboid rcon
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ zomboid_path }}/data/Server/{{ zomboid_server_names[zomboid_server_mode] }}.ini"
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "RCONPort", value: "{{ zomboid_rcon_port }}" }
+    - { key: "RCONPassword", value: "{{ zomboid_admin_password }}" }
+  when: zomboid_ini_stat.stat.exists
+  tags: zomboid-conf
+
+# Mod configuration (only for modded server profile)
+- name: configure zomboid mods for modded server
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ zomboid_path }}/data/Server/{{ zomboid_server_names[zomboid_server_mode] }}.ini"
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "Mods", value: "{{ zomboid_mods.mod_ids }}" }
+    - { key: "WorkshopItems", value: "{{ zomboid_mods.workshop_items }}" }
+  when:
+    - zomboid_server_mode == 'modded'
+    - zomboid_ini_stat.stat.exists
   tags: zomboid-conf
 
 # World reset tasks REMOVED - too dangerous to have in automation

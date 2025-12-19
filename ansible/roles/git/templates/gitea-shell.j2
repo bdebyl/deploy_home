@@ -1,0 +1,27 @@
+#!/bin/sh
+# Gitea SSH shell - forwards commands to Gitea container
+# Managed by Ansible - do not edit directly
+#
+# When sshd runs a forced command from authorized_keys, it invokes:
+#   <user-shell> -c "<forced-command>"
+# The forced command is: /usr/local/bin/gitea --config=... serv key-<id>
+# SSH_ORIGINAL_COMMAND contains the client's requested command (e.g., git-upload-pack)
+
+# Use podman remote to connect via socket (avoids rootless pause process issues)
+export CONTAINER_HOST=unix:///run/user/1001/podman/podman.sock
+
+if [ "$1" = "-c" ] && [ -n "$2" ]; then
+    # sshd invoked us with -c "command" - execute the command
+    # The command is: /usr/local/bin/gitea --config=... serv key-<id>
+    exec $2
+elif [ -n "$SSH_ORIGINAL_COMMAND" ]; then
+    # Direct invocation with SSH_ORIGINAL_COMMAND (shouldn't happen normally)
+    echo "Interactive shell is disabled."
+    echo "Use: git clone git@{{ gitea_debyl_server_name }}:<owner>/<repo>.git"
+    exit 1
+else
+    # Interactive login attempt
+    echo "Interactive shell is disabled."
+    echo "Use: git clone git@{{ gitea_debyl_server_name }}:<owner>/<repo>.git"
+    exit 1
+fi

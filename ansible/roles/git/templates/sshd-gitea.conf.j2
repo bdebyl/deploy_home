@@ -1,0 +1,7 @@
+# Gitea SSH Key Authentication
+# Managed by Ansible - do not edit directly
+
+Match User {{ git_user }}
+    AuthorizedKeysFile none
+    AuthorizedKeysCommandUser {{ git_user }}
+    AuthorizedKeysCommand /usr/local/bin/gitea-authorized-keys %u %t %k

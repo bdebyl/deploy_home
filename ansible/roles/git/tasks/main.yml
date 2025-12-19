@@ -1,4 +1,10 @@
 ---
 - import_tasks: user.yml
-- import_tasks: systemd.yml
+- import_tasks: podman.yml
+- import_tasks: gitea-shell.yml
+- import_tasks: sshd.yml
 - import_tasks: selinux.yml
+- import_tasks: selinux-podman.yml
+- import_tasks: gitea.yml
+# git-daemon no longer needed - commented out
+# - import_tasks: systemd.yml

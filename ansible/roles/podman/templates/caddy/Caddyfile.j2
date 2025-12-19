@@ -243,6 +243,20 @@
 	}
 }
 
+# Gitea - {{ gitea_debyl_server_name }}
+{{ gitea_debyl_server_name }} {
+	import common_headers
+
+	reverse_proxy localhost:3100 {
+		flush_interval -1
+	}
+
+	log {
+		output file /var/log/caddy/gitea-debyl.log
+		format json
+	}
+}
+
 # Fulfillr - {{ fulfillr_server_name }} (Static + API with IP restrictions)
 {{ fulfillr_server_name }} {
 {{ ip_restricted_site() }}

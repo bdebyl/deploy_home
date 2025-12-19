@@ -106,3 +106,5 @@
   include_tasks: podman/systemd-generate.yml
   vars:
     container_name: awsddns-debyl
+
+# NOTE: git.debyl.io is an ALIAS record to home.debyl.io - no DDNS needed

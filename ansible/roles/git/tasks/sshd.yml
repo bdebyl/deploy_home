@@ -1,0 +1,19 @@
+---
+# Configure SSH AuthorizedKeysCommand for Gitea
+
+- name: create gitea-authorized-keys script
+  become: true
+  ansible.builtin.template:
+    src: gitea-authorized-keys.j2
+    dest: /usr/local/bin/gitea-authorized-keys
+    mode: 0755
+  tags: git, gitea
+
+- name: deploy sshd gitea configuration
+  become: true
+  ansible.builtin.template:
+    src: sshd-gitea.conf.j2
+    dest: /etc/ssh/sshd_config.d/50-gitea.conf
+    mode: 0644
+  notify: restart sshd
+  tags: git, gitea

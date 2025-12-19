@@ -1,0 +1,18 @@
+// SteamCMD script for Project Zomboid Server installation
+// Based on IndifferentBroccoli/projectzomboid-server-docker
+
+// Do not shutdown on a failed command
+@ShutdownOnFailedCommand 0
+
+// No password prompt as this is unattended
+@NoPromptForPassword 1
+
+// Set the game installation directory
+force_install_dir /project-zomboid
+
+login anonymous
+
+// Install/Update the Project Zomboid Dedicated Server - Unstable Branch (Build 42)
+app_update 380870 -beta unstable validate
+
+quit

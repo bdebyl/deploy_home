@@ -1,0 +1,90 @@
+---
+# Deploy Gitea containers using Podman pod
+
+# Create pod for Gitea services
+- name: create gitea-debyl pod
+  become: true
+  become_user: "{{ git_user }}"
+  containers.podman.podman_pod:
+    name: gitea-debyl-pod
+    state: started
+    ports:
+      - "3100:3000"
+  tags: gitea
+
+# PostgreSQL container in pod
+- name: create gitea-debyl-postgres container
+  become: true
+  become_user: "{{ git_user }}"
+  containers.podman.podman_container:
+    name: gitea-debyl-postgres
+    image: "{{ gitea_db_image }}"
+    pod: gitea-debyl-pod
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      POSTGRES_DB: gitea
+      POSTGRES_USER: gitea
+      POSTGRES_PASSWORD: "{{ gitea_debyl_db_pass }}"
+    volumes:
+      - "{{ git_home }}/volumes/gitea/psql:/var/lib/postgresql/data"
+  tags: gitea
+
+# Gitea container in pod
+- name: create gitea-debyl container
+  become: true
+  become_user: "{{ git_user }}"
+  containers.podman.podman_container:
+    name: gitea-debyl
+    image: "{{ gitea_image }}"
+    pod: gitea-debyl-pod
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: "127.0.0.1:5432"
+      GITEA__database__NAME: gitea
+      GITEA__database__USER: gitea
+      GITEA__database__PASSWD: "{{ gitea_debyl_db_pass }}"
+      GITEA__server__DOMAIN: "{{ gitea_debyl_server_name }}"
+      GITEA__server__ROOT_URL: "https://{{ gitea_debyl_server_name }}/"
+      GITEA__server__SSH_DOMAIN: "{{ gitea_debyl_server_name }}"
+      GITEA__server__START_SSH_SERVER: "false"
+      GITEA__server__DISABLE_SSH: "false"
+      GITEA__server__SSH_PORT: "22"
+      GITEA__security__SECRET_KEY: "{{ gitea_debyl_secret_key }}"
+      GITEA__security__INTERNAL_TOKEN: "{{ gitea_debyl_internal_token }}"
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__service__DISABLE_REGISTRATION: "true"
+      GITEA__service__REQUIRE_SIGNIN_VIEW: "false"
+    volumes:
+      - "{{ git_home }}/volumes/gitea/data:/data"
+      - /etc/localtime:/etc/localtime:ro
+  tags: gitea
+
+# Generate systemd service for the pod
+- name: create systemd job for gitea-debyl-pod
+  become: true
+  become_user: "{{ git_user }}"
+  ansible.builtin.shell: |
+    podman generate systemd --name gitea-debyl-pod --files --new
+    mv pod-gitea-debyl-pod.service {{ git_home }}/.config/systemd/user/
+    mv container-gitea-debyl-postgres.service {{ git_home }}/.config/systemd/user/
+    mv container-gitea-debyl.service {{ git_home }}/.config/systemd/user/
+  args:
+    chdir: "{{ git_home }}"
+  changed_when: false
+  tags: gitea
+
+- name: enable gitea-debyl-pod service
+  become: true
+  become_user: "{{ git_user }}"
+  ansible.builtin.systemd:
+    name: pod-gitea-debyl-pod.service
+    daemon_reload: true
+    enabled: true
+    state: started
+    scope: user
+  tags: gitea

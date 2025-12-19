@@ -1,0 +1,80 @@
+---
+# Rootless Podman setup for git user
+# Enables running Gitea containers under the git user
+
+# Enable lingering for systemd user services
+- name: check if git user lingering enabled
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/systemd/linger/{{ git_user }}"
+  register: git_user_lingering
+  tags: git, gitea
+
+- name: enable git user lingering
+  become: true
+  ansible.builtin.command: |
+    loginctl enable-linger {{ git_user }}
+  when: not git_user_lingering.stat.exists
+  tags: git, gitea
+
+# Set ulimits for container operations
+- name: set ulimits for git user
+  become: true
+  community.general.pam_limits:
+    domain: "{{ git_user }}"
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - { name: memlock, type: soft, value: "unlimited" }
+    - { name: memlock, type: hard, value: "unlimited" }
+    - { name: nofile, type: soft, value: 39693561 }
+    - { name: nofile, type: hard, value: 39693561 }
+  tags: git, gitea
+
+# Create container directories
+- name: create git podman directories
+  become: true
+  become_user: "{{ git_user }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - "{{ git_home }}/.config/systemd/user"
+    - "{{ git_home }}/volumes"
+    - "{{ git_home }}/volumes/gitea"
+    - "{{ git_home }}/volumes/gitea/data"
+    # NOTE: psql directory is created by PostgreSQL container with container user ownership
+  notify: restorecon git
+  tags: git, gitea
+
+# SELinux context for container volumes
+- name: selinux context for git container volumes
+  become: true
+  community.general.sefcontext:
+    target: "{{ git_home }}/volumes(/.*)?"
+    setype: container_file_t
+    state: present
+  notify: restorecon git
+  tags: git, gitea, selinux
+
+# Enable podman socket for SSH key lookup via AuthorizedKeysCommand
+- name: enable podman socket for git user
+  become: true
+  become_user: "{{ git_user }}"
+  ansible.builtin.systemd:
+    name: podman.socket
+    enabled: true
+    state: started
+    scope: user
+  tags: git, gitea
+
+# Fetch subuid for volume permissions
+- name: fetch subuid of {{ git_user }}
+  become: true
+  changed_when: false
+  ansible.builtin.shell: |
+    set -o pipefail && cat /etc/subuid | awk -F':' '/{{ git_user }}/{ print $2 }' | head -n 1
+  register: git_subuid
+  tags: always

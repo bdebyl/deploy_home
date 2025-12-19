@@ -1,0 +1,21 @@
+---
+# SELinux policy for SSH + Podman integration
+
+- name: copy gitea SELinux policy module
+  become: true
+  ansible.builtin.copy:
+    src: gitea-ssh-podman.te
+    dest: /tmp/gitea-ssh-podman.te
+    mode: 0644
+  register: selinux_policy
+  tags: git, gitea, selinux
+
+- name: compile and install gitea SELinux policy
+  become: true
+  ansible.builtin.shell: |
+    cd /tmp
+    checkmodule -M -m -o gitea-ssh-podman.mod gitea-ssh-podman.te
+    semodule_package -o gitea-ssh-podman.pp -m gitea-ssh-podman.mod
+    semodule -i gitea-ssh-podman.pp
+  when: selinux_policy.changed
+  tags: git, gitea, selinux

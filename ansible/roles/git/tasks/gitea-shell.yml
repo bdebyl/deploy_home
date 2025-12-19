@@ -1,0 +1,28 @@
+---
+# Deploy gitea shim and shell for SSH passthrough
+
+# The shim is called by SSH when authorized_keys command runs
+# It forwards gitea commands to the container
+- name: create gitea shim script
+  become: true
+  ansible.builtin.template:
+    src: gitea-shim.j2
+    dest: /usr/local/bin/gitea
+    mode: 0755
+  tags: git, gitea
+
+# The shell is used if someone tries to SSH interactively
+- name: create gitea-shell script
+  become: true
+  ansible.builtin.template:
+    src: gitea-shell.j2
+    dest: /usr/local/bin/gitea-shell
+    mode: 0755
+  tags: git, gitea
+
+- name: update git user shell to gitea-shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ git_user }}"
+    shell: /usr/local/bin/gitea-shell
+  tags: git, gitea

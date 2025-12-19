@@ -1,0 +1,13 @@
+module gitea-ssh-podman 1.0;
+
+require {
+    type sshd_t;
+    type container_runtime_exec_t;
+    type user_home_t;
+    class file { execute execute_no_trans open read };
+    class dir { search };
+}
+
+# Allow sshd to execute podman for AuthorizedKeysCommand
+allow sshd_t container_runtime_exec_t:file { execute execute_no_trans open read };
+allow sshd_t user_home_t:dir search;

@@ -1,4 +1,13 @@
 ---
+- name: enable post-quantum key exchange for sshd
+  become: true
+  ansible.builtin.template:
+    src: sshd-pq-kex.conf.j2
+    dest: /etc/ssh/sshd_config.d/30-pq-kex.conf
+    mode: 0600
+  notify: restart_sshd
+  tags: security, sshd
+
 - name: ensure sshd disallows passwords
   become: true
   ansible.builtin.lineinfile:

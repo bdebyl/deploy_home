@@ -1,0 +1,12 @@
+#!/bin/sh
+# Query Gitea for SSH authorized keys
+# Managed by Ansible - do not edit directly
+# Arguments: %u (username) %t (key type) %k (key blob)
+
+# Use podman remote to connect via socket (avoids rootless pause process issues)
+export CONTAINER_HOST=unix:///run/user/1001/podman/podman.sock
+
+/usr/bin/podman --remote exec -i --user 1000 gitea-debyl \
+    /usr/local/bin/gitea keys \
+    -c /data/gitea/conf/app.ini \
+    -e git -u "$1" -t "$2" -k "$3" 2>/dev/null

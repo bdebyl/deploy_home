@@ -1,0 +1,15 @@
+#!/bin/sh
+# Gitea shim - forwards gitea commands to the container
+# Managed by Ansible - do not edit directly
+#
+# This script is called when sshd executes the forced command from authorized_keys:
+#   /usr/local/bin/gitea --config=/data/gitea/conf/app.ini serv key-<id>
+#
+# SSH_ORIGINAL_COMMAND contains the client's git command (e.g., git-upload-pack <repo>)
+
+# Use podman remote to connect via socket (avoids rootless pause process issues)
+export CONTAINER_HOST=unix:///run/user/1001/podman/podman.sock
+
+exec /usr/bin/podman --remote exec -i --user 1000 \
+    --env SSH_ORIGINAL_COMMAND="$SSH_ORIGINAL_COMMAND" \
+    gitea-debyl /usr/local/bin/gitea "$@"

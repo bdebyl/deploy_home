@@ -1,3 +1,8 @@
 ---
 git_user: git
 git_home: "/srv/{{ git_user }}"
+
+# Gitea configuration
+gitea_debyl_server_name: git.debyl.io
+gitea_image: docker.gitea.com/gitea:1.25.2
+gitea_db_image: docker.io/library/postgres:14-alpine
