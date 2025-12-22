@@ -130,8 +130,8 @@
   loop:
     - { key: "DiscordEnable", value: "true" }
     - { key: "DiscordToken", value: "{{ zomboid_discord_token }}" }
-    - { key: "DiscordChannel", value: "zomboid" }
-    - { key: "DiscordChannelID", value: "{{ zomboid_discord_channel_id }}" }
+    - { key: "DiscordChannel", value: "zomboidbot" }
+    - { key: "DiscordChannelID", value: "1451961291194241095" }
   when: zomboid_ini_stat.stat.exists
   tags: zomboid-conf
 

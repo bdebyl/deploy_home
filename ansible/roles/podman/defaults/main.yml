@@ -20,9 +20,6 @@ zomboid_path: "{{ podman_volumes }}/zomboid"
 # Zomboid server mode: 'vanilla' or 'modded'
 zomboid_server_mode: modded
 
-# Zomboid Discord integration (channel for /all chat relay)
-zomboid_discord_channel_id: "1306000323642654751"
-
 # Zomboid RCON port for remote administration
 zomboid_rcon_port: "27015"
 
