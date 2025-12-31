@@ -1,0 +1,215 @@
+---
+# Graylog Logging Stack
+# Deploys MongoDB, OpenSearch, Graylog, and GELF decryption proxy
+
+# System prerequisite: OpenSearch requires increased virtual memory
+- name: set vm.max_map_count for OpenSearch
+  become: true
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    sysctl_set: true
+  tags: graylog
+
+# Create directory structure
+- name: create graylog host directory volumes
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ podman_subuid.stdout }}"
+    group: "{{ podman_subuid.stdout }}"
+    mode: '0755'
+  notify: restorecon podman
+  loop:
+    - "{{ graylog_path }}/mongo"
+    - "{{ graylog_path }}/opensearch"
+    - "{{ graylog_path }}/graylog/data"
+    - "{{ graylog_path }}/graylog/data/config"
+  tags: graylog
+
+# OpenSearch runs as UID 1000 inside the container
+- name: unshare chown the opensearch data volume
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 1000:1000 {{ graylog_path }}/opensearch
+  tags: graylog
+
+# Graylog runs as UID 1100 inside the container
+- name: unshare chown the graylog data volume
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown -R 1100:1100 {{ graylog_path }}/graylog
+  tags: graylog
+
+# Graylog requires minimal config file
+- name: create graylog.conf
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ graylog_path }}/graylog/data/config/graylog.conf"
+    content: |
+      is_leader = true
+      data_dir = /usr/share/graylog/data
+      node_id_file = /usr/share/graylog/data/node-id
+    mode: '0644'
+  tags: graylog
+
+- name: fix graylog.conf ownership
+  become: true
+  become_user: "{{ podman_user }}"
+  changed_when: false
+  ansible.builtin.command: |
+    podman unshare chown 1100:1100 {{ graylog_path }}/graylog/data/config/graylog.conf
+  tags: graylog
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers
+  tags: graylog
+
+# MongoDB container
+- name: pull graylog-mongo image
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_image:
+    name: docker.io/mongo:6
+    state: present
+  tags: graylog
+
+- name: create graylog-mongo container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog-mongo
+    image: docker.io/mongo:6
+    state: started
+    recreate: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    volumes:
+      - "{{ graylog_path }}/mongo:/data/db:Z"
+    ports:
+      - "127.0.0.1:27017:27017/tcp"
+  tags: graylog
+
+- name: create systemd startup job for graylog-mongo
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: graylog-mongo
+  tags: graylog
+
+# OpenSearch container
+- name: pull graylog-opensearch image
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_image:
+    name: docker.io/opensearchproject/opensearch:2
+    state: present
+  tags: graylog
+
+- name: create graylog-opensearch container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog-opensearch
+    image: docker.io/opensearchproject/opensearch:2
+    state: started
+    recreate: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    env:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - "{{ graylog_path }}/opensearch:/usr/share/opensearch/data:z"
+    ports:
+      - "127.0.0.1:9200:9200/tcp"
+  tags: graylog
+
+- name: create systemd startup job for graylog-opensearch
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: graylog-opensearch
+  tags: graylog
+
+# Graylog container
+- name: pull graylog image
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_image:
+    name: docker.io/graylog/graylog:6.0
+    state: present
+  tags: graylog
+
+# Graylog uses host network to reach MongoDB/OpenSearch on 127.0.0.1
+# Binds to: 9000 (web UI), 12202 (GELF UDP from gelf-proxy)
+- name: create graylog container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: graylog
+    image: docker.io/graylog/graylog:6.0
+    state: started
+    recreate: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    network: host
+    env:
+      GRAYLOG_PASSWORD_SECRET: "{{ graylog_password_secret }}"
+      GRAYLOG_ROOT_PASSWORD_SHA2: "{{ graylog_root_password_sha2 }}"
+      GRAYLOG_HTTP_EXTERNAL_URI: "https://{{ logs_server_name }}/"
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9000"
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://127.0.0.1:9200"
+      GRAYLOG_MONGODB_URI: "mongodb://127.0.0.1:27017/graylog"
+    volumes:
+      - "{{ graylog_path }}/graylog/data:/usr/share/graylog/data:z"
+    requires:
+      - graylog-mongo
+      - graylog-opensearch
+  tags: graylog
+
+- name: create systemd startup job for graylog
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: graylog
+  tags: graylog
+
+# GELF Decryption Proxy (container)
+- import_tasks: gitea/podman-gitea-login.yml
+  tags: graylog
+
+- name: pull gelf-proxy image
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_image:
+    name: "{{ gelf_proxy_image }}"
+    state: present
+  tags: graylog
+
+- name: create gelf-proxy container
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: gelf-proxy
+    image: "{{ gelf_proxy_image }}"
+    state: started
+    recreate: true
+    restart_policy: on-failure:3
+    log_driver: journald
+    network: host
+    env:
+      GELF_KEY: "{{ gelf_encryption_key }}"
+      GELF_LISTEN: ":12201"
+      GELF_FORWARD: "127.0.0.1:12202"
+  tags: graylog
+
+- name: create systemd startup job for gelf-proxy
+  include_tasks: podman/systemd-generate.yml
+  vars:
+    container_name: gelf-proxy
+  tags: graylog

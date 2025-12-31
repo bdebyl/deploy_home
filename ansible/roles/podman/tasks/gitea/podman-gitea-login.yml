@@ -1,0 +1,8 @@
+---
+- name: podman login to Gitea Container Registry
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_login:
+    registry: "git.debyl.io"
+    username: "{{ gitea_registry_username }}"
+    password: "{{ gitea_registry_token }}"

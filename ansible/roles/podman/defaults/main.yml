@@ -104,3 +104,9 @@ caddy_security_headers:
   X-Content-Type-Options: "nosniff"
   Referrer-Policy: "same-origin"
   X-Frame-Options: "SAMEORIGIN"
+
+# Graylog logging stack
+graylog_path: "{{ podman_volumes }}/graylog"
+logs_server_name: logs.debyl.io
+# Update tag to specific SHA after CI builds (e.g., :abc1234)
+gelf_proxy_image: git.debyl.io/debyltech/gelf-proxy:main
