@@ -1,0 +1,30 @@
+log:
+  level: info
+
+runner:
+  file: .runner
+  capacity: 1
+  timeout: 3h
+  insecure: false
+  fetch_timeout: 5s
+  fetch_interval: 2s
+  labels:
+    - ubuntu-latest:host
+    - ubuntu-22.04:host
+    - fedora:host
+
+cache:
+  enabled: true
+  dir: {{ act_runner_work_dir }}/cache
+
+container:
+  network: host
+  privileged: false
+  options:
+  workdir_parent:
+  valid_volumes: []
+  docker_host: ""
+  force_pull: false
+
+host:
+  workdir_parent: {{ act_runner_work_dir }}/workdir

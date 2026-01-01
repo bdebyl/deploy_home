@@ -1,0 +1,45 @@
+---
+- name: download act_runner binary
+  become: true
+  ansible.builtin.get_url:
+    url: "https://dl.gitea.com/act_runner/{{ gitea_runner_version }}/act_runner-{{ gitea_runner_version }}-{{ gitea_runner_arch }}"
+    dest: "{{ act_runner_bin }}"
+    mode: "0755"
+  tags: gitea-actions
+
+- name: create act_runner config directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ act_runner_config_dir }}"
+    state: directory
+    mode: "0755"
+  tags: gitea-actions
+
+- name: create act_runner working directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ act_runner_work_dir }}"
+    state: directory
+    owner: "{{ gitea_runner_user }}"
+    group: "{{ gitea_runner_user }}"
+    mode: "0755"
+  tags: gitea-actions
+
+- name: create act_runner cache directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ act_runner_work_dir }}/cache"
+    state: directory
+    owner: "{{ gitea_runner_user }}"
+    group: "{{ gitea_runner_user }}"
+    mode: "0755"
+  tags: gitea-actions
+
+- name: deploy act_runner configuration
+  become: true
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ act_runner_config_dir }}/config.yaml"
+    mode: "0644"
+  notify: restart act_runner
+  tags: gitea-actions

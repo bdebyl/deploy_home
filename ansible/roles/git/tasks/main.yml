@@ -8,3 +8,8 @@
 - import_tasks: gitea.yml
 # git-daemon no longer needed - commented out
 # - import_tasks: systemd.yml
+
+# Gitea Actions runner
+- include_role:
+    name: gitea-actions
+  tags: gitea-actions

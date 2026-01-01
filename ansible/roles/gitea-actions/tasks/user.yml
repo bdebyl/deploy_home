@@ -1,0 +1,34 @@
+---
+- name: create gitea-runner user
+  become: true
+  ansible.builtin.user:
+    name: "{{ gitea_runner_user }}"
+    comment: Gitea Actions runner
+    shell: /bin/bash
+    createhome: true
+    home: "{{ gitea_runner_home }}"
+    groups: docker
+    append: true
+  tags: gitea-actions
+
+- name: check if gitea-runner lingering enabled
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/systemd/linger/{{ gitea_runner_user }}"
+  register: gitea_runner_lingering
+  tags: gitea-actions
+
+- name: enable gitea-runner lingering
+  become: true
+  ansible.builtin.command: loginctl enable-linger {{ gitea_runner_user }}
+  when: not gitea_runner_lingering.stat.exists
+  tags: gitea-actions
+
+- name: create .config/systemd/user directory
+  become: true
+  become_user: "{{ gitea_runner_user }}"
+  ansible.builtin.file:
+    path: "{{ gitea_runner_home }}/.config/systemd/user"
+    state: directory
+    mode: "0755"
+  tags: gitea-actions

@@ -1,0 +1,17 @@
+[Unit]
+Description=Gitea Actions runner
+Documentation=https://gitea.com/gitea/act_runner
+After=network.target
+
+[Service]
+ExecStart={{ act_runner_bin }} daemon --config {{ act_runner_config_dir }}/config.yaml
+WorkingDirectory={{ act_runner_work_dir }}
+TimeoutSec=0
+RestartSec=10
+Restart=always
+User={{ gitea_runner_user }}
+Environment="XDG_RUNTIME_DIR=/run/user/%(uid)"
+Environment="DOCKER_HOST=unix:///run/user/%(uid)/podman/podman.sock"
+
+[Install]
+WantedBy=multi-user.target

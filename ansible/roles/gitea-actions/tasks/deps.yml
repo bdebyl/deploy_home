@@ -1,0 +1,19 @@
+---
+- name: install podman-docker for docker CLI compatibility
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - podman-docker
+      - golang
+    state: present
+  tags: gitea-actions
+
+- name: enable podman socket for gitea-runner
+  become: true
+  become_user: "{{ gitea_runner_user }}"
+  ansible.builtin.systemd:
+    name: podman.socket
+    enabled: true
+    state: started
+    scope: user
+  tags: gitea-actions

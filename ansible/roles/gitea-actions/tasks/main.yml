@@ -1,0 +1,9 @@
+---
+- import_tasks: user.yml
+  tags: gitea-actions
+- import_tasks: deps.yml
+  tags: gitea-actions
+- import_tasks: runner.yml
+  tags: gitea-actions
+- import_tasks: systemd.yml
+  tags: gitea-actions

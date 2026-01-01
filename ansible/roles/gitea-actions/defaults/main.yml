@@ -1,0 +1,11 @@
+---
+gitea_runner_user: gitea-runner
+gitea_runner_home: /home/gitea-runner
+gitea_runner_version: "0.2.13"
+gitea_runner_arch: linux-amd64
+gitea_instance_url: https://git.debyl.io
+
+# Paths
+act_runner_bin: /usr/local/bin/act_runner
+act_runner_config_dir: /etc/act_runner
+act_runner_work_dir: /var/lib/act_runner

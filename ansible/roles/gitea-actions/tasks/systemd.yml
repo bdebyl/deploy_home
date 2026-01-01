@@ -1,0 +1,17 @@
+---
+- name: deploy act_runner systemd service
+  become: true
+  ansible.builtin.template:
+    src: act_runner.service.j2
+    dest: /etc/systemd/system/act_runner.service
+    mode: "0644"
+  notify: restart act_runner
+  tags: gitea-actions
+
+- name: enable act_runner service
+  become: true
+  ansible.builtin.systemd:
+    name: act_runner
+    daemon_reload: true
+    enabled: true
+  tags: gitea-actions
