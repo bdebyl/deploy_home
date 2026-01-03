@@ -1,6 +1,6 @@
 ---
 # Graylog Logging Stack
-# Deploys MongoDB, OpenSearch, Graylog, and GELF decryption proxy
+# Deploys MongoDB, OpenSearch, and Graylog
 
 # System prerequisite: OpenSearch requires increased virtual memory
 - name: set vm.max_map_count for OpenSearch
@@ -72,12 +72,10 @@
   tags: graylog
 
 # MongoDB container
-- name: pull graylog-mongo image
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_image:
-    name: docker.io/mongo:6
-    state: present
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: graylog-mongo
+    container_image: docker.io/mongo:6
   tags: graylog
 
 - name: create graylog-mongo container
@@ -87,7 +85,6 @@
     name: graylog-mongo
     image: docker.io/mongo:6
     state: started
-    recreate: true
     restart_policy: on-failure:3
     log_driver: journald
     volumes:
@@ -103,12 +100,10 @@
   tags: graylog
 
 # OpenSearch container
-- name: pull graylog-opensearch image
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_image:
-    name: docker.io/opensearchproject/opensearch:2
-    state: present
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: graylog-opensearch
+    container_image: docker.io/opensearchproject/opensearch:2
   tags: graylog
 
 - name: create graylog-opensearch container
@@ -118,7 +113,6 @@
     name: graylog-opensearch
     image: docker.io/opensearchproject/opensearch:2
     state: started
-    recreate: true
     restart_policy: on-failure:3
     log_driver: journald
     env:
@@ -138,16 +132,14 @@
   tags: graylog
 
 # Graylog container
-- name: pull graylog image
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_image:
-    name: docker.io/graylog/graylog:6.0
-    state: present
+- import_tasks: podman/podman-check.yml
+  vars:
+    container_name: graylog
+    container_image: docker.io/graylog/graylog:6.0
   tags: graylog
 
 # Graylog uses host network to reach MongoDB/OpenSearch on 127.0.0.1
-# Binds to: 9000 (web UI), 12202 (GELF UDP from gelf-proxy)
+# Binds to: 9000 (web UI), 12202 (GELF HTTP input proxied via Caddy)
 - name: create graylog container
   become: true
   become_user: "{{ podman_user }}"
@@ -155,7 +147,6 @@
     name: graylog
     image: docker.io/graylog/graylog:6.0
     state: started
-    recreate: true
     restart_policy: on-failure:3
     log_driver: journald
     network: host
@@ -177,39 +168,4 @@
   include_tasks: podman/systemd-generate.yml
   vars:
     container_name: graylog
-  tags: graylog
-
-# GELF Decryption Proxy (container)
-- import_tasks: gitea/podman-gitea-login.yml
-  tags: graylog
-
-- name: pull gelf-proxy image
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_image:
-    name: "{{ gelf_proxy_image }}"
-    state: present
-  tags: graylog
-
-- name: create gelf-proxy container
-  become: true
-  become_user: "{{ podman_user }}"
-  containers.podman.podman_container:
-    name: gelf-proxy
-    image: "{{ gelf_proxy_image }}"
-    state: started
-    recreate: true
-    restart_policy: on-failure:3
-    log_driver: journald
-    network: host
-    env:
-      GELF_KEY: "{{ gelf_encryption_key }}"
-      GELF_LISTEN: ":12201"
-      GELF_FORWARD: "127.0.0.1:12202"
-  tags: graylog
-
-- name: create systemd startup job for gelf-proxy
-  include_tasks: podman/systemd-generate.yml
-  vars:
-    container_name: gelf-proxy
   tags: graylog

@@ -177,6 +177,49 @@
 	}
 }
 
+# Graylog Logs - {{ logs_server_name }}
+{{ logs_server_name }} {
+	# GELF HTTP endpoint - open for Lambda (auth via header)
+	# Must come BEFORE ip_restricted_site to allow external access
+	@gelf_authorized {
+		path /gelf
+		header X-Gelf-Token "{{ gelf_auth_token }}"
+	}
+
+	handle @gelf_authorized {
+		reverse_proxy localhost:12202
+	}
+
+	# Reject unauthorized GELF requests
+	handle /gelf {
+		respond "Unauthorized" 401
+	}
+
+	# IP restriction for Graylog web UI (excludes /gelf which is handled above)
+	@local {
+		remote_ip {{ caddy_local_networks | join(' ') }}
+	}
+
+	@denied {
+		not remote_ip {{ caddy_local_networks | join(' ') }}
+		not path /gelf
+	}
+
+	handle @denied {
+		redir https://debyl.io{uri} 302
+	}
+
+	handle @local {
+		import common_headers
+		reverse_proxy localhost:9000
+	}
+
+	log {
+		output file /var/log/caddy/graylog.log
+		format json
+	}
+}
+
 # ============================================================================
 # COMPLEX CONFIGURATIONS
 # ============================================================================

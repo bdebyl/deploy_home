@@ -8,12 +8,31 @@
     state: present
   tags: gitea-actions
 
-- name: enable podman socket for gitea-runner
+- name: create podman socket override directory
   become: true
-  become_user: "{{ gitea_runner_user }}"
+  ansible.builtin.file:
+    path: /etc/systemd/system/podman.socket.d
+    state: directory
+    mode: "0755"
+  tags: gitea-actions
+
+- name: configure podman socket for gitea-runner access
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/podman.socket.d/override.conf
+    content: |
+      [Socket]
+      SocketMode=0660
+      SocketGroup={{ gitea_runner_user }}
+    mode: "0644"
+  notify: restart podman socket
+  tags: gitea-actions
+
+- name: enable system podman socket
+  become: true
   ansible.builtin.systemd:
     name: podman.socket
+    daemon_reload: true
     enabled: true
     state: started
-    scope: user
   tags: gitea-actions

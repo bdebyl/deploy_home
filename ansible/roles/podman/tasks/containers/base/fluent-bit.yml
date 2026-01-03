@@ -1,0 +1,45 @@
+---
+# Fluent Bit - Log forwarder from journald to Graylog GELF
+# Deployed as systemd service (not container) for direct journal access
+
+# Clean up old container deployment if it exists
+- name: stop and remove fluent-bit container if exists
+  become: true
+  become_user: "{{ podman_user }}"
+  containers.podman.podman_container:
+    name: fluent-bit
+    state: absent
+  ignore_errors: true
+
+- name: disable old fluent-bit container systemd service
+  become: true
+  become_user: "{{ podman_user }}"
+  ansible.builtin.systemd:
+    name: fluent-bit
+    enabled: false
+    state: stopped
+    scope: user
+  ignore_errors: true
+
+- name: install fluent-bit package
+  become: true
+  ansible.builtin.dnf:
+    name: fluent-bit
+    state: present
+
+- name: deploy fluent-bit configuration
+  become: true
+  ansible.builtin.template:
+    src: fluent-bit/fluent-bit.conf.j2
+    dest: /etc/fluent-bit/fluent-bit.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart fluent-bit
+
+- name: enable and start fluent-bit service
+  become: true
+  ansible.builtin.systemd:
+    name: fluent-bit
+    enabled: true
+    state: started

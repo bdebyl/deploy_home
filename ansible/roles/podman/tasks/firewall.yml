@@ -69,5 +69,7 @@
     - 1080/tcp
     - 1443/tcp
     - 7000/tcp
+    # gelf-proxy (removed - now using GELF HTTP via Caddy)
+    - 12201/udp
   notify: restart firewalld
   tags: firewall

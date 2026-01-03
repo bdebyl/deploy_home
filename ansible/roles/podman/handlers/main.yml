@@ -42,3 +42,11 @@
     scope: user
   tags:
     - zomboid
+
+- name: restart fluent-bit
+  become: true
+  ansible.builtin.systemd:
+    name: fluent-bit
+    state: restarted
+  tags:
+    - fluent-bit

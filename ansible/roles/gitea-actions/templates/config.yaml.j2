@@ -2,7 +2,7 @@ log:
   level: info
 
 runner:
-  file: .runner
+  file: {{ act_runner_work_dir }}/.runner
   capacity: 1
   timeout: 3h
   insecure: false
