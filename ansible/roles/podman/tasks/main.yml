@@ -73,7 +73,7 @@
 
 - import_tasks: containers/debyltech/fulfillr.yml
   vars:
-    image: "{{ aws_ecr_endpoint }}/fulfillr:20251105.0436"
+    image: "git.debyl.io/debyltech/fulfillr:20260104.0001"
   tags: debyltech, fulfillr
 
 - import_tasks: containers/debyltech/uptime-kuma.yml

@@ -1,5 +1,5 @@
 ---
-- import_tasks: ecr/podman-ecr-login.yml
+- import_tasks: gitea/podman-gitea-login.yml
 
 - name: create nginx fulfillr-site directory
   become: true
